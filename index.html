@@ -13,11 +13,26 @@
   margin: 0;
 }
 
-h2 {
+h3 {
   text-align: center;
-  font-size: clamp(0.9rem, 2.5vw, 1.5rem);
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
   margin-bottom: 1rem;
 }
+
+    .brand-watermark {
+  font-size: 0.4em;
+  font-family: sans-serif;
+  color: #999;
+  position: absolute;     /* ⬅️ Supaya tidak mendorong kotak */
+  bottom: 0.5em;           /* ⬅️ Turunkan ke bawah */
+  left: 50%;              
+  transform: translateX(-50%); /* ⬅️ Tengahkan secara horizontal */
+  text-align: center;
+  font-style: italic;
+  direction: ltr;
+  user-select: none;
+}
+
 
     .translation[contenteditable="true"] {
   cursor: text;
@@ -52,47 +67,43 @@ button:hover {
   background-color: #007acc;
 }
 
-/* ✅ Pembungkus utama — ganti dari #pages jadi posterContainer */
-#posterContainer {
-  position: relative;
+#pages {
   width: 100%;
   max-width: 540px;
+  aspect-ratio: 1 / 1;
   margin: 2em auto;
-  overflow: hidden;
-}
-
-/* ✅ Area latar belakang gambar */
-#bgImage {
-  position: absolute;
-  inset: 0;
+  position: relative;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  z-index: 0;
-  filter: contrast(1);
-  transition: filter 0.3s ease;
-}
-
-/* ✅ Area konten Quran dan terjemah */
-#pages {
-  position: relative;
-  width: 100%;
-  padding: 1em;
-  box-sizing: border-box;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  z-index: 1;
+  flex-direction: column;
 }
 
-/* ✅ Setiap kontainer ayat */
-.page-container {
-  position: relative;
-  z-index: 1;
-  margin-bottom: 1em;
+.surah-info {
+  font-size: 0.4em;
+  font-family: sans-serif;
+  color: #999;
+  margin-top: 0.5em;
   text-align: center;
+  direction: ltr;
 }
 
+.brand-watermark {
+  font-size: 0.4em;
+  font-family: sans-serif;
+  color: #999;
+  position: absolute;     /* ⬅️ Supaya tidak mendorong kotak */
+  bottom: 0.5em;           /* ⬅️ Turunkan ke bawah */
+  left: 50%;              
+  transform: translateX(-50%); /* ⬅️ Tengahkan secara horizontal */
+  text-align: center;
+  font-style: italic;
+  direction: ltr;
+  user-select: none;
+}
 
 .controls {
   direction: ltr;
@@ -162,29 +173,6 @@ button:hover {
   margin-top: 0.5em;
   padding: 0 0.5em;
 }
-    .surah-info {
-  font-size: 0.4em;
-  font-family: sans-serif;
-  color: #ffffff;
-  margin-top: 0.5em;
-  text-align: center;
-  direction: ltr;
-}
-
-.brand-watermark {
-  font-size: 0.4em;
-  font-family: sans-serif;
-  color: #999;
-  position: absolute;     /* ⬅️ Supaya tidak mendorong kotak */
-  bottom: 0.5em;           /* ⬅️ Turunkan ke bawah */
-  left: 50%;              
-  transform: translateX(-50%); /* ⬅️ Tengahkan secara horizontal */
-  text-align: center;
-  font-style: italic;
-  direction: ltr;
-  user-select: none;
-}
-    
 
     .button-wrapper {
   display: flex;
@@ -196,12 +184,11 @@ button:hover {
     grid-template-columns: repeat(2, 1fr);
   }
 }
-    
   </style>
 </head>
 <body>
 
-<h2>Poster Quran (Klik Teks Terjemah Untuk Mengedit)</h2>
+<h3>Poster Quran (Klik Teks Terjemah Untuk Mengedit)</h3>
   
 <div class="controls">
   <!-- Baris 1: Surah & Ayat -->
@@ -219,76 +206,11 @@ button:hover {
   <!-- Baris 3: Terjemahan & Tombol Link & Quran V1/V2 -->
   <label>
   <select id="wordTranslationId">
-  <!-- Per-Kata (Quran.com) -->
-    <option value="33">Perkata Indonesian Affairs</option>
-    <option value="20">Perkata English Saheeh</option>
-
-    <!-- Per-Ayat (QuranEnc.com) -->
-    <option value="ayah_afar_hamza">Afar Hamza</option>
-    <option value="ayah_albanian_nahi">Albanian Nahi</option>
-    <option value="ayah_amharic_zain">Amharic Zain</option>
-    <option value="ayah_ankobambara_dayyan">Ankobambara Dayyan</option>
-    <option value="ayah_asante_harun">Asante Harun</option>
-    <option value="ayah_assamese_rafeeq">Assamese Rafeeq</option>
-    <option value="ayah_azeri_musayev">Azeri Musayev</option>
-    <option value="ayah_bisayan_rwwad">Bisayan Rwwad</option>
-    <option value="ayah_bosnian_mihanovich">Bosnian Mihanovich</option>
-    <option value="ayah_bosnian_rwwad">Bosnian Rwwad</option>
-    <option value="ayah_chinese_makin">Chinese Makin</option>
-    <option value="ayah_chinese_suliman">Chinese Suliman</option>
-    <option value="ayah_croatian_rwwad">Croatian Rwwad</option>
-    <option value="ayah_dutch_center">Dutch Center</option>
-    <option value="ayah_english_hilali_khan">English Hilali–Khan</option>
-    <option value="ayah_english_rwwad">English Rwwad</option>
-    <option value="ayah_english_saheeh">English Saheeh</option>
-    <option value="ayah_french_montada">French Montada</option>
-    <option value="ayah_french_rashid">French Rashid</option>
-    <option value="ayah_german_bubenheim">German Bubenheim</option>
-    <option value="ayah_gujarati_omari">Gujarati Omari</option>
-    <option value="ayah_hausa_gummi">Hausa Gummi</option>
-    <option value="ayah_hindi_omari">Hindi Omari</option>
-    <option value="ayah_ikirundi_gehiti">Kirundi Gehiti</option>
-    <option value="ayah_indonesian_affairs">Indonesian Affairs</option>
-    <option value="ayah_indonesian_complex">Indonesian Complex</option>
-    <option value="ayah_indonesian_sabiq">Indonesian Sabiq</option>
-    <option value="ayah_japanese_saeedsato">Japanese Saeed Sato</option>
-    <option value="ayah_kannada_hamza">Kannada Hamza</option>
-    <option value="ayah_kinyarwanda_assoc">Kinyarwanda Assoc</option>
-    <option value="ayah_khmer_rwwad">Khmer Rwwad</option>
-    <option value="ayah_kurdish_bamoki">Kurdish Bamoki</option>
-    <option value="ayah_kyrgyz_hakimov">Kyrgyz Hakimov</option>
-    <option value="ayah_lingala_zakaria">Lingala Zakaria</option>
-    <option value="ayah_lithuanian_rwwad">Lithuanian Rwwad</option>
-    <option value="ayah_macedonian_group">Macedonian Group</option>
-    <option value="ayah_malayalam_kunhi">Malayalam Kunhi</option>
-    <option value="ayah_moore_rwwad">Moore Rwwad</option>
-    <option value="ayah_oromo_ababor">Oromo Ababor</option>
-    <option value="ayah_pashto_rwwad">Pashto Rwwad</option>
-    <option value="ayah_persian_ih">Persian IH</option>
-    <option value="ayah_portuguese_nasr">Portuguese Nasr</option>
-    <option value="ayah_punjabi_arif">Punjabi Arif</option>
-    <option value="ayah_romanian_project">Romanian Project</option>
-    <option value="ayah_serbian_rwwad">Serbian Rwwad</option>
-    <option value="ayah_sinhalese_mahir">Sinhalese Mahir</option>
-    <option value="ayah_somali_yacob">Somali Yacob</option>
-    <option value="ayah_spanish_garcia">Spanish Garcia</option>
-    <option value="ayah_spanish_montada_eu">Spanish Montada EU</option>
-    <option value="ayah_spanish_montada_latin">Spanish Montada Latin</option>
-    <option value="ayah_swahili_barawani">Swahili Barawani</option>
-    <option value="ayah_tagalog_rwwad">Tagalog Rwwad</option>
-    <option value="ayah_tajik_arifi">Tajik Arifi</option>
-    <option value="ayah_tamil_baqavi">Tamil Baqavi</option>
-    <option value="ayah_tamil_omar">Tamil Omar</option>
-    <option value="ayah_telugu_muhammad">Telugu Muhammad</option>
-    <option value="ayah_turkish_rwwad">Turkish Rwwad</option>
-    <option value="ayah_turkish_shaban">Turkish Shaban</option>
-    <option value="ayah_turkish_shahin">Turkish Shahin</option>
-    <option value="ayah_urdu_junagarhi">Urdu Junagarhi</option>
-    <option value="ayah_uyghur_saleh">Uyghur Saleh</option>
-    <option value="ayah_uzbek_mansour">Uzbek Mansour</option>
-    <option value="ayah_uzbek_rwwad">Uzbek Rwwad</option>
-    <option value="ayah_vietnamese_rwwad">Vietnamese Rwwad</option>
-    <option value="ayah_yoruba_mikail">Yoruba Mikail</option>
+    <option value="">Tanpa Terjemah</option>
+    <option value="33">Per-Kata – Indonesian Affairs</option>
+    <option value="20">Per-Kata – English Saheeh</option>
+    <option value="ayah_indonesian_sabiq">Per-Ayat – Indonesian Sabiq</option>
+    <option value="ayah_english_saheeh">Per-Ayat – English Saheeh</option>
   </select>
 </label>
 
@@ -305,11 +227,7 @@ button:hover {
 </div>
 
 
-<div id="posterContainer" style="position: relative; width: 100%; max-width: 540px; margin: auto;">
-  <div id="bgImage"></div>
-  <div id="pages" style="position: relative; z-index: 1;"></div>
-</div>
-
+<div id="pages"></div>
 
 <div class="controls">
   <!-- Dropdown Background -->
@@ -423,7 +341,6 @@ button:hover {
 
 <script>
 
-const bgImage = document.getElementById("bgImage");
 const backgroundSelect = document.getElementById("backgroundSelect");
 const backgroundUpload = document.getElementById("backgroundUpload");
 const backgroundUrl = document.getElementById("backgroundUrl");
@@ -436,7 +353,7 @@ const toggleContrast = document.getElementById("toggleContrast");
 backgroundSelect.addEventListener("change", () => {
   const bg = backgroundSelect.value;
   if (bg) {
-    bgImage.style.backgroundImage = `url('${bg}')`;
+    pagesContainer.style.backgroundImage = `url('${bg}')`;
     backgroundUrl.value = "";
   } else {
     pagesContainer.style.backgroundImage = "none";
@@ -450,7 +367,7 @@ backgroundUpload.addEventListener("change", () => {
   if (file) {
     const reader = new FileReader();
     reader.onload = function (e) {
-      bgImage.style.backgroundImage = `url('${e.target.result}')`;
+      pagesContainer.style.backgroundImage = `url('${e.target.result}')`;
       backgroundSelect.value = "";
       backgroundUrl.value = "";
     };
@@ -463,7 +380,7 @@ backgroundUrl.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     const url = backgroundUrl.value.trim();
     if (url) {
-      bgImage.style.backgroundImage = `url('${url}')`;
+      pagesContainer.style.backgroundImage = `url('${url}')`;
       backgroundSelect.value = "";
       saveHistory();
     }
@@ -475,13 +392,13 @@ toggleContrast.addEventListener("click", () => {
   const isVisible = contrastSlider.style.display === "block";
   contrastSlider.style.display = isVisible ? "none" : "block";
   if (!isVisible) contrastSlider.value = 100; // reset ke normal saat muncul
-  bgImage.style.filter = `contrast(${contrastSlider.value / 100})`;
+  pagesContainer.style.filter = `contrast(${contrastSlider.value / 100})`;
 });
 
 // Ubah kontras saat slider digeser
 contrastSlider.addEventListener("input", () => {
   const contrastValue = 1 + ((contrastSlider.value - 100) / 100); 
-  bgImage.style.filter = `contrast(${contrastValue})`;
+  pagesContainer.style.filter = `contrast(${contrastValue})`;
 });
 
 
@@ -512,7 +429,7 @@ function loadHistory() {
   const bgToUse = history.background || defaultBg;
 
   backgroundSelect.value = bgToUse;
-  bgImage.style.backgroundImage = `url('${bgToUse}')`;
+  pagesContainer.style.backgroundImage = `url('${bgToUse}')`;
 
   return history;
 }
@@ -602,12 +519,7 @@ async function loadAyat() {
   try {
     const s = surahSelect.value, a = ayahSelect.value, key = `${s}:${a}`;
     const container = document.getElementById("pages");
-
-    // Hapus semua anak kecuali #bgImage
-    Array.from(container.children).forEach(child => {
-      if (child.id !== "bgImage") container.removeChild(child);
-    });
-
+    container.innerHTML = "";
 
     const pageMap = await fetch("https://raw.githubusercontent.com/dickymiswardi/tadabbur/main/ayah_page_map.json").then(r => r.json());
     const page = pageMap[key];
@@ -744,45 +656,31 @@ updateAyahDropdown().then(() => {
 <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 
 <script>
-const saveImageTrigger = document.getElementById("saveImageTrigger");
-const contrastSlider = document.getElementById("contrastSlider"); // pastikan ini ada
-const surahSelect = document.getElementById("surahSelect");
-const ayahSelect = document.getElementById("ayahSelect");
-const surahList = window.surahList; // pastikan ini sudah disiapkan di tempat lain
+  const saveImageTrigger = document.getElementById("saveImageTrigger");
 
-saveImageTrigger.addEventListener("click", () => {
-  const node = document.getElementById("posterContainer");
-  const s = surahSelect.value;
-  const a = ayahSelect.value;
-  const surahName = surahList[s][0].replace(/[^a-zA-Z0-9]/g, "-");
-  const filename = `${surahName}-${a}.png`;
-  const scale = window.devicePixelRatio || 2;
+  saveImageTrigger.addEventListener("click", () => {
+    const node = document.getElementById("pages");
+    const s = surahSelect.value;
+    const a = ayahSelect.value;
+    const surahName = surahList[s][0].replace(/[^a-zA-Z0-9]/g, "-");
+    const filename = `${surahName}-${a}.png`;
 
-  // Ambil nilai kontras dari slider
-  const contrastValue = contrastSlider.value;
-  const filterValue = `contrast(${contrastValue / 100})`;
+    // Gunakan DPI perangkat
+    const scale = window.devicePixelRatio || 2;
 
-  // Terapkan filter langsung ke container
-  const originalFilter = node.style.filter;
-  node.style.filter = filterValue;
-
-  html2canvas(node, {
-    scale: scale,
-    useCORS: true,
-    backgroundColor: null
-  }).then(canvas => {
-    canvas.toBlob(blob => {
-      saveAs(blob, filename);
-    }, 'image/png');
-  }).catch(err => {
-    alert("Gagal menyimpan gambar: " + err.message);
-    console.error(err);
-  }).finally(() => {
-    // Kembalikan filter seperti semula
-    node.style.filter = originalFilter;
+    html2canvas(node, {
+      scale: scale,
+      useCORS: true, // jika ada gambar dari URL lain
+      backgroundColor: null // agar background transparan jika ingin
+    }).then(canvas => {
+      canvas.toBlob(blob => {
+        saveAs(blob, filename);
+      }, 'image/png');
+    }).catch(err => {
+      alert("Gagal menyimpan gambar: " + err.message);
+      console.error(err);
+    });
   });
-});
-
 
 
 
@@ -816,7 +714,7 @@ showUrlInput.addEventListener("click", () => {
 applyUrlButton.addEventListener("click", () => {
   const url = document.getElementById("backgroundUrl").value.trim();
   if (url) {
-    bgImage.style.backgroundImage = `url('${url}')`;
+    pagesContainer.style.backgroundImage = `url('${url}')`;
     backgroundSelect.value = "";
     saveHistory();
   }
