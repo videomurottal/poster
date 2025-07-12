@@ -54,18 +54,18 @@ h2 {
 /* Tombol Close */
 .search-close {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 1.2em;
+  top: 0.4em;
+  right: 0.6em;
+  font-size: 1.4em;
+  font-weight: bold;
   background: none;
   border: none;
-  color: #333;
+  color: #c00;
   cursor: pointer;
-  z-index: 1;
+  z-index: 10;
 }
 .search-close:hover {
-  background: none;
-  color: red;
+  color: #f00;
 }
 
 /* Input & Button */
@@ -970,7 +970,7 @@ backgroundColorPicker.addEventListener("input", () => {
   // ==== Sumber XML untuk banyak bahasa ====
   const xmlSources = {
     indonesian_complex: 'https://raw.githubusercontent.com/tafsirnetlifyapp/quran/refs/heads/main/indonesian_complex_v1.0.xml',
-    english_saheeh: 'https://raw.githubusercontent.com/tafsirnetlifyapp/quran/refs/heads/main/english_saheeh_v1.0.xml'
+    english_rwwad: 'https://raw.githubusercontent.com/tafsirnetlifyapp/quran/refs/heads/main/terjemahEng.xml'
     // Tambahkan lagi jika perlu...
   };
 
