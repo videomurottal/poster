@@ -23,7 +23,9 @@ h2 {
 
 
 
-   /* Modal Overlay */
+
+
+ /* Modal Overlay */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -114,12 +116,21 @@ h2 {
 #searchResults button:hover {
   background: #1e7e34;
 }
- 
 
 
 
 
-    
+
+
+
+
+
+
+
+
+
+
+
 
     #pages {
   background-color: #82615f; /* default warna latar */
@@ -384,6 +395,8 @@ button:hover {
 </label>
 
   
+  
+
 <!-- Tombol Search -->
 <div class="button-wrapper">
   <button id="customLinkButton">Tombol Link</button>
@@ -400,7 +413,8 @@ button:hover {
   </div>
 </div>
 
-  
+
+
 <div class="button-wrapper">
   <button onclick="setVersion('v1')">Quran V1</button>
 </div>
@@ -954,16 +968,16 @@ backgroundColorPicker.addEventListener("input", () => {
     document.getElementById('searchModal').style.display = 'none';
   });
 
-  // Daftar XML multi-bahasa
+  // ==== Sumber XML untuk banyak bahasa ====
   const xmlSources = {
     indonesian_complex: 'https://raw.githubusercontent.com/tafsirnetlifyapp/quran/refs/heads/main/indonesian_complex_v1.0.xml',
-    english_rwwad: 'https://raw.githubusercontent.com/tafsirnetlifyapp/quran/refs/heads/main/terjemahEng.xml'
-    // Tambah lagi bila perlu
+    english_saheeh: 'https://raw.githubusercontent.com/tafsirnetlifyapp/quran/refs/heads/main/english_saheeh_v1.0.xml'
+    // Tambahkan lagi jika perlu...
   };
 
   const xmlDocs = {};
 
-  // Ambil semua XML
+  // ==== Load semua XML dan simpan ke localStorage/browser ====
   async function loadAllXMLs() {
     const parser = new DOMParser();
     for (const [langKey, url] of Object.entries(xmlSources)) {
@@ -972,8 +986,8 @@ backgroundColorPicker.addEventListener("input", () => {
         xmlDocs[langKey] = parser.parseFromString(cached, "application/xml");
       } else {
         try {
-          const res = await fetch(url);
-          const text = await res.text();
+          const response = await fetch(url);
+          const text = await response.text();
           localStorage.setItem(`quran_xml_${langKey}`, text);
           xmlDocs[langKey] = parser.parseFromString(text, "application/xml");
         } catch (e) {
@@ -985,7 +999,7 @@ backgroundColorPicker.addEventListener("input", () => {
 
   loadAllXMLs();
 
-  // Fungsi Search
+  // ==== Fungsi pencarian kata di semua bahasa ====
   document.getElementById('startSearchBtn').addEventListener('click', () => {
     const keyword = document.getElementById('searchInput').value.toLowerCase();
     const resultDiv = document.getElementById('searchResults');
@@ -1015,7 +1029,7 @@ backgroundColorPicker.addEventListener("input", () => {
             }
             const p = document.createElement('p');
             p.innerHTML = `Surah ${suraNum}, Ayat ${ayaNum}: ${translation}
-              <button onclick="goToAyat(${suraNum}, ${ayaNum})">Lihat Ayat Ini</button>`;
+              <button onclick="goToAyat(${suraNum}, ${ayaNum})">Menuju ke Ayat</button>`;
             resultDiv.appendChild(p);
           }
         }
@@ -1023,6 +1037,7 @@ backgroundColorPicker.addEventListener("input", () => {
     }
   });
 
+  // ==== Fungsi "Menuju ke Ayat" ====
   function goToAyat(sura, aya) {
     const surahSelect = document.getElementById('surahSelect');
     const ayahSelect = document.getElementById('ayahSelect');
@@ -1037,7 +1052,6 @@ backgroundColorPicker.addEventListener("input", () => {
     document.getElementById('searchModal').style.display = 'none';
   }
 </script>
-
 
   
 </body>
