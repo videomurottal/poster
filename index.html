@@ -263,9 +263,9 @@ button:hover {
 </div>
 
 <div id="saveSizeOptions" style="display:none; gap: 0.5em; flex-wrap: wrap;">
-  <button class="save-option" data-size="1080">1080x1080</button>
-  <button class="save-option" data-size="2048">2048x2048</button>
-  <button class="save-option" data-size="4096">4096x4096</button>
+  <button class="save-option" data-scale="1">📥 Kualitas Rendah</button>
+  <button class="save-option" data-scale="2">📥 Kualitas Sedang</button>
+  <button class="save-option" data-scale="4">📥 Kualitas Tinggi</button>
 </div>
 
 <!-- Pilihan Font Terjemah -->
@@ -621,32 +621,48 @@ saveImageTrigger.addEventListener("click", () => {
   saveSizeOptions.style.display = "flex";
 });
 
+    const saveImageTrigger = document.getElementById("saveImageTrigger");
+const saveSizeOptions = document.getElementById("saveSizeOptions");
+
+saveImageTrigger.addEventListener("click", () => {
+  saveSizeOptions.style.display = "flex";
+});
+
 document.querySelectorAll(".save-option").forEach(btn => {
   btn.addEventListener("click", () => {
-    const size = parseInt(btn.dataset.size);
-    saveImageAsPng(size);
+    const scale = parseInt(btn.dataset.scale);
+    saveImageAsPng(scale);
     saveSizeOptions.style.display = "none";
   });
 });
 
-function saveImageAsPng(size = 1080) {
+function saveImageAsPng(scale = 1) {
   const node = document.getElementById("pages");
+
+  const baseWidth = node.offsetWidth;
+  const baseHeight = node.offsetHeight;
+  const width = baseWidth * scale;
+  const height = baseHeight * scale;
+
   const s = surahSelect.value;
   const a = ayahSelect.value;
   const surahName = surahList[s][0].replace(/[^a-zA-Z0-9]/g, "-");
   const filename = `${surahName}-${a}.png`;
 
   domtoimage.toBlob(node, {
-    width: size,
-    height: size,
+    width: width,
+    height: height,
     style: {
       transform: "scale(1)",
       transformOrigin: "top left",
-      width: size + "px",
-      height: size + "px"
+      width: baseWidth + "px",
+      height: baseHeight + "px"
     }
   }).then(function (blob) {
     window.saveAs(blob, filename);
+  }).catch(function (error) {
+    console.error('Gagal menyimpan gambar:', error);
+    alert("Gagal menyimpan gambar. Coba lagi.");
   });
 }
 
