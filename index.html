@@ -1056,6 +1056,8 @@ updateAyahDropdown().then(() => {
   }
 
   // === XML Sources for Translation Search ===
+  <script>
+  // ==== Sumber XML ====
   const xmlSources = {
     indonesian_complex: 'https://raw.githubusercontent.com/tafsirnetlifyapp/quran/refs/heads/main/indonesian_complex_v1.0.xml',
     english_rwwad: 'https://raw.githubusercontent.com/tafsirnetlifyapp/quran/refs/heads/main/terjemahEng.xml',
@@ -1066,7 +1068,7 @@ updateAyahDropdown().then(() => {
   let activeLang = localStorage.getItem('activeLang') || 'indonesian_complex';
   let activeXMLDoc = null;
 
-  // === Loading Indicator ===
+  // ==== Loading Indicator ====
   function showLoading(msg = "⏳ Memuat...") {
     const loader = document.getElementById('loadingIndicator');
     if (loader) {
@@ -1080,47 +1082,96 @@ updateAyahDropdown().then(() => {
     if (loader) loader.style.display = 'none';
   }
 
-  // === Load Selected XML ===
+  // ==== Muat XML sesuai pilihan ====
   async function loadSelectedXML(langKey) {
     showLoading(`⏳ Memuat terjemah: ${langKey}`);
     const parser = new DOMParser();
+
     try {
-      activeXMLDoc = null;
+      activeXMLDoc = null; // Reset sebelumnya
       const noCacheUrl = xmlSources[langKey] + '?t=' + Date.now();
       const response = await fetch(noCacheUrl, { cache: "no-store" });
+
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
       const text = await response.text();
       activeXMLDoc = parser.parseFromString(text, "application/xml");
+
       localStorage.setItem('activeLang', langKey);
       console.log(`✅ Terjemah ${langKey} dimuat`);
     } catch (err) {
       console.error(`❌ Gagal memuat ${langKey}:`, err);
-      activeXMLDoc = null;
       tampilkanError("Gagal memuat terjemah.");
     } finally {
       hideLoading();
     }
   }
 
-  // === Change Translation ===
+  // ==== Panggil saat halaman load sekali saja ====
+  window.addEventListener('DOMContentLoaded', () => {
+    loadSelectedXML(activeLang);
+  });
+
+  // ==== Dropdown Change ====
   const translationSelect = document.getElementById('translationSelect');
   if (translationSelect) {
     translationSelect.value = activeLang;
-    translationSelect.addEventListener('change', e => {
+    translationSelect.addEventListener('change', (e) => {
       activeLang = e.target.value;
       loadSelectedXML(activeLang);
     });
   }
-  loadSelectedXML(activeLang);
 
-  // === Search Functionality ===
+  // ==== Fungsi pencarian kata ====
+  function searchKata(keyword) {
+    const resultDiv = document.getElementById('searchResults');
+    resultDiv.innerHTML = '';
+    if (!activeXMLDoc) {
+      tampilkanError("Terjemah belum siap.");
+      return;
+    }
+
+    const suras = activeXMLDoc.getElementsByTagName('sura');
+    let totalHasil = 0;
+    const hasilSet = new Set(); // ✅ Anti double
+
+    for (let sura of suras) {
+      const suraNum = sura.getAttribute('number');
+      const ayas = sura.getElementsByTagName('aya');
+      for (let aya of ayas) {
+        const ayaNum = aya.getAttribute('number');
+        const text = aya.textContent || '';
+        const hasilKey = `${suraNum}-${ayaNum}-${text}`; // ✅ Key unik
+        if (text.toLowerCase().includes(keyword) && !hasilSet.has(hasilKey)) {
+          hasilSet.add(hasilKey);
+
+          const p = document.createElement('p');
+          p.innerHTML = `
+            ${text}<br>
+            <small>Surah ${suraNum}, Ayat ${ayaNum}</small>
+            <button onclick="goToAyat(${suraNum}, ${ayaNum})">Menuju Ayat</button>
+          `;
+          resultDiv.appendChild(p);
+          totalHasil++;
+        }
+      }
+    }
+
+    if (totalHasil === 0) {
+      resultDiv.innerHTML = '<p style="color:red;">Tidak ditemukan hasil untuk kata tersebut.</p>';
+    }
+  }
+
+  // ==== Tombol Search & Enter Key ====
   const mulaiSearchBtn = document.getElementById("mulaiSearchBtn");
   const kataInput = document.getElementById("kataInput");
 
   function handleSearch() {
     const keyword = kataInput.value.trim().toLowerCase();
-    if (!keyword) return tampilkanError("Kata kosong.");
-    if (!activeXMLDoc) return tampilkanError("Terjemah belum siap.");
+    if (!keyword) {
+      tampilkanError("Kata kosong.");
+      return;
+    }
     showLoading("🔎 Mencari kata...");
     setTimeout(() => {
       searchKata(keyword);
@@ -1128,74 +1179,58 @@ updateAyahDropdown().then(() => {
     }, 100);
   }
 
-  mulaiSearchBtn?.addEventListener("click", debounce(handleSearch, 500));
-  kataInput?.addEventListener("keypress", e => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleSearch();
-    }
-  });
+  if (mulaiSearchBtn) {
+    mulaiSearchBtn.addEventListener("click", debounce(handleSearch, 500));
+  }
 
-  function searchKata(keyword) {
-  const resultDiv = document.getElementById('searchResults');
-  resultDiv.innerHTML = ''; // Bersihkan hasil sebelumnya
-
-  const suras = activeXMLDoc.getElementsByTagName('sura');
-  let totalHasil = 0;
-  const hasilSet = new Set(); // ✅ Tambah Set untuk cek duplikat
-
-  for (let sura of suras) {
-    const suraNum = sura.getAttribute('number');
-    const ayas = sura.getElementsByTagName('aya');
-    for (let aya of ayas) {
-      const ayaNum = aya.getAttribute('number');
-      const text = aya.textContent || '';
-
-      const hasilKey = `${suraNum}-${ayaNum}-${text}`; // ✅ Key unik
-      if (text.toLowerCase().includes(keyword) && !hasilSet.has(hasilKey)) {
-        hasilSet.add(hasilKey); // ✅ Tandai sudah ada
-
-        const p = document.createElement('p');
-        p.innerHTML = `
-          ${text}<br>
-          <small>Surah ${suraNum}, Ayat ${ayaNum}</small>
-          <button onclick="goToAyat(${suraNum}, ${ayaNum})">Menuju Ayat</button>
-        `;
-        resultDiv.appendChild(p);
-        totalHasil++;
+  if (kataInput) {
+    kataInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleSearch();
       }
-    }
+    });
   }
 
-  if (totalHasil === 0) {
-    resultDiv.innerHTML = '<p style="color:red;">Tidak ditemukan hasil untuk kata tersebut.</p>';
-  }
-}
-
-
+  // ==== Fungsi "Menuju ke Ayat" ====
   function goToAyat(sura, aya) {
-    surahSelect.value = sura;
-    surahSelect.dispatchEvent(new Event('change'));
-    setTimeout(() => {
-      ayahSelect.value = aya;
-      ayahSelect.dispatchEvent(new Event('change'));
-      if (wordTranslationId && activeLang) {
-        const dropdownValue = "ayah_" + activeLang;
-        const matchedOption = Array.from(wordTranslationId.options)
-          .find(opt => opt.value === dropdownValue);
-        if (matchedOption) {
-          wordTranslationId.value = matchedOption.value;
-          wordTranslationId.dispatchEvent(new Event('change'));
+    const surahSelect = document.getElementById('surahSelect');
+    const ayahSelect = document.getElementById('ayahSelect');
+    const wordTranslationId = document.getElementById('wordTranslationId');
+
+    if (surahSelect && ayahSelect) {
+      surahSelect.value = sura;
+      surahSelect.dispatchEvent(new Event('change'));
+
+      setTimeout(() => {
+        ayahSelect.value = aya;
+        ayahSelect.dispatchEvent(new Event('change'));
+
+        // Sync dropdown terjemahan
+        if (wordTranslationId && typeof activeLang === 'string') {
+          const dropdownValue = "ayah_" + activeLang;
+          const matchedOption = Array.from(wordTranslationId.options)
+            .find(opt => opt.value === dropdownValue);
+
+          if (matchedOption) {
+            wordTranslationId.value = matchedOption.value;
+            wordTranslationId.dispatchEvent(new Event('change'));
+          }
         }
-      }
-    }, 300);
-    modal.style.display = 'none';
+      }, 300);
+    }
+
+    const modal = document.querySelector('.modal-overlay');
+    if (modal) modal.style.display = 'none';
   }
 
+  // ==== Fungsi Error ====
   function tampilkanError(msg) {
-    document.getElementById('searchResults').innerHTML = `<p style="color:red;">${msg}</p>`;
+    const resultDiv = document.getElementById('searchResults');
+    resultDiv.innerHTML = `<p style="color:red;">${msg}</p>`;
   }
 
+  // ==== Debounce Helper ====
   function debounce(fn, delay) {
     let timeout;
     return function (...args) {
@@ -1204,6 +1239,7 @@ updateAyahDropdown().then(() => {
     };
   }
 </script>
+
 
 
 
