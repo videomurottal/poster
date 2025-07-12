@@ -58,13 +58,27 @@ button:hover {
   aspect-ratio: 1 / 1;
   margin: 2em auto;
   position: relative;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
+}
+
+    #bgOverlay {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+  filter: contrast(1); /* 🔥 Kontras hanya berlaku di sini */
+  transition: filter 0.3s ease;
+}
+
+.page-container {
+  position: relative;
+  z-index: 1;
 }
 
 .controls {
@@ -278,7 +292,18 @@ button:hover {
 </div>
 
 
-<div id="pages"></div>
+<div id="pages">
+  <div id="bgOverlay" style="
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: contrast(1);
+    transition: filter 0.3s ease;
+  "></div>
+</div>
 
 <div class="controls">
   <!-- Dropdown Background -->
@@ -392,6 +417,7 @@ button:hover {
 
 <script>
 
+const bgOverlay = document.getElementById("bgOverlay");
 const backgroundSelect = document.getElementById("backgroundSelect");
 const backgroundUpload = document.getElementById("backgroundUpload");
 const backgroundUrl = document.getElementById("backgroundUrl");
@@ -404,7 +430,7 @@ const toggleContrast = document.getElementById("toggleContrast");
 backgroundSelect.addEventListener("change", () => {
   const bg = backgroundSelect.value;
   if (bg) {
-    pagesContainer.style.backgroundImage = `url('${bg}')`;
+    bgOverlay.style.backgroundImage = `url('${bg}')`;
     backgroundUrl.value = "";
   } else {
     pagesContainer.style.backgroundImage = "none";
@@ -418,7 +444,7 @@ backgroundUpload.addEventListener("change", () => {
   if (file) {
     const reader = new FileReader();
     reader.onload = function (e) {
-      pagesContainer.style.backgroundImage = `url('${e.target.result}')`;
+      bgOverlay.style.backgroundImage = `url('${e.target.result}')`;
       backgroundSelect.value = "";
       backgroundUrl.value = "";
     };
@@ -431,7 +457,7 @@ backgroundUrl.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     const url = backgroundUrl.value.trim();
     if (url) {
-      pagesContainer.style.backgroundImage = `url('${url}')`;
+      bgOverlay.style.backgroundImage = `url('${url}')`;
       backgroundSelect.value = "";
       saveHistory();
     }
@@ -443,13 +469,13 @@ toggleContrast.addEventListener("click", () => {
   const isVisible = contrastSlider.style.display === "block";
   contrastSlider.style.display = isVisible ? "none" : "block";
   if (!isVisible) contrastSlider.value = 100; // reset ke normal saat muncul
-  pagesContainer.style.filter = `contrast(${contrastSlider.value / 100})`;
+  bgOverlay.style.filter = `contrast(${contrastSlider.value / 100})`;
 });
 
 // Ubah kontras saat slider digeser
 contrastSlider.addEventListener("input", () => {
   const contrastValue = 1 + ((contrastSlider.value - 100) / 100); 
-  pagesContainer.style.filter = `contrast(${contrastValue})`;
+  bgOverlay.style.filter = `contrast(${contrastValue})`;
 });
 
 
@@ -480,7 +506,7 @@ function loadHistory() {
   const bgToUse = history.background || defaultBg;
 
   backgroundSelect.value = bgToUse;
-  pagesContainer.style.backgroundImage = `url('${bgToUse}')`;
+  bgOverlay.style.backgroundImage = `url('${bgToUse}')`;
 
   return history;
 }
@@ -765,7 +791,7 @@ showUrlInput.addEventListener("click", () => {
 applyUrlButton.addEventListener("click", () => {
   const url = document.getElementById("backgroundUrl").value.trim();
   if (url) {
-    pagesContainer.style.backgroundImage = `url('${url}')`;
+    bgOverlay.style.backgroundImage = `url('${url}')`;
     backgroundSelect.value = "";
     saveHistory();
   }
