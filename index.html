@@ -584,134 +584,130 @@ button:hover {
 </style>
 
 <script>
+  let isLoadingAyat = false; // ✅ Global flag anti tumpang tindih
 
-  let isLoadingAyat = false; // global flag
+  function goToAyat(sura, aya) {
+    const surahSelect = document.getElementById('surahSelect');
+    const ayahSelect = document.getElementById('ayahSelect');
+    const wordTranslationId = document.getElementById('wordTranslationId');
 
-function goToAyat(sura, aya) {
-  const surahSelect = document.getElementById('surahSelect');
-  const ayahSelect = document.getElementById('ayahSelect');
-  const wordTranslationId = document.getElementById('wordTranslationId');
+    if (surahSelect && ayahSelect) {
+      surahSelect.value = sura;
+      surahSelect.dispatchEvent(new Event('change'));
 
-  if (surahSelect && ayahSelect) {
-    // Set Surah & Ayat
-    surahSelect.value = sura;
-    surahSelect.dispatchEvent(new Event('change'));
+      setTimeout(() => {
+        ayahSelect.value = aya;
+        ayahSelect.dispatchEvent(new Event('change'));
 
-    setTimeout(() => {
-      ayahSelect.value = aya;
-      ayahSelect.dispatchEvent(new Event('change'));
+        if (wordTranslationId && typeof activeLang === 'string') {
+          const dropdownValue = "ayah_" + activeLang;
+          const matchedOption = [...wordTranslationId.options]
+            .find(opt => opt.value === dropdownValue);
 
-      if (wordTranslationId && typeof activeLang === 'string') {
-        const dropdownValue = "ayah_" + activeLang; // prefix 'ayah_'
-        const matchedOption = Array.from(wordTranslationId.options)
-          .find(opt => opt.value === dropdownValue);
-
-        if (matchedOption) {
-          // 🚨 Cegah trigger ganda
-          isLoadingAyat = true;
-          wordTranslationId.value = matchedOption.value;
-          wordTranslationId.dispatchEvent(new Event('change'));
-          isLoadingAyat = false;
+          if (matchedOption) {
+            // 🚨 Cegah trigger ganda
+            isLoadingAyat = true;
+            wordTranslationId.value = matchedOption.value;
+            wordTranslationId.dispatchEvent(new Event('change'));
+            isLoadingAyat = false;
+          }
         }
-      }
-    }, 300);
+      }, 300);
+    }
+
+    // Tutup modal jika ada
+    document.querySelector('.modal-overlay')?.style.display = 'none';
   }
 
-  // Tutup modal
-  const modal = document.querySelector('.modal-overlay');
-  if (modal) modal.style.display = 'none';
-}
+  function loadAyat() {
+    if (isLoadingAyat) return; // 🔥 Skip jika sedang loading
+    isLoadingAyat = true;
 
-// Di awal fungsi loadAyat():
-function loadAyat() {
-  if (isLoadingAyat) return; // 🔥 skip kalau sedang auto-load
-  // ... lanjut render seperti biasa
-}
-
-const backgroundSelect = document.getElementById("backgroundSelect");
-const backgroundUpload = document.getElementById("backgroundUpload");
-const backgroundUrl = document.getElementById("backgroundUrl");
-const pagesContainer = document.getElementById("pages");
-
-
-
-// Dropdown Gambar
-backgroundSelect.addEventListener("change", () => {
-  const bg = backgroundSelect.value;
-  if (bg) {
-    pagesContainer.style.backgroundImage = `url('${bg}')`;
-    backgroundUrl.value = "";
-  } else {
-    pagesContainer.style.backgroundImage = "none";
-  }
-  saveHistory();
-});
-
-// Upload Gambar
-backgroundUpload.addEventListener("change", () => {
-  const file = backgroundUpload.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      pagesContainer.style.backgroundImage = `url('${e.target.result}')`;
-      backgroundSelect.value = "";
-      backgroundUrl.value = "";
-    };
-    reader.readAsDataURL(file);
-  }
-});
-
-// Gambar dari URL (tekan Enter)
-backgroundUrl.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    const url = backgroundUrl.value.trim();
-    if (url) {
-      pagesContainer.style.backgroundImage = `url('${url}')`;
-      backgroundSelect.value = "";
-      saveHistory();
+    showLoader();
+    try {
+      // 📝 Lanjut render seperti biasa di sini
+    } catch (e) {
+      alert("Gagal memuat ayat: " + e.message);
+    } finally {
+      hideLoader();
+      isLoadingAyat = false;
     }
   }
-});
 
+  const backgroundSelect = document.getElementById("backgroundSelect");
+  const backgroundUpload = document.getElementById("backgroundUpload");
+  const backgroundUrl = document.getElementById("backgroundUrl");
+  const pagesContainer = document.getElementById("pages");
 
+  // 🎨 Dropdown Gambar
+  backgroundSelect?.addEventListener("change", () => {
+    const bg = backgroundSelect.value;
+    pagesContainer.style.backgroundImage = bg ? `url('${bg}')` : "none";
+    backgroundUrl.value = "";
+    saveHistory();
+  });
 
+  // 📁 Upload Gambar
+  backgroundUpload?.addEventListener("change", () => {
+    const file = backgroundUpload.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        pagesContainer.style.backgroundImage = `url('${e.target.result}')`;
+        backgroundSelect.value = "";
+        backgroundUrl.value = "";
+        saveHistory();
+      };
+      reader.readAsDataURL(file);
+    }
+  });
 
-  
-  
-function saveHistory() {
-  const history = {
-    surah: surahSelect.value,
-    ayah: ayahSelect.value,
-    wordStart: wordStart.value,
-    wordEnd: wordEnd.value,
-    translation: wordTranslationId.value,
-    background: backgroundSelect.value,
-    version: currentVersion
-  };
-  localStorage.setItem('quranHistory', JSON.stringify(history));
-}
+  // 🌐 Gambar dari URL (tekan Enter)
+  backgroundUrl?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      const url = backgroundUrl.value.trim();
+      if (url) {
+        pagesContainer.style.backgroundImage = `url('${url}')`;
+        backgroundSelect.value = "";
+        saveHistory();
+      }
+    }
+  });
 
-function loadHistory() {
-  const history = JSON.parse(localStorage.getItem('quranHistory') || '{}');
+  function saveHistory() {
+    const history = {
+      surah: surahSelect.value,
+      ayah: ayahSelect.value,
+      wordStart: wordStart.value,
+      wordEnd: wordEnd.value,
+      translation: wordTranslationId.value,
+      background: backgroundSelect.value,
+      version: currentVersion
+    };
+    localStorage.setItem('quranHistory', JSON.stringify(history));
+  }
 
-  if (history.surah) surahSelect.value = history.surah;
-  if (history.version) currentVersion = history.version;
+  function loadHistory() {
+    const history = JSON.parse(localStorage.getItem('quranHistory') || '{}');
 
-  // ✅ Default wallpaper jika belum ada data background
-  const defaultBg = "https://images.pexels.com/photos/1819662/pexels-photo-1819662.jpeg";
-  const bgToUse = history.background || defaultBg;
+    if (history.surah) surahSelect.value = history.surah;
+    if (history.version) currentVersion = history.version;
 
-  backgroundSelect.value = bgToUse;
-  pagesContainer.style.backgroundImage = `url('${bgToUse}')`;
+    const defaultBg = "https://images.pexels.com/photos/1819662/pexels-photo-1819662.jpeg";
+    const bgToUse = history.background || defaultBg;
 
-  return history;
-}
+    backgroundSelect.value = bgToUse;
+    pagesContainer.style.backgroundImage = `url('${bgToUse}')`;
 
-const loaderOverlay = document.getElementById('loaderOverlay');
-function showLoader() { loaderOverlay.style.display = 'flex'; }
-function hideLoader() { loaderOverlay.style.display = 'none'; }
+    return history;
+  }
 
-const translationLanguageMap = { "20": "en", "33": "id" };
+  // 🔄 Loader Overlay
+  const loaderOverlay = document.getElementById('loaderOverlay');
+  function showLoader() { loaderOverlay.style.display = 'flex'; }
+  function hideLoader() { loaderOverlay.style.display = 'none'; }
+
+  const translationLanguageMap = { "20": "en", "33": "id" };
 
 const surahList = {
   1:["Al-Fātiḥah"], 2:["Al-Baqarah"], 3:["Āl ʿImrān"], 4:["An-Nisāʾ"],
@@ -752,18 +748,20 @@ const wordTranslationId = document.getElementById("wordTranslationId");
 let currentVersion = 'v1';
 let words = [];
 let initialLoad = true;
+let isLoadingAyat = false; // ✅ Global flag
 
 function setVersion(v) {
   currentVersion = v;
   loadAyat();
 }
 
+// Populate Surah Dropdown
 for (let i in surahList) {
   const [name] = surahList[i];
   surahSelect.appendChild(new Option(`${i}. ${name}`, i));
 }
 
-surahSelect.addEventListener("change", () => { updateAyahDropdown(); saveHistory(); });
+surahSelect.addEventListener("change", () => { updateAyahDropdown().then(saveHistory); });
 ayahSelect.addEventListener("change", () => { loadAyat(); saveHistory(); });
 wordStart.addEventListener("change", () => {
   const startVal = +wordStart.value;
@@ -777,18 +775,33 @@ wordEnd.addEventListener("change", () => { loadAyat(); saveHistory(); });
 wordTranslationId.addEventListener("change", () => { loadAyat(); saveHistory(); });
 
 async function updateAyahDropdown() {
-  const s = surahSelect.value;
-  const res = await fetch(`https://api.quran.com/api/v4/chapters/${s}`);
-  const json = await res.json();
-  const max = json.chapter.verses_count;
-  ayahSelect.innerHTML = "";
-  for (let i = 1; i <= max; i++) ayahSelect.appendChild(new Option(`Ayat ${i}`, i));
-  ayahSelect.value = 1;
-  loadAyat();
+  if (isLoadingAyat) return; // 🔥 Skip kalau sedang load
+  isLoadingAyat = true;
+
+  try {
+    const s = surahSelect.value;
+    const res = await fetch(`https://api.quran.com/api/v4/chapters/${s}`);
+    const json = await res.json();
+    const max = json.chapter.verses_count;
+
+    ayahSelect.innerHTML = "";
+    for (let i = 1; i <= max; i++) {
+      ayahSelect.appendChild(new Option(`Ayat ${i}`, i));
+    }
+    ayahSelect.value = 1;
+    await loadAyat(); // ⬅️ Panggil setelah update
+  } catch (e) {
+    alert("Gagal memuat daftar ayat: " + e.message);
+  } finally {
+    isLoadingAyat = false;
+  }
 }
 
 async function loadAyat() {
+  if (isLoadingAyat) return; // 🔥 Skip jika sudah loading
+  isLoadingAyat = true;
   showLoader();
+
   try {
     const s = surahSelect.value, a = ayahSelect.value, key = `${s}:${a}`;
     const container = document.getElementById("pages");
@@ -805,6 +818,7 @@ async function loadAyat() {
     const data = await fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?words=true&word_fields=${apiField}`).then(r => r.json());
     words = data.verse.words.map(w => ({ arabic: w[apiField] || w.text, id: w.id }));
 
+    // Setup wordStart & wordEnd dropdowns
     const prevStart = +wordStart.value || 1, prevEnd = +wordEnd.value || 1;
     wordStart.innerHTML = "";
     for (let i = 1; i <= words.length; i++) wordStart.appendChild(new Option(`Word ${i}`, i));
@@ -814,17 +828,19 @@ async function loadAyat() {
     wordEnd.value = initialLoad ? 1 : Math.min(prevEnd, words.length);
     initialLoad = false;
 
+    // Load font
     const style = document.createElement("style");
     style.textContent = `@font-face { font-family: '${fontName}'; src: url('${fontUrl}') format('truetype'); }`;
     document.head.appendChild(style);
+    await document.fonts.load(`1em ${fontName}`);
 
     const div = document.createElement("div");
     div.className = `page-container quran-${currentVersion} quran-text`;
     div.style.fontFamily = fontName;
+    div.style.fontSize = document.getElementById("quranFontSize").value + "px";
     container.appendChild(div);
 
-    await document.fonts.load(`1em ${fontName}`);
-
+    // Render selected words
     const startIdx = (+wordStart.value || 1) - 1;
     const endIdx = (+wordEnd.value || startIdx + 1);
     const line = document.createElement("div");
@@ -837,14 +853,41 @@ async function loadAyat() {
     });
     div.appendChild(line);
 
+    // Load translations
+    await renderTranslation(s, a, startIdx, endIdx, div);
 
-    
-    const transVal = wordTranslationId.value;
-if (transVal) {
-  if (transVal.startsWith("ayah_")) {
-    // ✅ Terjemahan Per-Ayat (QuranEnc)
-    const transKey = transVal.replace("ayah_", "");
-    try {
+    // Add Surah info
+    const surahName = surahList[s][0];
+    const referenceDiv = document.createElement("div");
+    referenceDiv.className = "surah-info";
+    referenceDiv.textContent = `${surahName}: ${a}`;
+    referenceDiv.style.fontSize = document.getElementById("infoFontSize").value + "px";
+    div.appendChild(referenceDiv);
+
+    // Add watermark
+    const brandDiv = document.createElement("div");
+    brandDiv.className = "brand-watermark";
+    brandDiv.textContent = "videomurottal.com";
+    container.appendChild(brandDiv);
+
+    div.style.display = "block";
+    requestAnimationFrame(() => div.style.opacity = "1");
+  } catch (e) {
+    alert("Gagal memuat ayat: " + e.message);
+  } finally {
+    hideLoader();
+    isLoadingAyat = false;
+  }
+}
+
+async function renderTranslation(s, a, startIdx, endIdx, div) {
+  const transVal = wordTranslationId.value;
+  if (!transVal) return;
+
+  try {
+    if (transVal.startsWith("ayah_")) {
+      // Per-Ayat
+      const transKey = transVal.replace("ayah_", "");
       const res = await fetch(`https://quranenc.com/api/v1/translation/aya/${transKey}/${s}/${a}`);
       const json = await res.json();
       const fullTranslation = json.result.translation;
@@ -853,64 +896,26 @@ if (transVal) {
       ayahTransDiv.className = "translation";
       ayahTransDiv.contentEditable = true;
       ayahTransDiv.innerText = fullTranslation;
-      ayahTransDiv.style.userSelect = "text";
-      ayahTransDiv.setAttribute("draggable", "false");
       div.appendChild(ayahTransDiv);
-    } catch (e) {
-      console.error("Gagal ambil terjemahan per-ayat:", e);
-    }
-  } else {
-    // ✅ Terjemahan Per-Kata (Quran.com)
-    const langCode = translationLanguageMap[transVal];
-    try {
-      const r = await fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?words=true&language=${langCode}&translations=${transVal}`);
+    } else {
+      // Per-Kata
+      const langCode = translationLanguageMap[transVal];
+      const r = await fetch(`https://api.quran.com/api/v4/verses/by_key/${s}:${a}?words=true&language=${langCode}&translations=${transVal}`);
       const j = await r.json();
       const wordsData = j.verse.words;
       const wordTranslations = wordsData.map(w => w.translation?.text || "").slice(startIdx, endIdx);
 
       const perKataDiv = document.createElement("div");
       perKataDiv.className = "translation";
-      perKataDiv.textContent = wordTranslations.join(" ");
       perKataDiv.contentEditable = true;
-      perKataDiv.style.userSelect = "text";
-      perKataDiv.setAttribute("draggable", "false");
+      perKataDiv.textContent = wordTranslations.join(" ");
       div.appendChild(perKataDiv);
-    } catch (e) {
-      console.error("Gagal ambil terjemah perkata:", e);
     }
-  }
-
-  // ✅ Tampilkan info surah dan ayat
-  const surahName = surahList[s][0];
-  const referenceDiv = document.createElement("div");
-  referenceDiv.className = "surah-info";
-  referenceDiv.textContent = `${surahName}: ${a}`;
-  div.appendChild(referenceDiv);
-
-  // ✅ Atur font size
-  div.style.fontSize = document.getElementById("quranFontSize").value + "px";
-  document.querySelectorAll(".translation").forEach(el => {
-    el.style.fontSize = document.getElementById("translationFontSize").value + "px";
-  });
-  referenceDiv.style.fontSize = document.getElementById("infoFontSize").value + "px";
-
-  // ✅ Tambah watermark
-  const brandDiv = document.createElement("div");
-  brandDiv.className = "brand-watermark";
-  brandDiv.textContent = "videomurottal.com";
-  pagesContainer.appendChild(brandDiv);
-}
-
-
-
-    
-
-    div.style.display = "block";
-    requestAnimationFrame(() => div.style.opacity = "1");
+    document.querySelectorAll(".translation").forEach(el => {
+      el.style.fontSize = document.getElementById("translationFontSize").value + "px";
+    });
   } catch (e) {
-    alert("Gagal memuat ayat: " + e.message);
-  } finally {
-    hideLoader();
+    console.error("Gagal ambil terjemahan:", e);
   }
 }
 
@@ -921,6 +926,7 @@ updateAyahDropdown().then(() => {
   if (last.wordEnd) wordEnd.value = last.wordEnd;
   if (last.translation) wordTranslationId.value = last.translation;
 });
+
   
 </script>
 
@@ -929,22 +935,20 @@ updateAyahDropdown().then(() => {
 <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 
 <script>
+  // === Save Image ===
   const saveImageTrigger = document.getElementById("saveImageTrigger");
-
   saveImageTrigger.addEventListener("click", () => {
     const node = document.getElementById("pages");
     const s = surahSelect.value;
     const a = ayahSelect.value;
     const surahName = surahList[s][0].replace(/[^a-zA-Z0-9]/g, "-");
     const filename = `${surahName}-${a}.png`;
-
-    // Gunakan DPI perangkat
     const scale = window.devicePixelRatio || 2;
 
     html2canvas(node, {
       scale: scale,
-      useCORS: true, // jika ada gambar dari URL lain
-      backgroundColor: null // agar background transparan jika ingin
+      useCORS: true,
+      backgroundColor: null
     }).then(canvas => {
       canvas.toBlob(blob => {
         saveAs(blob, filename);
@@ -955,99 +959,89 @@ updateAyahDropdown().then(() => {
     });
   });
 
-
-
-
-    
-    
-    const colorTarget = document.getElementById("colorTarget");
-const colorPicker = document.getElementById("colorPicker");
-
-colorPicker.addEventListener("input", () => {
-  const targetClass = colorTarget.value;
-  const color = colorPicker.value;
-  document.querySelectorAll(`.${targetClass}`).forEach(el => {
-    el.style.color = color;
+  // === Color Picker for Text ===
+  const colorTarget = document.getElementById("colorTarget");
+  const colorPicker = document.getElementById("colorPicker");
+  colorPicker.addEventListener("input", () => {
+    const targetClass = colorTarget.value;
+    const color = colorPicker.value;
+    document.querySelectorAll(`.${targetClass}`).forEach(el => {
+      el.style.color = color;
+    });
   });
-});
 
-// Trigger input file saat tombol diklik
-document.getElementById("uploadTrigger").addEventListener("click", function () {
-  document.getElementById("backgroundUpload").click();
-});
+  // === Upload Background ===
+  document.getElementById("uploadTrigger").addEventListener("click", function () {
+    document.getElementById("backgroundUpload").click();
+  });
 
-const showUrlInput = document.getElementById("showUrlInput");
-const urlInputWrapper = document.getElementById("urlInputWrapper");
-const applyUrlButton = document.getElementById("applyUrlButton");
+  // === Set Background from URL ===
+  const showUrlInput = document.getElementById("showUrlInput");
+  const urlInputWrapper = document.getElementById("urlInputWrapper");
+  const applyUrlButton = document.getElementById("applyUrlButton");
 
-showUrlInput.addEventListener("click", () => {
-  urlInputWrapper.style.display = "flex";
-});
+  showUrlInput.addEventListener("click", () => {
+    urlInputWrapper.style.display = "flex";
+  });
 
-applyUrlButton.addEventListener("click", () => {
-  const url = document.getElementById("backgroundUrl").value.trim();
-  if (url) {
-    pagesContainer.style.backgroundImage = `url('${url}')`;
-    backgroundSelect.value = "";
-    saveHistory();
-  }
-});
-
-const translationFontSelect = document.getElementById("translationFontSelect");
-const translationFontSize = document.getElementById("translationFontSize");
-
-function loadFontFromUrl(fontUrl, fontName) {
-  const style = document.createElement("style");
-  style.textContent = `
-    @font-face {
-      font-family: '${fontName}';
-      src: url('${fontUrl}');
+  applyUrlButton.addEventListener("click", () => {
+    const url = document.getElementById("backgroundUrl").value.trim();
+    if (url) {
+      pagesContainer.style.backgroundImage = `url('${url}')`;
+      backgroundSelect.value = "";
+      saveHistory();
     }
-  `;
-  document.head.appendChild(style);
-  document.fonts.load(`1em ${fontName}`);
-}
-
-translationFontSelect.addEventListener("change", () => {
-  const fontUrl = translationFontSelect.value;
-  const fontName = "customTranslationFont";
-  loadFontFromUrl(fontUrl, fontName);
-  document.querySelectorAll(".translation").forEach(el => {
-    el.style.fontFamily = fontName;
   });
-});
 
- document.getElementById("quranFontSize").addEventListener("input", e => {
-   document.querySelectorAll(".quran-v1, .quran-v2").forEach(el => {
-     el.style.fontSize = `${e.target.value}px`;
+  // === Custom Font for Translation ===
+  const translationFontSelect = document.getElementById("translationFontSelect");
+  translationFontSelect.addEventListener("change", () => {
+    const fontUrl = translationFontSelect.value;
+    const fontName = "customTranslationFont";
+    const style = document.createElement("style");
+    style.textContent = `
+      @font-face {
+        font-family: '${fontName}';
+        src: url('${fontUrl}');
+      }
+    `;
+    document.head.appendChild(style);
+    document.fonts.load(`1em ${fontName}`);
+    document.querySelectorAll(".translation").forEach(el => {
+      el.style.fontFamily = fontName;
+    });
   });
-});
 
-document.getElementById("translationFontSize").addEventListener("input", e => {
-  document.querySelectorAll(".translation").forEach(el => {
-    el.style.fontSize = `${e.target.value}px`;
+  // === Font Size Sliders ===
+  document.getElementById("quranFontSize").addEventListener("input", e => {
+    document.querySelectorAll(".quran-v1, .quran-v2").forEach(el => {
+      el.style.fontSize = `${e.target.value}px`;
+    });
   });
-});
 
-document.getElementById("infoFontSize").addEventListener("input", e => {
-  document.querySelectorAll(".surah-info").forEach(el => {
-    el.style.fontSize = `${e.target.value}px`;
+  document.getElementById("translationFontSize").addEventListener("input", e => {
+    document.querySelectorAll(".translation").forEach(el => {
+      el.style.fontSize = `${e.target.value}px`;
+    });
   });
-});
 
+  document.getElementById("infoFontSize").addEventListener("input", e => {
+    document.querySelectorAll(".surah-info").forEach(el => {
+      el.style.fontSize = `${e.target.value}px`;
+    });
+  });
+
+  // === Background Color Picker ===
   const backgroundColorPicker = document.getElementById("backgroundColorPicker");
-
-backgroundColorPicker.addEventListener("input", () => {
-  const color = backgroundColorPicker.value;
-  pagesContainer.style.backgroundColor = color;
-
-  // Otomatis hapus gambar background (termasuk pattern) jika ada
-  pagesContainer.style.backgroundImage = "none";
-});
+  backgroundColorPicker.addEventListener("input", () => {
+    const color = backgroundColorPicker.value;
+    pagesContainer.style.backgroundColor = color;
+    pagesContainer.style.backgroundImage = "none";
+  });
 </script>
 
 <script>
-  // ==== Modal Open/Close ====
+  // === Modal Open/Close ===
   const btnOpen = document.getElementById('customLinkButton');
   const btnClose = document.querySelector('.search-close');
   const modal = document.getElementById('searchModal');
@@ -1061,7 +1055,7 @@ backgroundColorPicker.addEventListener("input", () => {
     });
   }
 
-  // ==== Sumber XML ====
+  // === XML Sources for Translation Search ===
   const xmlSources = {
     indonesian_complex: 'https://raw.githubusercontent.com/tafsirnetlifyapp/quran/refs/heads/main/indonesian_complex_v1.0.xml',
     english_rwwad: 'https://raw.githubusercontent.com/tafsirnetlifyapp/quran/refs/heads/main/terjemahEng.xml',
@@ -1072,7 +1066,7 @@ backgroundColorPicker.addEventListener("input", () => {
   let activeLang = localStorage.getItem('activeLang') || 'indonesian_complex';
   let activeXMLDoc = null;
 
-  // ==== Loading Indicator ====
+  // === Loading Indicator ===
   function showLoading(msg = "⏳ Memuat...") {
     const loader = document.getElementById('loadingIndicator');
     if (loader) {
@@ -1086,25 +1080,18 @@ backgroundColorPicker.addEventListener("input", () => {
     if (loader) loader.style.display = 'none';
   }
 
-  // ==== Muat XML sesuai pilihan ====
+  // === Load Selected XML ===
   async function loadSelectedXML(langKey) {
     showLoading(`⏳ Memuat terjemah: ${langKey}`);
     const parser = new DOMParser();
-
     try {
-      // Reset XML lama
       activeXMLDoc = null;
-
-      // Fetch fresh data (bypass cache)
       const noCacheUrl = xmlSources[langKey] + '?t=' + Date.now();
       const response = await fetch(noCacheUrl, { cache: "no-store" });
-
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
       const text = await response.text();
       activeXMLDoc = parser.parseFromString(text, "application/xml");
-
-      localStorage.setItem('activeLang', langKey); // hanya simpan nama bahasa aktif
+      localStorage.setItem('activeLang', langKey);
       console.log(`✅ Terjemah ${langKey} dimuat`);
     } catch (err) {
       console.error(`❌ Gagal memuat ${langKey}:`, err);
@@ -1115,34 +1102,25 @@ backgroundColorPicker.addEventListener("input", () => {
     }
   }
 
-  // ==== Dropdown Change ====
+  // === Change Translation ===
   const translationSelect = document.getElementById('translationSelect');
   if (translationSelect) {
-    translationSelect.value = activeLang; // set default
-    translationSelect.addEventListener('change', (e) => {
+    translationSelect.value = activeLang;
+    translationSelect.addEventListener('change', e => {
       activeLang = e.target.value;
       loadSelectedXML(activeLang);
     });
   }
-
-  // ==== Saat Halaman Dimuat, Load XML aktif ====
   loadSelectedXML(activeLang);
 
-  // ==== Tombol "Mulai Search" & Enter Key ====
+  // === Search Functionality ===
   const mulaiSearchBtn = document.getElementById("mulaiSearchBtn");
   const kataInput = document.getElementById("kataInput");
 
   function handleSearch() {
     const keyword = kataInput.value.trim().toLowerCase();
-    if (!keyword) {
-      tampilkanError("Kata kosong.");
-      return;
-    }
-    if (!activeXMLDoc) {
-      tampilkanError("Terjemah belum siap.");
-      return;
-    }
-
+    if (!keyword) return tampilkanError("Kata kosong.");
+    if (!activeXMLDoc) return tampilkanError("Terjemah belum siap.");
     showLoading("🔎 Mencari kata...");
     setTimeout(() => {
       searchKata(keyword);
@@ -1150,24 +1128,17 @@ backgroundColorPicker.addEventListener("input", () => {
     }, 100);
   }
 
-  if (mulaiSearchBtn) {
-    mulaiSearchBtn.addEventListener("click", debounce(handleSearch, 500));
-  }
+  mulaiSearchBtn?.addEventListener("click", debounce(handleSearch, 500));
+  kataInput?.addEventListener("keypress", e => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSearch();
+    }
+  });
 
-  if (kataInput) {
-    kataInput.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        handleSearch();
-      }
-    });
-  }
-
-  // ==== Fungsi pencarian kata ====
   function searchKata(keyword) {
     const resultDiv = document.getElementById('searchResults');
     resultDiv.innerHTML = '';
-
     const suras = activeXMLDoc.getElementsByTagName('sura');
     let totalHasil = 0;
 
@@ -1194,48 +1165,29 @@ backgroundColorPicker.addEventListener("input", () => {
     }
   }
 
-  // ==== Fungsi "Menuju ke Ayat" ====
- function goToAyat(sura, aya) {
-  const surahSelect = document.getElementById('surahSelect');
-  const ayahSelect = document.getElementById('ayahSelect');
-  const wordTranslationId = document.getElementById('wordTranslationId');
-
-  if (surahSelect && ayahSelect) {
-    // Set Surah & Ayat
+  function goToAyat(sura, aya) {
     surahSelect.value = sura;
     surahSelect.dispatchEvent(new Event('change'));
-
     setTimeout(() => {
       ayahSelect.value = aya;
       ayahSelect.dispatchEvent(new Event('change'));
-
-      // Sinkronkan dropdown terjemahan dengan activeLang
-      if (wordTranslationId && typeof activeLang === 'string') {
-        const dropdownValue = "ayah_" + activeLang; // prefix 'ayah_'
+      if (wordTranslationId && activeLang) {
+        const dropdownValue = "ayah_" + activeLang;
         const matchedOption = Array.from(wordTranslationId.options)
           .find(opt => opt.value === dropdownValue);
-
         if (matchedOption) {
           wordTranslationId.value = matchedOption.value;
           wordTranslationId.dispatchEvent(new Event('change'));
         }
       }
     }, 300);
+    modal.style.display = 'none';
   }
 
-  // Tutup modal
-  const modal = document.querySelector('.modal-overlay');
-  if (modal) modal.style.display = 'none';
-}
-
-
-  // ==== Fungsi Error ====
   function tampilkanError(msg) {
-    const resultDiv = document.getElementById('searchResults');
-    resultDiv.innerHTML = `<p style="color:red;">${msg}</p>`;
+    document.getElementById('searchResults').innerHTML = `<p style="color:red;">${msg}</p>`;
   }
 
-  // ==== Debounce Helper ====
   function debounce(fn, delay) {
     let timeout;
     return function (...args) {
@@ -1244,6 +1196,7 @@ backgroundColorPicker.addEventListener("input", () => {
     };
   }
 </script>
+
 
 
   
