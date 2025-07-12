@@ -19,6 +19,18 @@ h2 {
   margin-bottom: 1rem;
 }
 
+    input[type="color"] {
+  width: 100%;           /* agar selebar elemen lain */
+  height: 2.8em;         /* ⬅️ ini membuatnya setara tinggi tombol/dropdown */
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 0;            /* hilangkan padding default */
+  box-sizing: border-box;
+  background: none;
+  cursor: pointer;
+}
+
+
     .translation[contenteditable="true"] {
   cursor: text;
 }
@@ -292,24 +304,22 @@ button:hover {
 
   <!-- Upload File -->
   <div class="button-wrapper">
-  <button id="uploadTrigger">Upload Gambar</button>
+  <button id="uploadTrigger">Background Upload</button>
   <input type="file" id="backgroundUpload" accept="image/*" style="display: none;">
 </div>
 
   <!-- Input URL di awal -->
   <div class="button-wrapper">
-  <button id="showUrlInput" class="button">Link Gambar</button>
+  <button id="showUrlInput" class="button">Background Link</button>
 </div>
 
-    <!-- Tombol/Slider Contrast -->
-  <label><button id="toggleContrast">⚙️ Atur Kontras</button>
-  <input type="range" id="contrastSlider" min="0" max="200" value="100" style="display:none; width: 100%;">
-</label>
+  
+
 
 <div id="urlInputWrapper" style="display:none; flex-direction: column; gap: 0.5em;">
   <label>
-    <span style="font-size: 0.9em;">URL Gambar:</span>
-    <input type="url" id="backgroundUrl" placeholder="https://..." style="width: 100%;">
+    <span style="font-size: 0.9em;">Masukkan URL Gambar:</span>
+    <input type="url" id="backgroundUrl" placeholder="Pastekan https://" style="width: 100%;">
   </label>
   <button id="applyUrlButton" class="button">OK</button>
 </div>
@@ -323,7 +333,7 @@ button:hover {
 </label>
 
 <label>
-  <input type="color" id="colorPicker" value="#ffffff">
+  <input type="color" id="colorPicker" value="#e83fb0">
 </label>
 
   <div class="button-wrapper">
@@ -397,8 +407,7 @@ const backgroundUpload = document.getElementById("backgroundUpload");
 const backgroundUrl = document.getElementById("backgroundUrl");
 const pagesContainer = document.getElementById("pages");
 
-const contrastSlider = document.getElementById("contrastSlider");
-const toggleContrast = document.getElementById("toggleContrast");
+
 
 // Dropdown Gambar
 backgroundSelect.addEventListener("change", () => {
@@ -438,19 +447,6 @@ backgroundUrl.addEventListener("keydown", (e) => {
   }
 });
 
-// Toggle kontras: muncul/sembunyi slider
-toggleContrast.addEventListener("click", () => {
-  const isVisible = contrastSlider.style.display === "block";
-  contrastSlider.style.display = isVisible ? "none" : "block";
-  if (!isVisible) contrastSlider.value = 100; // reset ke normal saat muncul
-  pagesContainer.style.filter = `contrast(${contrastSlider.value / 100})`;
-});
-
-// Ubah kontras saat slider digeser
-contrastSlider.addEventListener("input", () => {
-  const contrastValue = 1 + ((contrastSlider.value - 100) / 100); 
-  pagesContainer.style.filter = `contrast(${contrastValue})`;
-});
 
 
 
