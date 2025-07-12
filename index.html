@@ -971,33 +971,37 @@ backgroundColorPicker.addEventListener("input", () => {
     indonesian_complex: 'https://raw.githubusercontent.com/tafsirnetlifyapp/quran/refs/heads/main/indonesian_complex_v1.0.xml',
     english_rwwad: 'https://raw.githubusercontent.com/tafsirnetlifyapp/quran/refs/heads/main/terjemahEng.xml',
     french_rashid: 'https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/terjemahFr.xml',
-    french_rashid: 'https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/terjemahr.xml'
-    // Tambahkan lagi jika perlu...
+    spanish_montada_eu: 'https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/terjemahSpain.xml',
   };
 
   const xmlDocs = {};
 
-  // ==== Load semua XML dan simpan ke localStorage/browser ====
-  async function loadAllXMLs() {
-    const parser = new DOMParser();
-    for (const [langKey, url] of Object.entries(xmlSources)) {
-      const cached = localStorage.getItem(`quran_xml_${langKey}`);
-      if (cached) {
-        xmlDocs[langKey] = parser.parseFromString(cached, "application/xml");
-      } else {
-        try {
-          const response = await fetch(url);
-          const text = await response.text();
-          localStorage.setItem(`quran_xml_${langKey}`, text);
-          xmlDocs[langKey] = parser.parseFromString(text, "application/xml");
-        } catch (e) {
-          console.error(`Gagal ambil ${langKey}:`, e);
-        }
+// ==== Load semua XML dan simpan ke localStorage/browser ====
+async function loadAllXMLs() {
+  const parser = new DOMParser();
+  for (const [langKey, url] of Object.entries(xmlSources)) {
+    console.log(`📦 Memproses ${langKey}...`);
+    const cached = localStorage.getItem(langKey);
+    if (cached) {
+      console.log(`✅ ${langKey} sudah ada di localStorage`);
+      xmlDocs[langKey] = parser.parseFromString(cached, "application/xml");
+    } else {
+      try {
+        console.log(`⬇️ Mengambil ${langKey} dari ${url}`);
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Status ${response.status}`);
+        const text = await response.text();
+        localStorage.setItem(langKey, text);
+        xmlDocs[langKey] = parser.parseFromString(text, "application/xml");
+        console.log(`✅ ${langKey} berhasil disimpan`);
+      } catch (e) {
+        console.error(`❌ Gagal ambil ${langKey}:`, e);
       }
     }
   }
+}
 
-  loadAllXMLs();
+loadAllXMLs();
 
   // ==== Fungsi pencarian kata di semua bahasa ====
   document.getElementById('startSearchBtn').addEventListener('click', () => {
