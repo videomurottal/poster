@@ -401,18 +401,6 @@ button:hover {
   <button id="customLinkButton">Cari Judul</button>
 </div>
 
-<!-- Modal Pencarian -->
-<div id="searchModal" class="modal-overlay" style="display: none;">
-  <div class="modal-content"><button class="search-close">❌</button>
-    <h3>Pencarian Kata</h3>
-    <input type="text" id="searchInput" placeholder="Cari kata di Quran sesuai bahasamu...">
-    <button id="startSearchBtn">Mulai Search</button>
-    <div id="searchResults"></div>
-  </div>
-</div>
-
-
-
 <div class="button-wrapper">
   <button onclick="setVersion('v1')">Quran V1</button>
 </div>
@@ -955,6 +943,16 @@ backgroundColorPicker.addEventListener("input", () => {
 });
 </script>
 
+<!-- Modal Pencarian -->
+<div id="searchModal" class="modal-overlay" style="display: none;">
+  <div class="modal-content"><button class="search-close">❌</button>
+    <h3>Pencarian Kata</h3>
+    <input type="text" id="searchInput" placeholder="Cari kata di Quran sesuai bahasamu...">
+    <button id="startSearchBtn">Mulai Search</button>
+    <div id="searchResults"></div>
+  </div>
+</div>
+  
 <script>
   // ==== Modal ====
   document.getElementById('customLinkButton').addEventListener('click', () => {
@@ -972,9 +970,9 @@ backgroundColorPicker.addEventListener("input", () => {
     spanish_montada_eu: 'https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/terjemahSpain.xml'
   };
 
-  const xmlDocs = {};
+  const xmlDocs = {}; // Semua XML dimuat ke memori saja
 
-  // ==== Load semua XML (hanya sekali) ====
+  // ==== Load semua XML (tanpa localStorage) ====
   async function loadAllXMLs() {
     console.log("⏳ Memuat semua XML...");
     const parser = new DOMParser();
@@ -983,7 +981,6 @@ backgroundColorPicker.addEventListener("input", () => {
         const response = await fetch(url);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const text = await response.text();
-        localStorage.setItem(langKey, text); // cache ke localStorage
         xmlDocs[langKey] = parser.parseFromString(text, "application/xml");
         console.log(`✅ ${langKey} berhasil dimuat`);
       } catch (err) {
@@ -1080,6 +1077,7 @@ backgroundColorPicker.addEventListener("input", () => {
     resultDiv.innerHTML = `<p style="color:red;">${msg}</p>`;
   }
 </script>
+
 
 
   
