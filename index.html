@@ -1029,37 +1029,53 @@ backgroundColorPicker.addEventListener("input", () => {
   let activeLang = localStorage.getItem('activeLang') || 'indonesian_complex';
   let activeXMLDoc = null;
 
+  // ==== Loading Indicator ====
+  function showLoading(msg = "⏳ Memuat...") {
+    const loader = document.getElementById('loadingIndicator');
+    if (loader) {
+      loader.textContent = msg;
+      loader.style.display = 'block';
+    }
+  }
+
+  function hideLoading() {
+    const loader = document.getElementById('loadingIndicator');
+    if (loader) loader.style.display = 'none';
+  }
+
   // ==== Muat XML sesuai pilihan ====
   async function loadSelectedXML(langKey) {
-  console.log(`⏳ Memuat terjemah: ${langKey}`);
-  const parser = new DOMParser();
+    showLoading(`⏳ Memuat terjemah: ${langKey}`);
+    const parser = new DOMParser();
 
-  try {
-    // Hapus XML lama dari memori
-    activeXMLDoc = null;
+    try {
+      // Reset XML lama dari memori
+      activeXMLDoc = null;
 
-    // Tambahkan query ?t=timestamp untuk memaksa fetch fresh
-    const noCacheUrl = xmlSources[langKey] + '?t=' + Date.now();
+      // Force fetch fresh (bypass cache)
+      const noCacheUrl = xmlSources[langKey] + '?t=' + Date.now();
 
-    const response = await fetch(noCacheUrl, { cache: "no-store" });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const response = await fetch(noCacheUrl, { cache: "no-store" });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-    const text = await response.text();
-    activeXMLDoc = parser.parseFromString(text, "application/xml");
+      const text = await response.text();
+      activeXMLDoc = parser.parseFromString(text, "application/xml");
+      localStorage.setItem('activeLang', langKey); // hanya simpan nama bahasa aktif
 
-    // Simpan hanya nama terjemah aktif, bukan isi XML
-    localStorage.setItem('activeLang', langKey);
-
-    console.log(`✅ Terjemah ${langKey} berhasil dimuat`);
-  } catch (err) {
-    console.error(`❌ Gagal memuat ${langKey}:`, err);
-    activeXMLDoc = null;
+      console.log(`✅ Terjemah ${langKey} dimuat`);
+    } catch (err) {
+      console.error(`❌ Gagal memuat ${langKey}:`, err);
+      activeXMLDoc = null;
+      tampilkanError("Gagal memuat terjemah.");
+    } finally {
+      hideLoading();
+    }
   }
-}
 
   // ==== Dropdown Change ====
   const translationSelect = document.getElementById('translationSelect');
   if (translationSelect) {
+    translationSelect.value = activeLang; // set default pilihan
     translationSelect.addEventListener('change', (e) => {
       activeLang = e.target.value;
       loadSelectedXML(activeLang);
@@ -1067,30 +1083,41 @@ backgroundColorPicker.addEventListener("input", () => {
   }
 
   // ==== Saat Halaman Dimuat, Load XML aktif ====
-  if (localStorage.getItem(activeLang)) {
-    console.log(`📦 Memuat terjemah aktif dari localStorage: ${activeLang}`);
-    const parser = new DOMParser();
-    const cachedText = localStorage.getItem(activeLang);
-    activeXMLDoc = parser.parseFromString(cachedText, "application/xml");
-  } else {
-    loadSelectedXML(activeLang);
+  loadSelectedXML(activeLang);
+
+  // ==== Tombol "Mulai Search" & Enter Key ====
+  const mulaiSearchBtn = document.getElementById("mulaiSearchBtn");
+  const kataInput = document.getElementById("kataInput");
+
+  function handleSearch() {
+    const keyword = kataInput.value.trim().toLowerCase();
+    if (!keyword) {
+      tampilkanError("Kata kosong.");
+      return;
+    }
+    if (!activeXMLDoc) {
+      tampilkanError("Terjemah belum siap.");
+      return;
+    }
+
+    showLoading("🔎 Mencari kata...");
+    setTimeout(() => {
+      searchKata(keyword);
+      hideLoading();
+    }, 100);
   }
 
-  // ==== Tombol "Mulai Search" ====
-  const mulaiSearchBtn = document.getElementById("mulaiSearchBtn");
   if (mulaiSearchBtn) {
-    mulaiSearchBtn.addEventListener("click", debounce(() => {
-      const keyword = document.getElementById("kataInput").value.trim().toLowerCase();
-      if (!keyword) {
-        tampilkanError("Kata kosong.");
-        return;
+    mulaiSearchBtn.addEventListener("click", debounce(handleSearch, 500));
+  }
+
+  if (kataInput) {
+    kataInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleSearch();
       }
-      if (!activeXMLDoc) {
-        tampilkanError("Terjemah belum siap.");
-        return;
-      }
-      searchKata(keyword);
-    }, 500));
+    });
   }
 
   // ==== Fungsi pencarian kata ====
@@ -1120,7 +1147,7 @@ backgroundColorPicker.addEventListener("input", () => {
     }
 
     if (totalHasil === 0) {
-      resultDiv.innerHTML = '<p>Tidak ditemukan hasil untuk kata tersebut.</p>';
+      resultDiv.innerHTML = '<p style="color:red;">Tidak ditemukan hasil untuk kata tersebut.</p>';
     }
   }
 
@@ -1128,16 +1155,6 @@ backgroundColorPicker.addEventListener("input", () => {
   function tampilkanError(msg) {
     const resultDiv = document.getElementById('searchResults');
     resultDiv.innerHTML = `<p style="color:red;">${msg}</p>`;
-  }
-
-  // ==== Loading Spinner ====
-  function tampilkanLoading(show) {
-    const resultDiv = document.getElementById('searchResults');
-    if (show) {
-      resultDiv.innerHTML = '<p>⏳ Memuat terjemah...</p>';
-    } else {
-      resultDiv.innerHTML = '';
-    }
   }
 
   // ==== Debounce Helper ====
@@ -1148,63 +1165,8 @@ backgroundColorPicker.addEventListener("input", () => {
       timeout = setTimeout(() => fn.apply(this, args), delay);
     };
   }
-
-  function showLoading(msg = "⏳ Memuat...") {
-  const loader = document.getElementById('loadingIndicator');
-  loader.textContent = msg;
-  loader.style.display = 'block';
-}
-
-function hideLoading() {
-  const loader = document.getElementById('loadingIndicator');
-  loader.style.display = 'none';
-}
-
-
-  async function loadSelectedXML(langKey) {
-  showLoading(`⏳ Memuat terjemah: ${langKey}`);
-  const parser = new DOMParser();
-
-  try {
-    Object.keys(xmlSources).forEach(key => localStorage.removeItem(key));
-
-    const response = await fetch(xmlSources[langKey]);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-    const text = await response.text();
-    localStorage.setItem(langKey, text);
-    localStorage.setItem('activeLang', langKey);
-    activeXMLDoc = parser.parseFromString(text, "application/xml");
-
-    console.log(`✅ Terjemah ${langKey} dimuat & disimpan`);
-  } catch (err) {
-    console.error(`❌ Gagal memuat ${langKey}:`, err);
-    activeXMLDoc = null;
-    tampilkanError("Gagal memuat terjemah.");
-  } finally {
-    hideLoading();
-  }
-}
-
-  document.getElementById("mulaiSearchBtn").addEventListener("click", () => {
-  const keyword = document.getElementById("kataInput").value.trim().toLowerCase();
-  if (!keyword) {
-    tampilkanError("Kata kosong.");
-    return;
-  }
-  if (!activeXMLDoc) {
-    tampilkanError("Terjemah belum siap.");
-    return;
-  }
-
-  showLoading("🔎 Mencari kata...");
-  setTimeout(() => {
-    searchKata(keyword);
-    hideLoading();
-  }, 100); // delay kecil agar loading muncul
-});
-
 </script>
+
 
   
 </body>
