@@ -1153,18 +1153,44 @@ backgroundColorPicker.addEventListener("input", () => {
 
   // ==== Fungsi "Menuju ke Ayat" ====
   function goToAyat(sura, aya) {
-    const surahSelect = document.getElementById('surahSelect');
-    const ayahSelect = document.getElementById('ayahSelect');
+  const surahSelect = document.getElementById('surahSelect');
+  const ayahSelect = document.getElementById('ayahSelect');
+  const translationSelect = document.getElementById('translationSelect');
 
-    if (surahSelect && ayahSelect) {
-      surahSelect.value = sura;
-      surahSelect.dispatchEvent(new Event('change'));
+  if (surahSelect && ayahSelect && translationSelect) {
+    // Ambil bahasa aktif dari dropdown
+    const selectedValue = translationSelect.value.replace('ayah_', '');
+    activeLang = selectedValue;
 
-      setTimeout(() => {
-        ayahSelect.value = aya;
-        ayahSelect.dispatchEvent(new Event('change'));
-      }, 300);
+    // Update dropdown agar sinkron
+    translationSelect.value = 'ayah_' + selectedValue;
+
+    // Load XML baru jika belum aktif
+    if (!activeXMLDoc || localStorage.getItem('activeLang') !== selectedValue) {
+      loadSelectedXML(selectedValue).then(() => {
+        pindahAyat(sura, aya);
+      });
+    } else {
+      pindahAyat(sura, aya);
     }
+  }
+
+  // Tutup modal pencarian
+  modal.style.display = 'none';
+}
+
+function pindahAyat(sura, aya) {
+  const surahSelect = document.getElementById('surahSelect');
+  const ayahSelect = document.getElementById('ayahSelect');
+
+  surahSelect.value = sura;
+  surahSelect.dispatchEvent(new Event('change'));
+
+  setTimeout(() => {
+    ayahSelect.value = aya;
+    ayahSelect.dispatchEvent(new Event('change'));
+  }, 300);
+}
 
     // Tutup modal
     if (modal) modal.style.display = 'none';
