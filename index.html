@@ -63,6 +63,29 @@ h2 {
   cursor: pointer;
 }
 
+    .search-close {
+  position: absolute;
+  top: 2px;        /* sedikit di luar modal */
+  right: 18px;
+  background: #ffffff; /* langsung warna merah */
+  border-radius: 50%; /* bulat */
+  color: #fff;
+  font-size: 1rem;
+  border: none;
+  width: 30px;       /* biar kotak pas */
+  height: 30px;
+  line-height: 30px; /* vertikal tengah */
+  text-align: right;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transition: background 0.3s, transform 0.2s;
+}
+
+.search-close:hover {
+  background: #c0392b; /* lebih gelap saat hover */
+  transform: scale(1.1);
+}
+
 
 /* Input & Button */
 #searchInput, #startSearchBtn {
