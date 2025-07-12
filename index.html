@@ -295,9 +295,7 @@ button:hover {
 </div>
 
 
-<div id="pages">
-  <div id="overlayLayer"></div>
-</div>
+<div id="pages"></div>
 
 <div class="controls">
   <!-- Dropdown Background -->
@@ -583,6 +581,22 @@ async function loadAyat() {
     const s = surahSelect.value, a = ayahSelect.value, key = `${s}:${a}`;
     const container = document.getElementById("pages");
     container.innerHTML = "";
+
+    // Tambahkan kembali overlayLayer yang hilang
+const overlayLayer = document.createElement("div");
+overlayLayer.id = "overlayLayer";
+overlayLayer.style.position = "absolute";
+overlayLayer.style.top = "0";
+overlayLayer.style.left = "0";
+overlayLayer.style.right = "0";
+overlayLayer.style.bottom = "0";
+overlayLayer.style.pointerEvents = "none";
+overlayLayer.style.zIndex = "1";
+overlayLayer.style.borderRadius = "0.5em";
+container.appendChild(overlayLayer);
+
+// Update warnanya sesuai input color dan range
+updateOverlayColor();
 
     const pageMap = await fetch("https://raw.githubusercontent.com/dickymiswardi/tadabbur/main/ayah_page_map.json").then(r => r.json());
     const page = pageMap[key];
