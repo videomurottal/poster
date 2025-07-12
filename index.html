@@ -19,6 +19,108 @@ h2 {
   margin-bottom: 1rem;
 }
 
+
+
+
+
+   /* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  width: 100vw;
+  height: 100vh;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+}
+
+/* Modal Box */
+.modal-content {
+  background: #fff;
+  width: 90%;
+  max-width: 420px;
+  padding: 1.5em;
+  border-radius: 10px;
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+/* Tombol Close */
+.search-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 1.2em;
+  background: none;
+  border: none;
+  color: #333;
+  cursor: pointer;
+  z-index: 1;
+}
+.search-close:hover {
+  background: none;
+  color: red;
+}
+
+/* Input & Button */
+#searchInput, #startSearchBtn {
+  width: 100%;
+  margin-top: 10px;
+  padding: 0.7em;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+#startSearchBtn {
+  background: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-top: 12px;
+}
+
+#startSearchBtn:hover {
+  background: #0056b3;
+}
+
+/* Hasil */
+#searchResults {
+  margin-top: 1em;
+  max-height: 250px;
+  overflow-y: auto;
+}
+#searchResults p {
+  background: #f0f0f0;
+  padding: 0.6em;
+  margin-bottom: 0.5em;
+  border-radius: 6px;
+}
+#searchResults button {
+  margin-top: 0.5em;
+  padding: 0.3em 0.6em;
+  font-size: 0.9rem;
+  background: #28a745;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+}
+#searchResults button:hover {
+  background: #1e7e34;
+}
+ 
+
+
+
+
+    
+
     #pages {
   background-color: #82615f; /* default warna latar */
 }
@@ -282,9 +384,23 @@ button:hover {
 </label>
 
   
-  <div class="button-wrapper">
+<!-- Tombol Search -->
+<div class="button-wrapper">
   <button id="customLinkButton">Tombol Link</button>
 </div>
+
+<!-- Modal Pencarian -->
+<div id="searchModal" class="modal-overlay" style="display: none;">
+  <div class="modal-content">
+    <button class="search-close">✕</button>
+    <h3>Pencarian Kata</h3>
+    <input type="text" id="searchInput" placeholder="Cari kata sesuai bahasamu...">
+    <button id="startSearchBtn">Mulai Search</button>
+    <div id="searchResults"></div>
+  </div>
+</div>
+
+  
 <div class="button-wrapper">
   <button onclick="setVersion('v1')">Quran V1</button>
 </div>
@@ -828,25 +944,26 @@ backgroundColorPicker.addEventListener("input", () => {
 </script>
 
 <script>
-  // ==== Tombol buka/tutup modal ====
+  // Buka Modal
   document.getElementById('customLinkButton').addEventListener('click', () => {
-    document.getElementById('searchModal').style.display = 'block';
+    document.getElementById('searchModal').style.display = 'flex';
   });
 
-  document.querySelector('.close-modal').addEventListener('click', () => {
+  // Tutup Modal
+  document.querySelector('.search-close').addEventListener('click', () => {
     document.getElementById('searchModal').style.display = 'none';
   });
 
-  // ==== Sumber XML untuk banyak bahasa ====
+  // Daftar XML multi-bahasa
   const xmlSources = {
     indonesian_complex: 'https://raw.githubusercontent.com/tafsirnetlifyapp/quran/refs/heads/main/indonesian_complex_v1.0.xml',
-    english_saheeh: 'https://raw.githubusercontent.com/tafsirnetlifyapp/quran/refs/heads/main/english_saheeh_v1.0.xml'
-    // Tambahkan lagi jika perlu...
+    english_rwwad: 'https://raw.githubusercontent.com/tafsirnetlifyapp/quran/refs/heads/main/terjemahEng.xml'
+    // Tambah lagi bila perlu
   };
 
   const xmlDocs = {};
 
-  // ==== Load semua XML dan simpan ke localStorage/browser ====
+  // Ambil semua XML
   async function loadAllXMLs() {
     const parser = new DOMParser();
     for (const [langKey, url] of Object.entries(xmlSources)) {
@@ -855,8 +972,8 @@ backgroundColorPicker.addEventListener("input", () => {
         xmlDocs[langKey] = parser.parseFromString(cached, "application/xml");
       } else {
         try {
-          const response = await fetch(url);
-          const text = await response.text();
+          const res = await fetch(url);
+          const text = await res.text();
           localStorage.setItem(`quran_xml_${langKey}`, text);
           xmlDocs[langKey] = parser.parseFromString(text, "application/xml");
         } catch (e) {
@@ -868,7 +985,7 @@ backgroundColorPicker.addEventListener("input", () => {
 
   loadAllXMLs();
 
-  // ==== Fungsi pencarian kata di semua bahasa ====
+  // Fungsi Search
   document.getElementById('startSearchBtn').addEventListener('click', () => {
     const keyword = document.getElementById('searchInput').value.toLowerCase();
     const resultDiv = document.getElementById('searchResults');
@@ -898,7 +1015,7 @@ backgroundColorPicker.addEventListener("input", () => {
             }
             const p = document.createElement('p');
             p.innerHTML = `Surah ${suraNum}, Ayat ${ayaNum}: ${translation}
-              <button onclick="goToAyat(${suraNum}, ${ayaNum})">Menuju ke Ayat</button>`;
+              <button onclick="goToAyat(${suraNum}, ${ayaNum})">Lihat Ayat Ini</button>`;
             resultDiv.appendChild(p);
           }
         }
@@ -906,7 +1023,6 @@ backgroundColorPicker.addEventListener("input", () => {
     }
   });
 
-  // ==== Fungsi "Menuju ke Ayat" ====
   function goToAyat(sura, aya) {
     const surahSelect = document.getElementById('surahSelect');
     const ayahSelect = document.getElementById('ayahSelect');
@@ -921,6 +1037,7 @@ backgroundColorPicker.addEventListener("input", () => {
     document.getElementById('searchModal').style.display = 'none';
   }
 </script>
+
 
   
 </body>
