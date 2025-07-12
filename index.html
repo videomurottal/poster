@@ -258,8 +258,10 @@ button:hover {
   <button id="applyColor">Konfirmasi Warna</button>
 </div>
 
- <div class="button-wrapper">
+  <div class="button-wrapper">
+<div id="saveSizeOptions" style="display:none; gap: 0.5em; flex-wrap: wrap;">
   <button class="save-option" data-scale="1">Download Gambar</button>
+</div>
 </div>
 
 
@@ -638,12 +640,12 @@ function saveImageWithScale(scale = 1) {
   const baseWidth = node.offsetWidth;
   const baseHeight = node.offsetHeight;
 
-  // Clone elemen node
+  // Clone elemen node agar bisa di-render offscreen
   const clone = node.cloneNode(true);
   clone.style.width = baseWidth + "px";
   clone.style.height = baseHeight + "px";
 
-  // Bungkus clone dalam container offscreen
+  // Bungkus clone dalam container tersembunyi
   const container = document.createElement("div");
   container.style.position = "fixed";
   container.style.left = "-9999px";
@@ -653,27 +655,23 @@ function saveImageWithScale(scale = 1) {
   container.appendChild(clone);
   document.body.appendChild(container);
 
-  // Tunggu font selesai dimuat sebelum capture
-  document.fonts.ready.then(() => {
-    return domtoimage.toBlob(clone, {
-      width: baseWidth * scale,
-      height: baseHeight * scale,
-      style: {
-        width: `${baseWidth * scale}px`,
-        height: `${baseHeight * scale}px`,
-        transform: "none", // Hindari scale CSS
-      }
-    });
+  // Render dan simpan sebagai PNG
+  domtoimage.toBlob(clone, {
+    width: baseWidth * scale,
+    height: baseHeight * scale,
+    style: {
+      width: `${baseWidth * scale}px`,
+      height: `${baseHeight * scale}px`
+    }
   }).then(blob => {
     window.saveAs(blob, filename);
-    document.body.removeChild(container);
+    document.body.removeChild(container); // Hapus clone
   }).catch(err => {
     alert("Gagal menyimpan gambar: " + err.message);
     console.error(err);
     document.body.removeChild(container);
   });
 }
-
     
     document.getElementById("applyColor").addEventListener("click", () => {
   const target = document.getElementById("colorTarget").value;
