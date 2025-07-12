@@ -13,11 +13,26 @@
   margin: 0;
 }
 
-h2 {
+h3 {
   text-align: center;
   font-size: clamp(1.5rem, 4vw, 2.5rem);
   margin-bottom: 1rem;
 }
+
+    .brand-watermark {
+  font-size: 0.4em;
+  font-family: sans-serif;
+  color: #999;
+  position: absolute;     /* ⬅️ Supaya tidak mendorong kotak */
+  bottom: 0.5em;           /* ⬅️ Turunkan ke bawah */
+  left: 50%;              
+  transform: translateX(-50%); /* ⬅️ Tengahkan secara horizontal */
+  text-align: center;
+  font-style: italic;
+  direction: ltr;
+  user-select: none;
+}
+
 
     .translation[contenteditable="true"] {
   cursor: text;
@@ -173,7 +188,7 @@ button:hover {
 </head>
 <body>
 
-<h2>Poster Quran</h2>
+<h3>Poster Quran (Klik Teks Terjemah Untuk Mengedit)</h3>
   
 <div class="controls">
   <!-- Baris 1: Surah & Ayat -->
@@ -189,11 +204,17 @@ button:hover {
   </label>
 
   <!-- Baris 3: Terjemahan & Tombol Link & Quran V1/V2 -->
-  <label><select id="wordTranslationId">
-      <option value="33" selected>Indonesian – Islamic Affairs Ministry</option>
-      <option value="20">English – Saheeh International</option>
-    </select>
-  </label>
+  <label>
+  <select id="wordTranslationId">
+    <option value="">Tanpa Terjemah</option>
+    <option value="33">Per-Kata – Indonesian Affairs</option>
+    <option value="20">Per-Kata – English Saheeh</option>
+    <option value="ayah_indonesian_sabiq">Per-Ayat – Indonesian Sabiq</option>
+    <option value="ayah_english_saheeh">Per-Ayat – English Saheeh</option>
+  </select>
+</label>
+
+  
   <div class="button-wrapper">
   <button id="customLinkButton">Tombol Link</button>
 </div>
@@ -543,42 +564,73 @@ async function loadAyat() {
     });
     div.appendChild(line);
 
-    if (wordTranslationId.value) {
-      const langCode = translationLanguageMap[wordTranslationId.value];
-      try {
-        const r = await fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?words=true&language=${langCode}&translations=${wordTranslationId.value}`);
-        const j = await r.json();
-        const wordsData = j.verse.words;
-        const wordTranslations = wordsData.map(w => w.translation?.text || "").slice(startIdx, endIdx);
-        const perKataDiv = document.createElement("div");
-        perKataDiv.className = "translation";
-        perKataDiv.textContent = wordTranslations.join(" ");
-        perKataDiv.contentEditable = true;
-        perKataDiv.style.userSelect = "text";
-        perKataDiv.setAttribute("draggable", "false");
-        div.appendChild(perKataDiv);
 
-        const surahName = surahList[s][0];
-        const referenceDiv = document.createElement("div");
-        referenceDiv.className = "surah-info";
-        referenceDiv.textContent = `${surahName}: ${a}`;
-        div.appendChild(referenceDiv);
+    
+    const transVal = wordTranslationId.value;
+if (transVal) {
+  if (transVal.startsWith("ayah_")) {
+    // ✅ Terjemahan Per-Ayat (QuranEnc)
+    const transKey = transVal.replace("ayah_", "");
+    try {
+      const res = await fetch(`https://quranenc.com/api/v1/translation/aya/${transKey}/${s}/${a}`);
+      const json = await res.json();
+      const fullTranslation = json.result.translation;
 
-        // Atur font size langsung sesuai slider
-        div.style.fontSize = document.getElementById("fontSizeAyat").value + "px";
-        perKataDiv.style.fontSize = document.getElementById("fontSizeTerjemah").value + "px";
-        referenceDiv.style.fontSize = document.getElementById("fontSizeInfo").value + "px";
-
-        const brandDiv = document.createElement("div");
-        brandDiv.className = "brand-watermark";
-        brandDiv.textContent = "videomurottal.com";
-        div.appendChild(brandDiv);
-
-        
-      } catch (e) {
-        console.error("Gagal ambil terjemah perkata:", e);
-      }
+      const ayahTransDiv = document.createElement("div");
+      ayahTransDiv.className = "translation";
+      ayahTransDiv.contentEditable = true;
+      ayahTransDiv.innerText = fullTranslation;
+      ayahTransDiv.style.userSelect = "text";
+      ayahTransDiv.setAttribute("draggable", "false");
+      div.appendChild(ayahTransDiv);
+    } catch (e) {
+      console.error("Gagal ambil terjemahan per-ayat:", e);
     }
+  } else {
+    // ✅ Terjemahan Per-Kata (Quran.com)
+    const langCode = translationLanguageMap[transVal];
+    try {
+      const r = await fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?words=true&language=${langCode}&translations=${transVal}`);
+      const j = await r.json();
+      const wordsData = j.verse.words;
+      const wordTranslations = wordsData.map(w => w.translation?.text || "").slice(startIdx, endIdx);
+
+      const perKataDiv = document.createElement("div");
+      perKataDiv.className = "translation";
+      perKataDiv.textContent = wordTranslations.join(" ");
+      perKataDiv.contentEditable = true;
+      perKataDiv.style.userSelect = "text";
+      perKataDiv.setAttribute("draggable", "false");
+      div.appendChild(perKataDiv);
+    } catch (e) {
+      console.error("Gagal ambil terjemah perkata:", e);
+    }
+  }
+
+  // ✅ Tampilkan info surah dan ayat
+  const surahName = surahList[s][0];
+  const referenceDiv = document.createElement("div");
+  referenceDiv.className = "surah-info";
+  referenceDiv.textContent = `${surahName}: ${a}`;
+  div.appendChild(referenceDiv);
+
+  // ✅ Atur font size
+  div.style.fontSize = document.getElementById("quranFontSize").value + "px";
+  document.querySelectorAll(".translation").forEach(el => {
+    el.style.fontSize = document.getElementById("translationFontSize").value + "px";
+  });
+  referenceDiv.style.fontSize = document.getElementById("infoFontSize").value + "px";
+
+  // ✅ Tambah watermark
+  const brandDiv = document.createElement("div");
+  brandDiv.className = "brand-watermark";
+  brandDiv.textContent = "videomurottal.com";
+  div.appendChild(brandDiv);
+}
+
+
+
+    
 
     div.style.display = "block";
     requestAnimationFrame(() => div.style.opacity = "1");
