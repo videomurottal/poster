@@ -263,10 +263,11 @@ button:hover {
 </div>
 
 <div id="saveSizeOptions" style="display:none; gap: 0.5em; flex-wrap: wrap;">
-  <button class="save-option" data-scale="1">Kualitas Rendah</button>
-  <button class="save-option" data-scale="2">Kualitas Sedang</button>
-  <button class="save-option" data-scale="4">Kualitas Tinggi</button>
+  <button class="save-option" data-scale="1">Rendah</button>
+  <button class="save-option" data-scale="2">Sedang</button>
+  <button class="save-option" data-scale="4">Tinggi</button>
 </div>
+
 
 <!-- Pilihan Font Terjemah -->
 <label>
@@ -616,46 +617,65 @@ updateAyahDropdown().then(() => {
   <script>
 
 const saveImageTrigger = document.getElementById("saveImageTrigger");
-  const saveSizeOptions = document.getElementById("saveSizeOptions");
+const saveSizeOptions = document.getElementById("saveSizeOptions");
 
-  saveImageTrigger.addEventListener("click", () => {
-    saveSizeOptions.style.display = "flex";
+// Tampilkan opsi kualitas saat tombol diklik
+saveImageTrigger.addEventListener("click", () => {
+  saveSizeOptions.style.display = "flex";
+});
+
+// Aksi saat salah satu opsi kualitas ditekan
+document.querySelectorAll(".save-option").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const scale = parseFloat(btn.dataset.scale);
+    saveImageWithScale(scale);
+    saveSizeOptions.style.display = "none";
   });
+});
 
-  document.querySelectorAll(".save-option").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const scale = parseFloat(btn.dataset.scale);
-      saveImageWithScale(scale);
-      saveSizeOptions.style.display = "none";
-    });
+// Fungsi utama untuk menyimpan gambar dengan skala
+function saveImageWithScale(scale = 1) {
+  const node = document.getElementById("pages");
+  const s = surahSelect.value;
+  const a = ayahSelect.value;
+  const surahName = surahList[s][0].replace(/[^a-zA-Z0-9]/g, "-");
+  const filename = `${surahName}-${a}.png`;
+
+  const baseWidth = node.offsetWidth;
+  const baseHeight = node.offsetHeight;
+
+  // Clone elemen node agar bisa di-render offscreen
+  const clone = node.cloneNode(true);
+  clone.style.width = baseWidth + "px";
+  clone.style.height = baseHeight + "px";
+
+  // Bungkus clone dalam container tersembunyi
+  const container = document.createElement("div");
+  container.style.position = "fixed";
+  container.style.left = "-9999px";
+  container.style.top = "-9999px";
+  container.style.width = baseWidth + "px";
+  container.style.height = baseHeight + "px";
+  container.appendChild(clone);
+  document.body.appendChild(container);
+
+  // Render dan simpan sebagai PNG
+  domtoimage.toBlob(clone, {
+    width: baseWidth * scale,
+    height: baseHeight * scale,
+    style: {
+      width: `${baseWidth * scale}px`,
+      height: `${baseHeight * scale}px`
+    }
+  }).then(blob => {
+    window.saveAs(blob, filename);
+    document.body.removeChild(container); // Hapus clone
+  }).catch(err => {
+    alert("Gagal menyimpan gambar: " + err.message);
+    console.error(err);
+    document.body.removeChild(container);
   });
-
-  function saveImageWithScale(scale = 1) {
-    const node = document.getElementById("pages");
-    const s = surahSelect.value;
-    const a = ayahSelect.value;
-    const surahName = surahList[s][0].replace(/[^a-zA-Z0-9]/g, "-");
-    const filename = `${surahName}-${a}.png`;
-
-    const baseWidth = node.offsetWidth;
-    const baseHeight = node.offsetHeight;
-
-    domtoimage.toBlob(node, {
-      width: baseWidth * scale,
-      height: baseHeight * scale,
-      style: {
-        transform: `scale(${scale})`,
-        transformOrigin: 'top left',
-        width: `${baseWidth}px`,
-        height: `${baseHeight}px`
-      }
-    }).then(blob => {
-      window.saveAs(blob, filename);
-    }).catch(err => {
-      alert("Gagal menyimpan gambar: " + err.message);
-      console.error(err);
-    });
-  }
+}
     
     document.getElementById("applyColor").addEventListener("click", () => {
   const target = document.getElementById("colorTarget").value;
