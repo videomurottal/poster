@@ -69,7 +69,7 @@ button:hover {
   background-position: center;
   background-repeat: no-repeat;
   z-index: 0;
-  filter: contrast(1); /* 🔥 Efek kontras aktif di sini */
+  filter: contrast(1);
   transition: filter 0.3s ease;
 }
 
@@ -306,7 +306,7 @@ button:hover {
 
 
 <div id="posterContainer" style="position: relative; width: 100%; max-width: 540px; margin: auto;">
-  <img id="bgImage" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; filter:contrast(1); transition:filter 0.3s ease;">
+  <div id="bgImage"></div>
   <div id="pages" style="position: relative; z-index: 1;"></div>
 </div>
 
