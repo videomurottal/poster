@@ -5,35 +5,31 @@
   <title>Poster Quran</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <style>
-    body {
-  background: #fefcf8;
-  padding: 1em;
-  font-family: sans-serif;
-  direction: rtl;
-  margin: 0;
-}
+  body {
+    background: #fefcf8;
+    padding: 1em;
+    font-family: sans-serif;
+    direction: rtl;
+    margin: 0;
+  }
 
-h2 {
-  text-align: center;
-  font-size: clamp(0.9rem, 2.5vw, 1.5rem);
-  margin-bottom: 1rem;
-}
-
-
-  /* Tombol Link Wrapper */
-  .button-wrapper {
-    position: relative;
-    z-index: 1;
+  h2 {
+    text-align: center;
+    font-size: clamp(0.9rem, 2.5vw, 1.5rem);
     margin-bottom: 1rem;
   }
 
-  /* Modal Overlay */
+  .button-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.5em;
+  }
+
   .modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(3px);
     display: flex;
@@ -42,7 +38,6 @@ h2 {
     z-index: 9999;
   }
 
-  /* Modal Box */
   .modal-content {
     background: #fff;
     max-width: 90%;
@@ -57,18 +52,15 @@ h2 {
     max-height: 80vh;
   }
 
-  /* Close Button */
   .close-modal {
     position: absolute;
-    top: 10px;
-    right: 15px;
+    top: 10px; right: 15px;
     background: transparent;
     border: none;
     font-size: 1.2rem;
     cursor: pointer;
   }
 
-  /* Input & Button */
   #searchInput {
     width: 100%;
     padding: 8px;
@@ -93,7 +85,6 @@ h2 {
     background-color: #0056b3;
   }
 
-  /* Hasil Pencarian */
   #searchResults {
     margin-top: 15px;
     max-height: 250px;
@@ -133,176 +124,145 @@ h2 {
       font-size: 0.9rem;
     }
   }
-    
-    
-    #pages {
-  background-color: #82615f; /* default warna latar */
-}
 
-    input[type="color"] {
-  width: 100%;           /* agar selebar elemen lain */
-  height: 2.8em;         /* ⬅️ ini membuatnya setara tinggi tombol/dropdown */
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 0;            /* hilangkan padding default */
-  box-sizing: border-box;
-  background: none;
-  cursor: pointer;
-}
-
-
-    .translation[contenteditable="true"] {
-  cursor: text;
-}
-
-#pages {
-  /* ... (sudah ada background properties) */
-  filter: contrast(1); /* Default */
-  transition: filter 0.3s ease;
-}
-    
-input[type="file"],
-input[type="url"],
-select,
-button {
-  font-size: clamp(1rem, 3vw, 1.2rem);
-  padding: 0.5em;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-button {
-  background-color: #4cafef;
-  color: #fff;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-button:hover {
-  background-color: #007acc;
-}
-
-#pages {
-  width: 100%;
-  max-width: 540px;
-  aspect-ratio: 1 / 1;
-  margin: 2em auto;
-  position: relative;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-}
-
-.controls {
-  direction: ltr;
-  max-width: 800px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 0.8em;
-  justify-content: center;
-  align-items: center;
-  padding: 0.5em;
-}
-
-.controls label {
-  font-size: clamp(0.85rem, 2.5vw, 1rem);
-  display: flex;
-  flex-direction: column;
-}
-
-/* Quran V1 */
-.quran-v1 {
-  font-size: clamp(1.8em, 5vw, 2.5em);
-  line-height: 1.5;
-  word-spacing: 0.1em;
-  text-align: center;
-  user-select: text;
-  margin: 2em auto;
-  color: #ffffff;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  display: none;
-  max-width: 80%;
-  overflow-wrap: break-word;
-}
-
-/* Quran V2 */
-.quran-v2 {
-  font-size: clamp(1.8em, 5vw, 2.5em);
-  line-height: 1.5;
-  word-spacing: 0.1em;
-  text-align: center;
-  user-select: text;
-  margin: 2em auto;
-  color: #ffffff;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  display: none;
-  max-width: 80%;
-  overflow-wrap: break-word;
-}
-
-.word {
-  display: inline-block;
-  margin: 0;
-  cursor: default;
-}
-
-/* Terjemahan */
-.translation {
-  font-family: sans-serif;
-  font-size: clamp(1rem, 3vw, 1.2rem);
-  color: #ffffff;
-  direction: ltr;
-  text-align: center;
-  line-height: 1.4;
-  word-spacing: 0.2em;
-  margin-top: 0.5em;
-  padding: 0 0.5em;
-}
-    .surah-info {
-  font-size: 0.4em;
-  font-family: sans-serif;
-  color: #ffffff;
-  margin-top: 0.5em;
-  text-align: center;
-  direction: ltr;
-}
-
-.brand-watermark {
-  font-size: 0.8em;
-  font-family: sans-serif;
-  color: #999;
-  position: absolute;     /* ⬅️ Supaya tidak mendorong kotak */
-  bottom: 0.5em;           /* ⬅️ Turunkan ke bawah */
-  left: 50%;              
-  transform: translateX(-50%); /* ⬅️ Tengahkan secara horizontal */
-  text-align: center;
-  font-style: italic;
-  direction: ltr;
-  user-select: none;
-}
-    
-
-    .button-wrapper {
-  display: flex;
-  align-items: flex-end;
-}
-
-@media (max-width: 600px) {
-  .controls {
-    grid-template-columns: repeat(2, 1fr);
+  #pages {
+    background-color: #82615f;
+    filter: contrast(1);
+    transition: filter 0.3s ease;
+    width: 100%;
+    max-width: 540px;
+    aspect-ratio: 1 / 1;
+    margin: 2em auto;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
   }
-}
-    
-  </style>
+
+  input[type="color"] {
+    width: 100%;
+    height: 2.8em;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 0;
+    box-sizing: border-box;
+    background: none;
+    cursor: pointer;
+  }
+
+  .translation[contenteditable="true"] {
+    cursor: text;
+  }
+
+  input[type="file"],
+  input[type="url"],
+  select,
+  button {
+    font-size: clamp(1rem, 3vw, 1.2rem);
+    padding: 0.5em;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  button {
+    background-color: #4cafef;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  button:hover {
+    background-color: #007acc;
+  }
+
+  .controls {
+    direction: ltr;
+    max-width: 800px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.8em;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5em;
+  }
+
+  .controls label {
+    font-size: clamp(0.85rem, 2.5vw, 1rem);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .quran-v1,
+  .quran-v2 {
+    font-size: clamp(1.8em, 5vw, 2.5em);
+    line-height: 1.5;
+    word-spacing: 0.1em;
+    text-align: center;
+    user-select: text;
+    margin: 2em auto;
+    color: #ffffff;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: none;
+    max-width: 80%;
+    overflow-wrap: break-word;
+  }
+
+  .word {
+    display: inline-block;
+    margin: 0;
+    cursor: default;
+  }
+
+  .translation {
+    font-family: sans-serif;
+    font-size: clamp(1rem, 3vw, 1.2rem);
+    color: #ffffff;
+    direction: ltr;
+    text-align: center;
+    line-height: 1.4;
+    word-spacing: 0.2em;
+    margin-top: 0.5em;
+    padding: 0 0.5em;
+  }
+
+  .surah-info {
+    font-size: 0.4em;
+    font-family: sans-serif;
+    color: #ffffff;
+    margin-top: 0.5em;
+    text-align: center;
+    direction: ltr;
+  }
+
+  .brand-watermark {
+    font-size: 0.8em;
+    font-family: sans-serif;
+    color: #999;
+    position: absolute;
+    bottom: 0.5em;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-style: italic;
+    direction: ltr;
+    user-select: none;
+  }
+
+  @media (max-width: 600px) {
+    .controls {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>
+
 </head>
 <body>
 
@@ -310,21 +270,18 @@ button:hover {
   
 <div class="controls">
   <!-- Baris 1: Surah & Ayat -->
-  <label><select id="surahSelect"></select>
-  </label>
-  <label><select id="ayahSelect"></select>
-  </label>
+  <label><select id="surahSelect"></select></label>
+  <label><select id="ayahSelect"></select></label>
 
   <!-- Baris 2: Dari Kata & Sampai Kata -->
-  <label><select id="wordStart"></select>
-  </label>
-  <label><select id="wordEnd"></select>
-  </label>
+  <label><select id="wordStart"></select></label>
+  <label><select id="wordEnd"></select></label>
 
-  <!-- Baris 3: Terjemahan & Tombol Link & Quran V1/V2 -->
-  <label>
-  <select id="wordTranslationId">
-  <!-- Per-Kata (Quran.com) -->
+  <!-- Baris 3: Terjemahan & Tombol-tombol -->
+  <div class="control-row">
+    <label>
+      <select id="wordTranslationId">
+        <!-- Per-Kata (Quran.com) -->
     <option value="33">Perkata Indonesian Affairs</option>
     <option value="20">Perkata English Saheeh</option>
 
@@ -394,12 +351,12 @@ button:hover {
     <option value="ayah_uzbek_rwwad">Uzbek Rwwad</option>
     <option value="ayah_vietnamese_rwwad">Vietnamese Rwwad</option>
     <option value="ayah_yoruba_mikail">Yoruba Mikail</option>
-  </select>
-</label>
-
-  
-  <div class="button-wrapper">
-  <button id="customLinkButton">Tombol Link</button>
+    </select>
+    </label>
+    <button id="customLinkButton">Tombol Link</button>
+    <button onclick="setVersion('v1')">Quran V1</button>
+    <button onclick="setVersion('v2')">Quran V2</button>
+  </div>
 </div>
 
 <!-- Modal Pencarian -->
@@ -413,13 +370,6 @@ button:hover {
   </div>
 </div>
 
-<div class="button-wrapper">
-  <button onclick="setVersion('v1')">Quran V1</button>
-</div>
-<div class="button-wrapper">
-  <button onclick="setVersion('v2')">Quran V2</button>
-</div>
-</div>
 
 
 <div id="pages"></div>
