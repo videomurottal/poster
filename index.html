@@ -62,7 +62,7 @@ button:hover {
 }
 
 /* ✅ Area latar belakang gambar */
-#bgOverlay {
+#bgImage {
   position: absolute;
   inset: 0;
   background-size: cover;
@@ -306,9 +306,10 @@ button:hover {
 
 
 <div id="posterContainer" style="position: relative; width: 100%; max-width: 540px; margin: auto;">
-  <div id="bgOverlay"></div>
-  <div id="pages"></div>
+  <img id="bgImage" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; filter:contrast(1); transition:filter 0.3s ease;">
+  <div id="pages" style="position: relative; z-index: 1;"></div>
 </div>
+
 
 <div class="controls">
   <!-- Dropdown Background -->
@@ -422,7 +423,7 @@ button:hover {
 
 <script>
 
-const bgOverlay = document.getElementById("bgOverlay");
+const bgImage = document.getElementById("bgImage");
 const backgroundSelect = document.getElementById("backgroundSelect");
 const backgroundUpload = document.getElementById("backgroundUpload");
 const backgroundUrl = document.getElementById("backgroundUrl");
@@ -435,7 +436,7 @@ const toggleContrast = document.getElementById("toggleContrast");
 backgroundSelect.addEventListener("change", () => {
   const bg = backgroundSelect.value;
   if (bg) {
-    bgOverlay.style.backgroundImage = `url('${bg}')`;
+    bgImage.style.backgroundImage = `url('${bg}')`;
     backgroundUrl.value = "";
   } else {
     pagesContainer.style.backgroundImage = "none";
@@ -449,7 +450,7 @@ backgroundUpload.addEventListener("change", () => {
   if (file) {
     const reader = new FileReader();
     reader.onload = function (e) {
-      bgOverlay.style.backgroundImage = `url('${e.target.result}')`;
+      bgImage.style.backgroundImage = `url('${e.target.result}')`;
       backgroundSelect.value = "";
       backgroundUrl.value = "";
     };
@@ -462,7 +463,7 @@ backgroundUrl.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     const url = backgroundUrl.value.trim();
     if (url) {
-      bgOverlay.style.backgroundImage = `url('${url}')`;
+      bgImage.style.backgroundImage = `url('${url}')`;
       backgroundSelect.value = "";
       saveHistory();
     }
@@ -474,13 +475,13 @@ toggleContrast.addEventListener("click", () => {
   const isVisible = contrastSlider.style.display === "block";
   contrastSlider.style.display = isVisible ? "none" : "block";
   if (!isVisible) contrastSlider.value = 100; // reset ke normal saat muncul
-  bgOverlay.style.filter = `contrast(${contrastSlider.value / 100})`;
+  bgImage.style.filter = `contrast(${contrastSlider.value / 100})`;
 });
 
 // Ubah kontras saat slider digeser
 contrastSlider.addEventListener("input", () => {
   const contrastValue = 1 + ((contrastSlider.value - 100) / 100); 
-  bgOverlay.style.filter = `contrast(${contrastValue})`;
+  bgImage.style.filter = `contrast(${contrastValue})`;
 });
 
 
@@ -511,7 +512,7 @@ function loadHistory() {
   const bgToUse = history.background || defaultBg;
 
   backgroundSelect.value = bgToUse;
-  bgOverlay.style.backgroundImage = `url('${bgToUse}')`;
+  bgImage.style.backgroundImage = `url('${bgToUse}')`;
 
   return history;
 }
@@ -602,9 +603,9 @@ async function loadAyat() {
     const s = surahSelect.value, a = ayahSelect.value, key = `${s}:${a}`;
     const container = document.getElementById("pages");
 
-    // Hapus semua anak kecuali #bgOverlay
+    // Hapus semua anak kecuali #bgImage
     Array.from(container.children).forEach(child => {
-      if (child.id !== "bgOverlay") container.removeChild(child);
+      if (child.id !== "bgImage") container.removeChild(child);
     });
 
 
@@ -801,7 +802,7 @@ showUrlInput.addEventListener("click", () => {
 applyUrlButton.addEventListener("click", () => {
   const url = document.getElementById("backgroundUrl").value.trim();
   if (url) {
-    bgOverlay.style.backgroundImage = `url('${url}')`;
+    bgImage.style.backgroundImage = `url('${url}')`;
     backgroundSelect.value = "";
     saveHistory();
   }
