@@ -33,12 +33,6 @@ h2 {
     .translation[contenteditable="true"] {
   cursor: text;
 }
-
-#pages {
-  /* ... (sudah ada background properties) */
-  filter: contrast(1); /* Default */
-  transition: filter 0.3s ease;
-}
     
 input[type="file"],
 input[type="url"],
@@ -104,7 +98,7 @@ button:hover {
   text-align: center;
   user-select: text;
   margin: 2em auto;
-  color: #ffffff;
+  color: #f54260;
   opacity: 0;
   transition: opacity 0.3s ease;
   display: none;
@@ -301,26 +295,32 @@ button:hover {
     </select>
   </label>
 
+<!-- Warna Background -->
+<label><input type="color" id="backgroundColorPicker" value="#fefcf8">
+</label>
+
+<!-- Pola Background -->
+<label><select id="backgroundPattern">
+    <option value="dots">Pola Titik</option>
+    <option value="stripes">Pola Garis</option>
+    <option value="grid">Pola Kotak</option>
+  </select>
+</label>
+  
   <!-- Upload File -->
   <div class="button-wrapper">
-  <button id="uploadTrigger">Upload Gambar</button>
+  <button id="uploadTrigger">Background Upload</button>
   <input type="file" id="backgroundUpload" accept="image/*" style="display: none;">
 </div>
 
   <!-- Input URL di awal -->
   <div class="button-wrapper">
-  <button id="showUrlInput" class="button">Link Gambar</button>
+  <button id="showUrlInput" class="button">Background Link</button>
 </div>
-
-    <!-- Tombol/Slider Contrast -->
-  <label><button id="toggleContrast">⚙️ Atur Kontras</button>
-  <input type="range" id="contrastSlider" min="0" max="200" value="100" style="display:none; width: 100%;">
-</label>
-
 <div id="urlInputWrapper" style="display:none; flex-direction: column; gap: 0.5em;">
   <label>
-    <span style="font-size: 0.9em;">URL Gambar:</span>
-    <input type="url" id="backgroundUrl" placeholder="https://..." style="width: 100%;">
+    <span style="font-size: 0.9em;">Masukkan URL Gambar:</span>
+    <input type="url" id="backgroundUrl" placeholder="Pastekan https://" style="width: 100%;">
   </label>
   <button id="applyUrlButton" class="button">OK</button>
 </div>
@@ -408,9 +408,6 @@ const backgroundUpload = document.getElementById("backgroundUpload");
 const backgroundUrl = document.getElementById("backgroundUrl");
 const pagesContainer = document.getElementById("pages");
 
-const contrastSlider = document.getElementById("contrastSlider");
-const toggleContrast = document.getElementById("toggleContrast");
-
 // Dropdown Gambar
 backgroundSelect.addEventListener("change", () => {
   const bg = backgroundSelect.value;
@@ -447,20 +444,6 @@ backgroundUrl.addEventListener("keydown", (e) => {
       saveHistory();
     }
   }
-});
-
-// Toggle kontras: muncul/sembunyi slider
-toggleContrast.addEventListener("click", () => {
-  const isVisible = contrastSlider.style.display === "block";
-  contrastSlider.style.display = isVisible ? "none" : "block";
-  if (!isVisible) contrastSlider.value = 100; // reset ke normal saat muncul
-  pagesContainer.style.filter = `contrast(${contrastSlider.value / 100})`;
-});
-
-// Ubah kontras saat slider digeser
-contrastSlider.addEventListener("input", () => {
-  const contrastValue = 1 + ((contrastSlider.value - 100) / 100); 
-  pagesContainer.style.filter = `contrast(${contrastValue})`;
 });
 
 
@@ -822,6 +805,34 @@ document.getElementById("infoFontSize").addEventListener("input", e => {
   document.querySelectorAll(".surah-info").forEach(el => {
     el.style.fontSize = `${e.target.value}px`;
   });
+});
+
+
+
+  const backgroundColorPicker = document.getElementById("backgroundColorPicker");
+const backgroundPattern = document.getElementById("backgroundPattern");
+
+backgroundColorPicker.addEventListener("input", () => {
+  const color = backgroundColorPicker.value;
+  pagesContainer.style.backgroundColor = color;
+});
+
+backgroundPattern.addEventListener("change", () => {
+  const pattern = backgroundPattern.value;
+  let patternStyle = "";
+
+  if (pattern === "dots") {
+    patternStyle = "radial-gradient(#ccc 1px, transparent 1px)";
+    pagesContainer.style.backgroundSize = "10px 10px";
+  } else if (pattern === "stripes") {
+    patternStyle = "repeating-linear-gradient(45deg, #ccc, #ccc 2px, transparent 2px, transparent 6px)";
+    pagesContainer.style.backgroundSize = "20px 20px";
+  } else if (pattern === "grid") {
+    patternStyle = "linear-gradient(#ccc 1px, transparent 1px), linear-gradient(to right, #ccc 1px, transparent 1px)";
+    pagesContainer.style.backgroundSize = "20px 20px";
+  }
+
+  pagesContainer.style.backgroundImage = pattern ? patternStyle : "";
 });
     
 </script>
