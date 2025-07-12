@@ -19,7 +19,18 @@ h2 {
   margin-bottom: 1rem;
 }
 
+.controls-button {
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
+  justify-content: stretch;
+}
 
+.controls-button button {
+  flex: 1 1 auto;
+  white-space: nowrap;
+}
+    
   /* Tombol Link Wrapper */
   .button-wrapper {
     position: relative;
@@ -310,21 +321,17 @@ button:hover {
   
 <div class="controls">
   <!-- Baris 1: Surah & Ayat -->
-  <label><select id="surahSelect"></select>
-  </label>
-  <label><select id="ayahSelect"></select>
-  </label>
+  <label><select id="surahSelect"></select></label>
+  <label><select id="ayahSelect"></select></label>
 
   <!-- Baris 2: Dari Kata & Sampai Kata -->
-  <label><select id="wordStart"></select>
-  </label>
-  <label><select id="wordEnd"></select>
-  </label>
+  <label><select id="wordStart"></select></label>
+  <label><select id="wordEnd"></select></label>
 
-  <!-- Baris 3: Terjemahan & Tombol Link & Quran V1/V2 -->
+  <!-- Baris 3: Terjemahan -->
   <label>
-  <select id="wordTranslationId">
-  <!-- Per-Kata (Quran.com) -->
+    <select id="wordTranslationId">
+<!-- Per-Kata (Quran.com) -->
     <option value="33">Perkata Indonesian Affairs</option>
     <option value="20">Perkata English Saheeh</option>
 
@@ -394,16 +401,18 @@ button:hover {
     <option value="ayah_uzbek_rwwad">Uzbek Rwwad</option>
     <option value="ayah_vietnamese_rwwad">Vietnamese Rwwad</option>
     <option value="ayah_yoruba_mikail">Yoruba Mikail</option>
-  </select>
-</label>
-
-  <label>
-  <div class="button-wrapper">
-  <button id="customLinkButton">Tombol Link</button>
-  </div>
+    </select>
   </label>
 
-<!-- Modal Pencarian -->
+  <!-- Tombol-tombol (TIDAK pakai label) -->
+  <div class="controls-button">
+    <button id="customLinkButton">Tombol Link</button>
+    <button onclick="setVersion('v1')">Quran V1</button>
+    <button onclick="setVersion('v2')">Quran V2</button>
+  </div>
+</div>
+
+<!-- Modal -->
 <div id="searchModal" class="modal-overlay" style="display:none;">
   <div class="modal-content">
     <button class="close-modal">✕</button>
@@ -414,19 +423,6 @@ button:hover {
   </div>
 </div>
 
-<label>
-<div class="button-wrapper">
-  <button onclick="setVersion('v1')">Quran V1</button>
-</div>
-</label>
-
-<label>
-<div class="button-wrapper">
-  <button onclick="setVersion('v2')">Quran V2</button>
-</div>
-</label>
-  
-</div>
 
 
 <div id="pages"></div>
