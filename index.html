@@ -19,6 +19,14 @@ h2 {
   margin-bottom: 1rem;
 }
 
+    #overlayLayer {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3); /* Default: hitam semi transparan */
+  pointer-events: none;
+  z-index: 1;
+  border-radius: 0.5em;
+}
     #pages {
   background-color: #23eb55; /* default warna latar */
 }
@@ -294,7 +302,9 @@ button:hover {
 </div>
 
 
-<div id="pages"></div>
+<div id="pages">
+  <div id="overlayLayer"></div>
+</div>
 
 <div class="controls">
   <!-- Dropdown Background -->
@@ -305,6 +315,10 @@ button:hover {
       <option value="https://images.pexels.com/photos/18945829/pexels-photo-18945829.jpeg">Wallpaper 4</option>
     </select>
   </label>
+
+  <label><input type="color" id="overlayColorPicker" value="#000000">
+  <input type="range" id="overlayOpacity" min="0" max="100" value="30">
+</label>
 
 <!-- Warna Background -->
 <label>
@@ -828,6 +842,26 @@ backgroundColorPicker.addEventListener("input", () => {
   pagesContainer.style.backgroundImage = "none";
 });
 
+const overlayColorPicker = document.getElementById("overlayColorPicker");
+const overlayOpacity = document.getElementById("overlayOpacity");
+const overlayLayer = document.getElementById("overlayLayer");
+
+function updateOverlayColor() {
+  const color = overlayColorPicker.value;
+  const opacity = overlayOpacity.value / 100;
+  overlayLayer.style.backgroundColor = hexToRGBA(color, opacity);
+}
+
+overlayColorPicker.addEventListener("input", updateOverlayColor);
+overlayOpacity.addEventListener("input", updateOverlayColor);
+
+// Konversi hex ke rgba
+function hexToRGBA(hex, alpha) {
+  const r = parseInt(hex.substr(1,2), 16);
+  const g = parseInt(hex.substr(3,2), 16);
+  const b = parseInt(hex.substr(5,2), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
     
 </script>
   
