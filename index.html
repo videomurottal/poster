@@ -302,6 +302,10 @@ button:hover {
     </select>
   </label>
 
+<label><input type="color" id="bgColorPicker" value="##23eb55">
+</label>
+
+  
   <!-- Upload File -->
   <div class="button-wrapper">
   <button id="uploadTrigger">Background Upload</button>
@@ -807,6 +811,12 @@ document.getElementById("infoFontSize").addEventListener("input", e => {
   document.querySelectorAll(".surah-info").forEach(el => {
     el.style.fontSize = `${e.target.value}px`;
   });
+});
+
+  const bgColorPicker = document.getElementById("bgColorPicker");
+bgColorPicker.addEventListener("input", () => {
+  pagesContainer.style.backgroundColor = bgColorPicker.value;
+  saveHistory();
 });
     
 </script>
