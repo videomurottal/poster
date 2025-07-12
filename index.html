@@ -285,8 +285,6 @@ button:hover {
   <div class="button-wrapper">
   <button id="customLinkButton">Tombol Link</button>
 </div>
-
-  
 <div class="button-wrapper">
   <button onclick="setVersion('v1')">Quran V1</button>
 </div>
@@ -826,113 +824,10 @@ backgroundColorPicker.addEventListener("input", () => {
 
   // Otomatis hapus gambar background (termasuk pattern) jika ada
   pagesContainer.style.backgroundImage = "none";
-});    
+});
+
+    
 </script>
-
-<!-- 🔍 Modal Pencarian Kata -->
-<div id="searchOverlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background-color:rgba(0,0,0,0.8); z-index:10000; justify-content:center; align-items:center;">
-  <div style="background:#fff; padding:1.5em; max-width:90%; width:400px; border-radius:10px; text-align:left; position:relative;">
-    <button id="closeSearchOverlay" style="position:absolute; top:0.5em; right:0.5em; font-size:1.2em;">✖</button>
-
-    <label>🔤 Pilih Bahasa:
-      <select id="searchLanguageSelect" style="width:100%; margin-top:0.5em;">
-        <option value="id">Indonesian</option>
-        <option value="en">English</option>
-        <option value="ar">Arabic</option>
-        <option value="ur">Urdu</option>
-        <option value="fr">French</option>
-        <option value="tr">Turkish</option>
-        <!-- tambahkan lagi bila perlu -->
-      </select>
-    </label>
-
-    <label style="display:block; margin-top:1em;">🔍 Kata yang Dicari:
-      <input type="text" id="searchKeywordInput" placeholder="Contoh: الله" style="width:100%; padding:0.5em; margin-top:0.3em;">
-    </label>
-
-    <button id="startSearchButton" style="margin-top:1em; width:100%; background:#4caf50; color:white; border:none; padding:0.6em; border-radius:5px; cursor:pointer;">Mulai Search</button>
-
-    <div id="searchResults" style="margin-top:1.2em; max-height:300px; overflow-y:auto;"></div>
-  </div>
-</div>
-
-  <script>
-const customLinkButton = document.getElementById("customLinkButton");
-const searchOverlay = document.getElementById("searchOverlay");
-const closeSearchOverlay = document.getElementById("closeSearchOverlay");
-const searchLanguageSelect = document.getElementById("searchLanguageSelect");
-const searchKeywordInput = document.getElementById("searchKeywordInput");
-const startSearchButton = document.getElementById("startSearchButton");
-const searchResults = document.getElementById("searchResults");
-
-// Tampilkan overlay saat tombol diklik
-customLinkButton.addEventListener("click", () => {
-  searchOverlay.style.display = "flex";
-  searchResults.innerHTML = "";
-  searchKeywordInput.value = "";
-});
-
-// Tutup overlay
-closeSearchOverlay.addEventListener("click", () => {
-  searchOverlay.style.display = "none";
-});
-
-// Tombol Mulai Search
-startSearchButton.addEventListener("click", async () => {
-  const lang = searchLanguageSelect.value;
-  const keyword = searchKeywordInput.value.trim();
-  if (!keyword) {
-    alert("Masukkan kata untuk dicari.");
-    return;
-  }
-
-  searchResults.innerHTML = "🔄 Mencari...";
-  try {
-    const response = await fetch(`https://quranenc.com/api/v1/search?keyword=${encodeURIComponent(keyword)}&language=${lang}`);
-    const data = await response.json();
-
-    if (!data.result || data.result.length === 0) {
-      searchResults.innerHTML = "❌ Tidak ditemukan hasil.";
-      return;
-    }
-
-    // Tampilkan hasil
-    searchResults.innerHTML = "";
-    data.result.forEach(item => {
-      const s = item.sura;
-      const a = item.aya;
-      const text = item.arabic_text;
-
-      const div = document.createElement("div");
-      div.style.border = "1px solid #ccc";
-      div.style.padding = "0.7em";
-      div.style.marginBottom = "0.6em";
-      div.style.borderRadius = "6px";
-      div.innerHTML = `
-        <b>${item.sura_name} (${s}:${a})</b><br>
-        <div style="font-size:1.2em; margin-top:0.4em;">${text}</div>
-        <button style="margin-top:0.6em; width:100%; background:#2196f3; color:white; border:none; padding:0.5em; border-radius:5px; cursor:pointer;" onclick="gotoAyah('${s}', '${a}')">Menuju ke Ayat</button>
-      `;
-      searchResults.appendChild(div);
-    });
-
-  } catch (err) {
-    console.error(err);
-    searchResults.innerHTML = "❌ Gagal memuat hasil.";
-  }
-});
-
-// Fungsi untuk pindah ke ayat
-window.gotoAyah = function(surahNum, ayahNum) {
-  surahSelect.value = surahNum;
-  updateAyahDropdown().then(() => {
-    ayahSelect.value = ayahNum;
-    loadAyat();
-    searchOverlay.style.display = "none";
-  });
-};
-</script>
-
   
 </body>
 </html>
