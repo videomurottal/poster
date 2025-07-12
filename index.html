@@ -28,46 +28,44 @@ h2 {
  /* Modal Overlay */
 .modal-overlay {
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(3px);
-  display: flex;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  width: 100vw;
+  height: 100vh;
+  display: none;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
 }
 
 /* Modal Box */
 .modal-content {
   background: #fff;
   width: 90%;
-  max-width: 450px;
-  border-radius: 10px;
+  max-width: 420px;
   padding: 1.5em;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-  position: relative; /* PENTING */
-  text-align: left;
-  font-family: sans-serif;
-  overflow-y: auto;
-  max-height: 80vh;
+  border-radius: 10px;
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
 }
 
 /* Tombol Close */
 .search-close {
   position: absolute;
   top: 10px;
-  right: 12px;
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #c00;
+  right: 10px;
+  font-size: 1.2em;
   background: none;
   border: none;
+  color: #333;
   cursor: pointer;
-  z-index: 10000;
+  z-index: 1;
 }
-
 .search-close:hover {
-  color: #900;
+  background: none;
+  color: red;
 }
 
 /* Input & Button */
@@ -406,8 +404,7 @@ button:hover {
 
 <!-- Modal Pencarian -->
 <div id="searchModal" class="modal-overlay" style="display: none;">
-  <div class="modal-content">
-    <button class="search-close">✕</button>
+  <div class="modal-content"><button class="search-close">❌</button>
     <h3>Pencarian Kata</h3>
     <input type="text" id="searchInput" placeholder="Cari kata sesuai bahasamu...">
     <button id="startSearchBtn">Mulai Search</button>
