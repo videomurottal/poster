@@ -1003,6 +1003,45 @@ async function loadAllXMLs() {
 
 loadAllXMLs();
 
+  document.getElementById("mulaiSearchBtn").addEventListener("click", async () => {
+  // Tunggu sampai semua XML dimuat
+  if (Object.keys(xmlDocs).length === 0) {
+    await loadAllXMLs();
+  }
+
+  const keyword = document.getElementById("kataInput").value.trim();
+  if (!keyword) {
+    showError("Kata kosong.");
+    return;
+  }
+
+  if (Object.keys(xmlDocs).length === 0) {
+    showError("XML belum siap.");
+    return;
+  }
+
+  searchKata(keyword);
+});
+
+
+  async function loadAllXMLs() {
+  showLoading("⏳ Memuat file XML...");
+  const parser = new DOMParser();
+  for (const [langKey, url] of Object.entries(xmlSources)) {
+    try {
+      const response = await fetch(url);
+      const text = await response.text();
+      localStorage.setItem(langKey, text);
+      xmlDocs[langKey] = parser.parseFromString(text, "application/xml");
+      console.log(`✅ ${langKey} siap`);
+    } catch (e) {
+      console.error(`❌ Gagal load ${langKey}:`, e);
+    }
+  }
+  hideLoading();
+}
+
+
   // ==== Fungsi pencarian kata di semua bahasa ====
   document.getElementById('startSearchBtn').addEventListener('click', () => {
     const keyword = document.getElementById('searchInput').value.toLowerCase();
