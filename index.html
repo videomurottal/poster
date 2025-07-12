@@ -308,23 +308,9 @@ button:hover {
 
 <!-- Warna Background -->
 <label>
-  🎨 Pilih Warna Background:
-  <input type="color" id="backgroundColorPicker" value="#fefcf8">
+  <input type="color" id="backgroundColorPicker" value="#23eb55">
 </label>
 
-<!-- Pola Background -->
-<label>
-  Pilih Pola Background:
-  <select id="backgroundPattern">
-    <option value="">Tanpa Pola</option>
-    <option value="dots">Pola Titik</option>
-    <option value="stripes">Pola Garis</option>
-    <option value="grid">Pola Kotak</option>
-  </select>
-</label>
-
-
-  
   <!-- Upload File -->
   <div class="button-wrapper">
   <button id="uploadTrigger">Background Upload</button>
@@ -833,29 +819,13 @@ document.getElementById("infoFontSize").addEventListener("input", e => {
 });
 
   const backgroundColorPicker = document.getElementById("backgroundColorPicker");
-const backgroundPattern = document.getElementById("backgroundPattern");
 
 backgroundColorPicker.addEventListener("input", () => {
   const color = backgroundColorPicker.value;
   pagesContainer.style.backgroundColor = color;
-});
 
-backgroundPattern.addEventListener("change", () => {
-  const pattern = backgroundPattern.value;
-  let patternStyle = "";
-
-  if (pattern === "dots") {
-    patternStyle = "radial-gradient(#ccc 1px, transparent 1px)";
-    pagesContainer.style.backgroundSize = "10px 10px";
-  } else if (pattern === "stripes") {
-    patternStyle = "repeating-linear-gradient(45deg, #ccc, #ccc 2px, transparent 2px, transparent 6px)";
-    pagesContainer.style.backgroundSize = "20px 20px";
-  } else if (pattern === "grid") {
-    patternStyle = "linear-gradient(#ccc 1px, transparent 1px), linear-gradient(to right, #ccc 1px, transparent 1px)";
-    pagesContainer.style.backgroundSize = "20px 20px";
-  }
-
-  pagesContainer.style.backgroundImage = pattern ? patternStyle : "";
+  // Otomatis hapus gambar background (termasuk pattern) jika ada
+  pagesContainer.style.backgroundImage = "none";
 });
 
     
