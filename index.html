@@ -1147,22 +1147,24 @@ backgroundColorPicker.addEventListener("input", () => {
     }
   }
 
-  // ==== Fungsi Menuju ke Ayat ====
+// ==== Fungsi Menuju ke Ayat ====
 function goToAyat(sura, aya, langKey) {
   const surahSelect = document.getElementById('surahSelect');
   const ayahSelect = document.getElementById('ayahSelect');
-  const translationSelect = document.getElementById('translationSelect');
+  const translationDropdown = document.getElementById('translationSelect');
 
-  // 🗺️ Map langKey ke format value dropdown utama (contoh: english_rwwad ➝ ayah_english_rwwad)
-  const mappedValue = `ayah_${langKey}`;
+  // 🗺️ Mapping langKey search ke value dropdown halaman utama
+  const dropdownValue = `ayah_${langKey}`; // Contoh: english_rwwad ➝ ayah_english_rwwad
 
-  // ⬇️ Ganti dropdown terjemahan utama
-  if (translationSelect) {
-    translationSelect.value = mappedValue;
-    translationSelect.dispatchEvent(new Event('change')); // biar halaman ikut refresh
+  // 🔄 Ubah dropdown terjemahan halaman utama
+  if (translationDropdown) {
+    if (translationDropdown.value !== dropdownValue) {
+      translationDropdown.value = dropdownValue;
+      translationDropdown.dispatchEvent(new Event('change')); // 🚀 Trigger onchange asli
+    }
   }
 
-  // 📖 Pindah ke Surah & Ayat
+  // 📖 Pindahkan ke Surah & Ayat
   if (surahSelect && ayahSelect) {
     surahSelect.value = sura;
     surahSelect.dispatchEvent(new Event('change'));
@@ -1177,6 +1179,7 @@ function goToAyat(sura, aya, langKey) {
   const modal = document.getElementById('searchModal');
   if (modal) modal.style.display = 'none';
 }
+
 
 
   // ==== Fungsi Error ====
