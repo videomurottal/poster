@@ -15,7 +15,7 @@
 
 h3 {
   text-align: center;
-  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-size: clamp(1rem, 4vw, 2.5rem);
   margin-bottom: 1rem;
 }
 
@@ -184,11 +184,12 @@ button:hover {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+    
   </style>
 </head>
 <body>
 
-<h3>Poster Quran (Klik Teks Terjemah Untuk Mengedit)</h3>
+<h2>Poster Quran (Klik Teks Terjemah Untuk Mengedit)</h2>
   
 <div class="controls">
   <!-- Baris 1: Surah & Ayat -->
@@ -206,11 +207,76 @@ button:hover {
   <!-- Baris 3: Terjemahan & Tombol Link & Quran V1/V2 -->
   <label>
   <select id="wordTranslationId">
-    <option value="">Tanpa Terjemah</option>
-    <option value="33">Per-Kata – Indonesian Affairs</option>
-    <option value="20">Per-Kata – English Saheeh</option>
-    <option value="ayah_indonesian_sabiq">Per-Ayat – Indonesian Sabiq</option>
-    <option value="ayah_english_saheeh">Per-Ayat – English Saheeh</option>
+  <!-- Per-Kata (Quran.com) -->
+    <option value="33">Perkata Indonesian Affairs</option>
+    <option value="20">Perkata English Saheeh</option>
+
+    <!-- Per-Ayat (QuranEnc.com) -->
+    <option value="ayah_afar_hamza">Afar Hamza</option>
+    <option value="ayah_albanian_nahi">Albanian Nahi</option>
+    <option value="ayah_amharic_zain">Amharic Zain</option>
+    <option value="ayah_ankobambara_dayyan">Ankobambara Dayyan</option>
+    <option value="ayah_asante_harun">Asante Harun</option>
+    <option value="ayah_assamese_rafeeq">Assamese Rafeeq</option>
+    <option value="ayah_azeri_musayev">Azeri Musayev</option>
+    <option value="ayah_bisayan_rwwad">Bisayan Rwwad</option>
+    <option value="ayah_bosnian_mihanovich">Bosnian Mihanovich</option>
+    <option value="ayah_bosnian_rwwad">Bosnian Rwwad</option>
+    <option value="ayah_chinese_makin">Chinese Makin</option>
+    <option value="ayah_chinese_suliman">Chinese Suliman</option>
+    <option value="ayah_croatian_rwwad">Croatian Rwwad</option>
+    <option value="ayah_dutch_center">Dutch Center</option>
+    <option value="ayah_english_hilali_khan">English Hilali–Khan</option>
+    <option value="ayah_english_rwwad">English Rwwad</option>
+    <option value="ayah_english_saheeh">English Saheeh</option>
+    <option value="ayah_french_montada">French Montada</option>
+    <option value="ayah_french_rashid">French Rashid</option>
+    <option value="ayah_german_bubenheim">German Bubenheim</option>
+    <option value="ayah_gujarati_omari">Gujarati Omari</option>
+    <option value="ayah_hausa_gummi">Hausa Gummi</option>
+    <option value="ayah_hindi_omari">Hindi Omari</option>
+    <option value="ayah_ikirundi_gehiti">Kirundi Gehiti</option>
+    <option value="ayah_indonesian_affairs">Indonesian Affairs</option>
+    <option value="ayah_indonesian_complex">Indonesian Complex</option>
+    <option value="ayah_indonesian_sabiq">Indonesian Sabiq</option>
+    <option value="ayah_japanese_saeedsato">Japanese Saeed Sato</option>
+    <option value="ayah_kannada_hamza">Kannada Hamza</option>
+    <option value="ayah_kinyarwanda_assoc">Kinyarwanda Assoc</option>
+    <option value="ayah_khmer_rwwad">Khmer Rwwad</option>
+    <option value="ayah_kurdish_bamoki">Kurdish Bamoki</option>
+    <option value="ayah_kyrgyz_hakimov">Kyrgyz Hakimov</option>
+    <option value="ayah_lingala_zakaria">Lingala Zakaria</option>
+    <option value="ayah_lithuanian_rwwad">Lithuanian Rwwad</option>
+    <option value="ayah_macedonian_group">Macedonian Group</option>
+    <option value="ayah_malayalam_kunhi">Malayalam Kunhi</option>
+    <option value="ayah_moore_rwwad">Moore Rwwad</option>
+    <option value="ayah_oromo_ababor">Oromo Ababor</option>
+    <option value="ayah_pashto_rwwad">Pashto Rwwad</option>
+    <option value="ayah_persian_ih">Persian IH</option>
+    <option value="ayah_portuguese_nasr">Portuguese Nasr</option>
+    <option value="ayah_punjabi_arif">Punjabi Arif</option>
+    <option value="ayah_romanian_project">Romanian Project</option>
+    <option value="ayah_serbian_rwwad">Serbian Rwwad</option>
+    <option value="ayah_sinhalese_mahir">Sinhalese Mahir</option>
+    <option value="ayah_somali_yacob">Somali Yacob</option>
+    <option value="ayah_spanish_garcia">Spanish Garcia</option>
+    <option value="ayah_spanish_montada_eu">Spanish Montada EU</option>
+    <option value="ayah_spanish_montada_latin">Spanish Montada Latin</option>
+    <option value="ayah_swahili_barawani">Swahili Barawani</option>
+    <option value="ayah_tagalog_rwwad">Tagalog Rwwad</option>
+    <option value="ayah_tajik_arifi">Tajik Arifi</option>
+    <option value="ayah_tamil_baqavi">Tamil Baqavi</option>
+    <option value="ayah_tamil_omar">Tamil Omar</option>
+    <option value="ayah_telugu_muhammad">Telugu Muhammad</option>
+    <option value="ayah_turkish_rwwad">Turkish Rwwad</option>
+    <option value="ayah_turkish_shaban">Turkish Shaban</option>
+    <option value="ayah_turkish_shahin">Turkish Shahin</option>
+    <option value="ayah_urdu_junagarhi">Urdu Junagarhi</option>
+    <option value="ayah_uyghur_saleh">Uyghur Saleh</option>
+    <option value="ayah_uzbek_mansour">Uzbek Mansour</option>
+    <option value="ayah_uzbek_rwwad">Uzbek Rwwad</option>
+    <option value="ayah_vietnamese_rwwad">Vietnamese Rwwad</option>
+    <option value="ayah_yoruba_mikail">Yoruba Mikail</option>
   </select>
 </label>
 
