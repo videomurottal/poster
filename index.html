@@ -1137,33 +1137,41 @@ updateAyahDropdown().then(() => {
   });
 
   function searchKata(keyword) {
-    const resultDiv = document.getElementById('searchResults');
-    resultDiv.innerHTML = '';
-    const suras = activeXMLDoc.getElementsByTagName('sura');
-    let totalHasil = 0;
+  const resultDiv = document.getElementById('searchResults');
+  resultDiv.innerHTML = ''; // Bersihkan hasil sebelumnya
 
-    for (let sura of suras) {
-      const suraNum = sura.getAttribute('number');
-      const ayas = sura.getElementsByTagName('aya');
-      for (let aya of ayas) {
-        const ayaNum = aya.getAttribute('number');
-        const text = aya.textContent || '';
-        if (text.toLowerCase().includes(keyword)) {
-          const p = document.createElement('p');
-          p.innerHTML = `
-            Surah ${suraNum}, Ayat ${ayaNum}: ${text}
-            <button onclick="goToAyat(${suraNum}, ${ayaNum})">Menuju Ayat</button>
-          `;
-          resultDiv.appendChild(p);
-          totalHasil++;
-        }
+  const suras = activeXMLDoc.getElementsByTagName('sura');
+  let totalHasil = 0;
+  const hasilSet = new Set(); // ✅ Tambah Set untuk cek duplikat
+
+  for (let sura of suras) {
+    const suraNum = sura.getAttribute('number');
+    const ayas = sura.getElementsByTagName('aya');
+    for (let aya of ayas) {
+      const ayaNum = aya.getAttribute('number');
+      const text = aya.textContent || '';
+
+      const hasilKey = `${suraNum}-${ayaNum}-${text}`; // ✅ Key unik
+      if (text.toLowerCase().includes(keyword) && !hasilSet.has(hasilKey)) {
+        hasilSet.add(hasilKey); // ✅ Tandai sudah ada
+
+        const p = document.createElement('p');
+        p.innerHTML = `
+          ${text}<br>
+          <small>Surah ${suraNum}, Ayat ${ayaNum}</small>
+          <button onclick="goToAyat(${suraNum}, ${ayaNum})">Menuju Ayat</button>
+        `;
+        resultDiv.appendChild(p);
+        totalHasil++;
       }
     }
-
-    if (totalHasil === 0) {
-      resultDiv.innerHTML = '<p style="color:red;">Tidak ditemukan hasil untuk kata tersebut.</p>';
-    }
   }
+
+  if (totalHasil === 0) {
+    resultDiv.innerHTML = '<p style="color:red;">Tidak ditemukan hasil untuk kata tersebut.</p>';
+  }
+}
+
 
   function goToAyat(sura, aya) {
     surahSelect.value = sura;
