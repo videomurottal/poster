@@ -53,22 +53,20 @@ h2 {
 
 .search-close {
   position: absolute;
-  top: 10px;         /* jarak 10px dari atas modal */
-  right: 10px;       /* jarak 10px dari kanan modal */
-  background: none;  /* hapus background bulat */
-  border: none;      /* hapus border */
-  color: #f44336;    /* merah untuk ❌ */
-  font-size: 1.5rem; /* sedikit lebih besar biar jelas */
+  top: -1px;        /* sedikit di luar modal */
+  right: -1px;
+  background: #f44336; /* langsung warna merah */
+  color: #fff;
+  font-size: 1rem;
+  border: none;
+  width: 30px;       /* biar kotak pas */
+  height: 30px;
+  line-height: 30px; /* vertikal tengah */
+  text-align: center;
   cursor: pointer;
-  z-index: 10;
-  transition: color 0.3s;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transition: background 0.3s, transform 0.2s;
 }
-
-.search-close:hover {
-  color: #c0392b; /* lebih gelap saat hover */
-}
-
-
 
 
 /* Input & Button */
