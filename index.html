@@ -744,16 +744,27 @@ updateAyahDropdown().then(() => {
 <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 
 <script>
-  const saveImageTrigger = document.getElementById("saveImageTrigger");
+const saveImageTrigger = document.getElementById("saveImageTrigger");
+const contrastSlider = document.getElementById("contrastSlider"); // pastikan ini ada
+const surahSelect = document.getElementById("surahSelect");
+const ayahSelect = document.getElementById("ayahSelect");
+const surahList = window.surahList; // pastikan ini sudah disiapkan di tempat lain
 
 saveImageTrigger.addEventListener("click", () => {
-  const node = document.getElementById("posterContainer"); // 🔁 GANTI INI
+  const node = document.getElementById("posterContainer");
   const s = surahSelect.value;
   const a = ayahSelect.value;
   const surahName = surahList[s][0].replace(/[^a-zA-Z0-9]/g, "-");
   const filename = `${surahName}-${a}.png`;
-
   const scale = window.devicePixelRatio || 2;
+
+  // Ambil nilai kontras dari slider
+  const contrastValue = contrastSlider.value;
+  const filterValue = `contrast(${contrastValue / 100})`;
+
+  // Terapkan filter langsung ke container
+  const originalFilter = node.style.filter;
+  node.style.filter = filterValue;
 
   html2canvas(node, {
     scale: scale,
@@ -766,6 +777,9 @@ saveImageTrigger.addEventListener("click", () => {
   }).catch(err => {
     alert("Gagal menyimpan gambar: " + err.message);
     console.error(err);
+  }).finally(() => {
+    // Kembalikan filter seperti semula
+    node.style.filter = originalFilter;
   });
 });
 
