@@ -51,22 +51,27 @@ h2 {
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
 }
 
-/* Tombol Close */
 .search-close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 1.2em;
-  background: none;
+  position: absolute; /* posisi relatif ke modal */
+  top: -15px;         /* keluar 15px dari atas modal */
+  right: -15px;       /* keluar 15px dari kanan modal */
+  background: #fff;   /* latar putih biar kontras */
+  border-radius: 50%; /* bulat */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); /* bayangan */
+  font-size: 1.4rem;
   border: none;
-  color: #333;
+  color: #f44336;     /* merah untuk icon ❌ */
   cursor: pointer;
-  z-index: 1;
+  z-index: 10;
+  padding: 0.4em 0.5em; /* area klik lebih besar */
+  transition: background 0.2s, color 0.2s;
 }
+
 .search-close:hover {
-  background: none;
-  color: red;
+  background: #f44336;
+  color: #fff;
 }
+
 
 /* Input & Button */
 #searchInput, #startSearchBtn {
