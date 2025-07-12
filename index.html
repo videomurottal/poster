@@ -302,7 +302,9 @@ button:hover {
     </select>
   </label>
 
-<label><input type="color" id="bgColorPicker" value="##23eb55">
+<label>
+  🎨 Pilih Warna Background:
+  <input type="color" id="backgroundColorPicker" value="#fefcf8">
 </label>
 
   
@@ -813,10 +815,12 @@ document.getElementById("infoFontSize").addEventListener("input", e => {
   });
 });
 
-  const bgColorPicker = document.getElementById("bgColorPicker");
-bgColorPicker.addEventListener("input", () => {
-  pagesContainer.style.backgroundColor = bgColorPicker.value;
-  saveHistory();
+  const backgroundColorPicker = document.getElementById("backgroundColorPicker");
+const backgroundPattern = document.getElementById("backgroundPattern");
+
+backgroundColorPicker.addEventListener("input", () => {
+  const color = backgroundColorPicker.value;
+  pagesContainer.style.backgroundColor = color;
 });
     
 </script>
