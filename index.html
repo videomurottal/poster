@@ -19,6 +19,122 @@ h2 {
   margin-bottom: 1rem;
 }
 
+
+  /* Tombol Link Wrapper */
+  .button-wrapper {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 1rem;
+  }
+
+  /* Modal Overlay */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+
+  /* Modal Box */
+  .modal-content {
+    background: #fff;
+    max-width: 90%;
+    width: 400px;
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    position: relative;
+    text-align: left;
+    font-family: sans-serif;
+    overflow-y: auto;
+    max-height: 80vh;
+  }
+
+  /* Close Button */
+  .close-modal {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+
+  /* Input & Button */
+  #searchInput {
+    width: 100%;
+    padding: 8px;
+    margin-top: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+
+  #startSearchBtn {
+    margin-top: 10px;
+    padding: 8px 12px;
+    font-size: 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  #startSearchBtn:hover {
+    background-color: #0056b3;
+  }
+
+  /* Hasil Pencarian */
+  #searchResults {
+    margin-top: 15px;
+    max-height: 250px;
+    overflow-y: auto;
+  }
+
+  #searchResults p {
+    background: #f9f9f9;
+    padding: 0.6em;
+    margin: 0.5em 0;
+    border-radius: 5px;
+    font-size: 0.95rem;
+  }
+
+  #searchResults button {
+    margin-top: 5px;
+    padding: 4px 8px;
+    font-size: 0.85rem;
+    background: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  #searchResults button:hover {
+    background: #218838;
+  }
+
+  @media screen and (max-width: 480px) {
+    .modal-content {
+      width: 95%;
+      padding: 1rem;
+    }
+
+    #searchResults p {
+      font-size: 0.9rem;
+    }
+  }
+    
+    
     #pages {
   background-color: #82615f; /* default warna latar */
 }
@@ -283,27 +399,21 @@ button:hover {
 
   
   <div class="button-wrapper">
-    <button id="customLinkButton">Tombol Link</button>
-  </div>
+  <button id="customLinkButton">Tombol Link</button>
+</div>
 
-  <!-- Modal Pencarian -->
-  <div id="searchModal" class="modal-overlay" style="display:none;">
-    <div class="modal-content">
-      <button class="close-modal">✕</button>
-      <label>
-        Pilih Bahasa:
-        <select id="languageSelect">
-          <option value="indonesian_complex">Indonesian</option>
-          <option value="english_saheeh">English</option>
-          <!-- Tambah bahasa lain jika perlu -->
-        </select>
-      </label>
-      <br><br>
-      <input type="text" id="searchInput" placeholder="Masukkan kata...">
-      <button id="startSearchBtn">Mulai Search</button>
-      <div id="searchResults"></div>
-    </div>
+<!-- Modal Pencarian -->
+<div id="searchModal" class="modal-overlay" style="display:none;">
+  <div class="modal-content">
+    <button class="close-modal">✕</button>
+    <h3>Pencarian Kata</h3>
+    <input type="text" id="searchInput" placeholder="Cari kata sesuai bahasamu...">
+    <button id="startSearchBtn">Mulai Search</button>
+    <div id="searchResults"></div>
   </div>
+</div>
+
+
 
 
 
@@ -853,45 +963,61 @@ backgroundColorPicker.addEventListener("input", () => {
 </script>
 
 <script>
-    // ==== search-modal.js ====
-    document.getElementById('customLinkButton').addEventListener('click', () => {
-      document.getElementById('searchModal').style.display = 'block';
-    });
+  // ==== Tombol buka/tutup modal ====
+  document.getElementById('customLinkButton').addEventListener('click', () => {
+    document.getElementById('searchModal').style.display = 'block';
+  });
 
-    document.querySelector('.close-modal').addEventListener('click', () => {
-      document.getElementById('searchModal').style.display = 'none';
-    });
+  document.querySelector('.close-modal').addEventListener('click', () => {
+    document.getElementById('searchModal').style.display = 'none';
+  });
 
-    // ==== load-xml.js ====
-    let xmlDoc = null;
+  // ==== Sumber XML untuk banyak bahasa ====
+  const xmlSources = {
+    indonesian_complex: 'https://raw.githubusercontent.com/tafsirnetlifyapp/quran/refs/heads/main/indonesian_complex_v1.0.xml',
+    english_saheeh: 'https://raw.githubusercontent.com/tafsirnetlifyapp/quran/refs/heads/main/english_saheeh_v1.0.xml'
+    // Tambahkan lagi jika perlu...
+  };
 
-    async function loadXMLtoStorage() {
-      const response = await fetch('https://raw.githubusercontent.com/tafsirnetlifyapp/quran/refs/heads/main/indonesian_complex_v1.0.xml');
-      const text = await response.text();
-      localStorage.setItem('quran_xml', text);
-      const parser = new DOMParser();
-      xmlDoc = parser.parseFromString(text, "application/xml");
-    }
+  const xmlDocs = {};
 
-    if (!localStorage.getItem('quran_xml')) {
-      loadXMLtoStorage();
-    } else {
-      const parser = new DOMParser();
-      xmlDoc = parser.parseFromString(localStorage.getItem('quran_xml'), "application/xml");
-    }
-
-    // ==== search-word.js ====
-    document.getElementById('startSearchBtn').addEventListener('click', () => {
-      const keyword = document.getElementById('searchInput').value.toLowerCase();
-      const resultDiv = document.getElementById('searchResults');
-      resultDiv.innerHTML = '';
-
-      if (!keyword || !xmlDoc) {
-        resultDiv.innerHTML = '<p>XML belum siap atau kata kosong.</p>';
-        return;
+  // ==== Load semua XML dan simpan ke localStorage/browser ====
+  async function loadAllXMLs() {
+    const parser = new DOMParser();
+    for (const [langKey, url] of Object.entries(xmlSources)) {
+      const cached = localStorage.getItem(`quran_xml_${langKey}`);
+      if (cached) {
+        xmlDocs[langKey] = parser.parseFromString(cached, "application/xml");
+      } else {
+        try {
+          const response = await fetch(url);
+          const text = await response.text();
+          localStorage.setItem(`quran_xml_${langKey}`, text);
+          xmlDocs[langKey] = parser.parseFromString(text, "application/xml");
+        } catch (e) {
+          console.error(`Gagal ambil ${langKey}:`, e);
+        }
       }
+    }
+  }
 
-      const suras = xmlDoc.getElementsByTagName('sura');
+  loadAllXMLs();
+
+  // ==== Fungsi pencarian kata di semua bahasa ====
+  document.getElementById('startSearchBtn').addEventListener('click', () => {
+    const keyword = document.getElementById('searchInput').value.toLowerCase();
+    const resultDiv = document.getElementById('searchResults');
+    resultDiv.innerHTML = '';
+
+    if (!keyword || Object.keys(xmlDocs).length === 0) {
+      resultDiv.innerHTML = '<p>XML belum siap atau kata kosong.</p>';
+      return;
+    }
+
+    for (const [langKey, doc] of Object.entries(xmlDocs)) {
+      const suras = doc.getElementsByTagName('sura');
+      let found = false;
+
       for (let sura of suras) {
         const suraNum = sura.getAttribute('number');
         const ayas = sura.getElementsByTagName('aya');
@@ -899,6 +1025,12 @@ backgroundColorPicker.addEventListener("input", () => {
           const ayaNum = aya.getAttribute('number');
           const translation = aya.getElementsByTagName('translation')[0]?.textContent || '';
           if (translation.toLowerCase().includes(keyword)) {
+            if (!found) {
+              const langHeader = document.createElement('h4');
+              langHeader.textContent = `Hasil dalam: ${langKey.replace('_', ' ')}`;
+              resultDiv.appendChild(langHeader);
+              found = true;
+            }
             const p = document.createElement('p');
             p.innerHTML = `Surah ${suraNum}, Ayat ${ayaNum}: ${translation}
               <button onclick="goToAyat(${suraNum}, ${ayaNum})">Menuju ke Ayat</button>`;
@@ -906,22 +1038,25 @@ backgroundColorPicker.addEventListener("input", () => {
           }
         }
       }
-    });
-
-    function goToAyat(sura, aya) {
-      const surahSelect = document.getElementById('surahSelect');
-      const ayahSelect = document.getElementById('ayahSelect');
-      if (surahSelect && ayahSelect) {
-        surahSelect.value = sura;
-        surahSelect.dispatchEvent(new Event('change')); // supaya ayah list refresh
-        setTimeout(() => {
-          ayahSelect.value = aya;
-          ayahSelect.dispatchEvent(new Event('change'));
-        }, 300); // delay agar ayah terisi dulu
-      }
-      document.getElementById('searchModal').style.display = 'none';
     }
-  </script>
+  });
+
+  // ==== Fungsi "Menuju ke Ayat" ====
+  function goToAyat(sura, aya) {
+    const surahSelect = document.getElementById('surahSelect');
+    const ayahSelect = document.getElementById('ayahSelect');
+    if (surahSelect && ayahSelect) {
+      surahSelect.value = sura;
+      surahSelect.dispatchEvent(new Event('change'));
+      setTimeout(() => {
+        ayahSelect.value = aya;
+        ayahSelect.dispatchEvent(new Event('change'));
+      }, 300);
+    }
+    document.getElementById('searchModal').style.display = 'none';
+  }
+</script>
+
   
 </body>
 </html>
