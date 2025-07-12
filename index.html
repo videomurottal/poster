@@ -1049,19 +1049,23 @@ backgroundColorPicker.addEventListener("input", () => {
     const parser = new DOMParser();
 
     try {
-      activeXMLDoc = null; // Reset XML lama
+      // Reset XML lama
+      activeXMLDoc = null;
 
+      // Fetch fresh data (bypass cache)
       const noCacheUrl = xmlSources[langKey] + '?t=' + Date.now();
       const response = await fetch(noCacheUrl, { cache: "no-store" });
+
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       const text = await response.text();
       activeXMLDoc = parser.parseFromString(text, "application/xml");
-      localStorage.setItem('activeLang', langKey);
 
+      localStorage.setItem('activeLang', langKey); // hanya simpan nama bahasa aktif
       console.log(`✅ Terjemah ${langKey} dimuat`);
     } catch (err) {
       console.error(`❌ Gagal memuat ${langKey}:`, err);
+      activeXMLDoc = null;
       tampilkanError("Gagal memuat terjemah.");
     } finally {
       hideLoading();
@@ -1071,7 +1075,7 @@ backgroundColorPicker.addEventListener("input", () => {
   // ==== Dropdown Change ====
   const translationSelect = document.getElementById('translationSelect');
   if (translationSelect) {
-    translationSelect.value = activeLang; // Set default pilihan
+    translationSelect.value = activeLang; // set default
     translationSelect.addEventListener('change', (e) => {
       activeLang = e.target.value;
       loadSelectedXML(activeLang);
@@ -1134,7 +1138,7 @@ backgroundColorPicker.addEventListener("input", () => {
           const p = document.createElement('p');
           p.innerHTML = `
             Surah ${suraNum}, Ayat ${ayaNum}: ${text}
-            <button onclick="goToAyat(${suraNum}, ${ayaNum}, '${activeLang}')">Menuju Ayat</button>
+            <button onclick="goToAyat(${suraNum}, ${ayaNum})">Menuju Ayat</button>
           `;
           resultDiv.appendChild(p);
           totalHasil++;
@@ -1147,39 +1151,39 @@ backgroundColorPicker.addEventListener("input", () => {
     }
   }
 
-// ==== Fungsi Menuju ke Ayat ====
-function goToAyat(sura, aya, langKey) {
+  // ==== Fungsi "Menuju ke Ayat" ====
+ function goToAyat(sura, aya) {
   const surahSelect = document.getElementById('surahSelect');
   const ayahSelect = document.getElementById('ayahSelect');
-  const translationDropdown = document.getElementById('translationSelect');
+  const wordTranslationId = document.getElementById('wordTranslationId');
 
-  // 🗺️ Mapping langKey search ke value dropdown halaman utama
-  const dropdownValue = `ayah_${langKey}`; // Contoh: english_rwwad ➝ ayah_english_rwwad
-
-  // 🔄 Ubah dropdown terjemahan halaman utama
-  if (translationDropdown) {
-    if (translationDropdown.value !== dropdownValue) {
-      translationDropdown.value = dropdownValue;
-      translationDropdown.dispatchEvent(new Event('change')); // 🚀 Trigger onchange asli
-    }
-  }
-
-  // 📖 Pindahkan ke Surah & Ayat
   if (surahSelect && ayahSelect) {
+    // Set Surah & Ayat
     surahSelect.value = sura;
     surahSelect.dispatchEvent(new Event('change'));
 
     setTimeout(() => {
       ayahSelect.value = aya;
       ayahSelect.dispatchEvent(new Event('change'));
+
+      // Sinkronkan dropdown terjemahan dengan activeLang
+      if (wordTranslationId && typeof activeLang === 'string') {
+        const dropdownValue = "ayah_" + activeLang; // prefix 'ayah_'
+        const matchedOption = Array.from(wordTranslationId.options)
+          .find(opt => opt.value === dropdownValue);
+
+        if (matchedOption) {
+          wordTranslationId.value = matchedOption.value;
+          wordTranslationId.dispatchEvent(new Event('change'));
+        }
+      }
     }, 300);
   }
 
-  // ❌ Tutup modal
-  const modal = document.getElementById('searchModal');
+  // Tutup modal
+  const modal = document.querySelector('.modal-overlay');
   if (modal) modal.style.display = 'none';
 }
-
 
 
   // ==== Fungsi Error ====
