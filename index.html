@@ -295,8 +295,7 @@ button:hover {
     </select>
   </label>
 
-<!-- Warna Background -->
-<label><input type="color" id="backgroundColorPicker" value="#ffa21f">
+<label><input type="color" id="backgroundColorPicker" value="#ffa21f" style="width: 60px; height: 30px;">
 </label>
   
   <!-- Upload File -->
@@ -802,7 +801,7 @@ document.getElementById("infoFontSize").addEventListener("input", e => {
 
 
   const backgroundColorPicker = document.getElementById("backgroundColorPicker");
-const backgroundPattern = document.getElementById("backgroundPattern");
+const pagesContainer = document.getElementById("pages"); // pastikan id ini sesuai di HTML
 
 backgroundColorPicker.addEventListener("input", () => {
   const color = backgroundColorPicker.value;
