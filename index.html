@@ -585,6 +585,49 @@ button:hover {
 
 <script>
 
+  let isLoadingAyat = false; // global flag
+
+function goToAyat(sura, aya) {
+  const surahSelect = document.getElementById('surahSelect');
+  const ayahSelect = document.getElementById('ayahSelect');
+  const wordTranslationId = document.getElementById('wordTranslationId');
+
+  if (surahSelect && ayahSelect) {
+    // Set Surah & Ayat
+    surahSelect.value = sura;
+    surahSelect.dispatchEvent(new Event('change'));
+
+    setTimeout(() => {
+      ayahSelect.value = aya;
+      ayahSelect.dispatchEvent(new Event('change'));
+
+      if (wordTranslationId && typeof activeLang === 'string') {
+        const dropdownValue = "ayah_" + activeLang; // prefix 'ayah_'
+        const matchedOption = Array.from(wordTranslationId.options)
+          .find(opt => opt.value === dropdownValue);
+
+        if (matchedOption) {
+          // 🚨 Cegah trigger ganda
+          isLoadingAyat = true;
+          wordTranslationId.value = matchedOption.value;
+          wordTranslationId.dispatchEvent(new Event('change'));
+          isLoadingAyat = false;
+        }
+      }
+    }, 300);
+  }
+
+  // Tutup modal
+  const modal = document.querySelector('.modal-overlay');
+  if (modal) modal.style.display = 'none';
+}
+
+// Di awal fungsi loadAyat():
+function loadAyat() {
+  if (isLoadingAyat) return; // 🔥 skip kalau sedang auto-load
+  // ... lanjut render seperti biasa
+}
+
 const backgroundSelect = document.getElementById("backgroundSelect");
 const backgroundUpload = document.getElementById("backgroundUpload");
 const backgroundUrl = document.getElementById("backgroundUrl");
