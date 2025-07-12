@@ -596,7 +596,12 @@ async function loadAyat() {
   try {
     const s = surahSelect.value, a = ayahSelect.value, key = `${s}:${a}`;
     const container = document.getElementById("pages");
-    container.innerHTML = "";
+
+    // Hapus semua anak kecuali #bgOverlay
+    Array.from(container.children).forEach(child => {
+      if (child.id !== "bgOverlay") container.removeChild(child);
+    });
+
 
     const pageMap = await fetch("https://raw.githubusercontent.com/dickymiswardi/tadabbur/main/ayah_page_map.json").then(r => r.json());
     const page = pageMap[key];
