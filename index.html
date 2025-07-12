@@ -24,6 +24,34 @@ h2 {
 
 
 
+#kataInput, #searchInput, #translationSelect, #mulaiSearchBtn {
+  width: 100%;
+  max-width: 420px; /* Biar di desktop rapi */
+  padding: 12px 16px;
+  font-size: 1.1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin: 8px auto;
+  display: block;
+  box-sizing: border-box;
+}
+
+#mulaiSearchBtn {
+  background-color: #4db8ff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+#mulaiSearchBtn:hover {
+  background-color: #1a90ff;
+}
+
+@media (max-width: 480px) {
+  #kataInput, #searchInput, #translationSelect, #mulaiSearchBtn {
+    max-width: 90%; /* Supaya pas di layar kecil */
+  }
+}
 
  /* Modal Overlay */
 .modal-overlay {
@@ -396,18 +424,38 @@ button:hover {
   
   
 
-<!-- Tombol Search -->
+<!-- 🔍 Tombol Search -->
 <div class="button-wrapper">
   <button id="customLinkButton">Cari Judul</button>
 </div>
 
-<!-- Modal Pencarian -->
+<!-- 📦 Modal Pencarian -->
 <div id="searchModal" class="modal-overlay" style="display: none;">
-  <div class="modal-content"><button class="search-close">❌</button>
+  <div class="modal-content">
+    <button class="search-close">❌</button>
     <h3>Pencarian Kata</h3>
-    <input type="text" id="searchInput" placeholder="Cari kata di Quran sesuai bahasamu...">
-    <button id="startSearchBtn">Mulai Search</button>
-    <div id="searchResults"></div>
+
+    <!-- 🌐 Dropdown Pilihan Terjemah -->
+    <label for="translationSelect">Pilih Terjemahan:</label>
+    <select id="translationSelect" style="width: 100%; margin-bottom: 10px;">
+      <option value="indonesian_complex">🇮🇩 Indonesian</option>
+      <option value="english_rwwad">🇬🇧 English</option>
+      <option value="french_rashid">🇫🇷 French</option>
+      <option value="spanish_montada_eu">🇪🇸 Spanish</option>
+    </select>
+
+    <!-- 🔤 Input Kata -->
+    <input type="text" id="kataInput" placeholder="Cari kata di Quran..." style="width: 100%; margin-bottom: 10px;">
+
+    <!-- 🚀 Tombol Mulai Search -->
+    <button id="mulaiSearchBtn" style="width: 100%;">Mulai Search</button>
+
+    <div id="loadingIndicator" style="display:none; text-align:center; margin:10px 0; color:#007bff; font-weight:bold;">
+    ⏳ Memuat...
+    </div>
+
+    <!-- 📋 Hasil Pencarian -->
+    <div id="searchResults" style="margin-top: 15px; max-height: 300px; overflow-y: auto;"></div>
   </div>
 </div>
 
@@ -956,102 +1004,188 @@ backgroundColorPicker.addEventListener("input", () => {
 </script>
 
 <script>
-  // Buka Modal
-  document.getElementById('customLinkButton').addEventListener('click', () => {
-    document.getElementById('searchModal').style.display = 'flex';
-  });
+  // ==== Modal Open/Close ====
+  const btnOpen = document.getElementById('customLinkButton');
+  const btnClose = document.querySelector('.search-close');
+  const modal = document.getElementById('searchModal');
 
-  // Tutup Modal
-  document.querySelector('.search-close').addEventListener('click', () => {
-    document.getElementById('searchModal').style.display = 'none';
-  });
+  if (btnOpen && btnClose && modal) {
+    btnOpen.addEventListener('click', () => {
+      modal.style.display = 'flex';
+    });
+    btnClose.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+  }
 
-  // ==== Sumber XML untuk banyak bahasa ====
+  // ==== Sumber XML ====
   const xmlSources = {
     indonesian_complex: 'https://raw.githubusercontent.com/tafsirnetlifyapp/quran/refs/heads/main/indonesian_complex_v1.0.xml',
     english_rwwad: 'https://raw.githubusercontent.com/tafsirnetlifyapp/quran/refs/heads/main/terjemahEng.xml',
     french_rashid: 'https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/terjemahFr.xml',
-    french_rashid: 'https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/terjemahr.xml'
-    // Tambahkan lagi jika perlu...
+    spanish_montada_eu: 'https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/terjemahSpain.xml'
   };
 
-  const xmlDocs = {};
+  let activeLang = localStorage.getItem('activeLang') || 'indonesian_complex';
+  let activeXMLDoc = null;
 
-  // ==== Load semua XML dan simpan ke localStorage/browser ====
-  async function loadAllXMLs() {
-    const parser = new DOMParser();
-    for (const [langKey, url] of Object.entries(xmlSources)) {
-      const cached = localStorage.getItem(`quran_xml_${langKey}`);
-      if (cached) {
-        xmlDocs[langKey] = parser.parseFromString(cached, "application/xml");
-      } else {
-        try {
-          const response = await fetch(url);
-          const text = await response.text();
-          localStorage.setItem(`quran_xml_${langKey}`, text);
-          xmlDocs[langKey] = parser.parseFromString(text, "application/xml");
-        } catch (e) {
-          console.error(`Gagal ambil ${langKey}:`, e);
-        }
-      }
+  // ==== Loading Indicator ====
+  function showLoading(msg = "⏳ Memuat...") {
+    const loader = document.getElementById('loadingIndicator');
+    if (loader) {
+      loader.textContent = msg;
+      loader.style.display = 'block';
     }
   }
 
-  loadAllXMLs();
+  function hideLoading() {
+    const loader = document.getElementById('loadingIndicator');
+    if (loader) loader.style.display = 'none';
+  }
 
-  // ==== Fungsi pencarian kata di semua bahasa ====
-  document.getElementById('startSearchBtn').addEventListener('click', () => {
-    const keyword = document.getElementById('searchInput').value.toLowerCase();
-    const resultDiv = document.getElementById('searchResults');
-    resultDiv.innerHTML = '';
+  // ==== Muat XML sesuai pilihan ====
+  async function loadSelectedXML(langKey) {
+    showLoading(`⏳ Memuat terjemah: ${langKey}`);
+    const parser = new DOMParser();
 
-    if (!keyword || Object.keys(xmlDocs).length === 0) {
-      resultDiv.innerHTML = '<p>XML belum siap atau kata kosong.</p>';
+    try {
+      // Reset XML lama
+      activeXMLDoc = null;
+
+      // Fetch fresh data (bypass cache)
+      const noCacheUrl = xmlSources[langKey] + '?t=' + Date.now();
+      const response = await fetch(noCacheUrl, { cache: "no-store" });
+
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+      const text = await response.text();
+      activeXMLDoc = parser.parseFromString(text, "application/xml");
+
+      localStorage.setItem('activeLang', langKey); // hanya simpan nama bahasa aktif
+      console.log(`✅ Terjemah ${langKey} dimuat`);
+    } catch (err) {
+      console.error(`❌ Gagal memuat ${langKey}:`, err);
+      activeXMLDoc = null;
+      tampilkanError("Gagal memuat terjemah.");
+    } finally {
+      hideLoading();
+    }
+  }
+
+  // ==== Dropdown Change ====
+  const translationSelect = document.getElementById('translationSelect');
+  if (translationSelect) {
+    translationSelect.value = activeLang; // set default
+    translationSelect.addEventListener('change', (e) => {
+      activeLang = e.target.value;
+      loadSelectedXML(activeLang);
+    });
+  }
+
+  // ==== Saat Halaman Dimuat, Load XML aktif ====
+  loadSelectedXML(activeLang);
+
+  // ==== Tombol "Mulai Search" & Enter Key ====
+  const mulaiSearchBtn = document.getElementById("mulaiSearchBtn");
+  const kataInput = document.getElementById("kataInput");
+
+  function handleSearch() {
+    const keyword = kataInput.value.trim().toLowerCase();
+    if (!keyword) {
+      tampilkanError("Kata kosong.");
+      return;
+    }
+    if (!activeXMLDoc) {
+      tampilkanError("Terjemah belum siap.");
       return;
     }
 
-    for (const [langKey, doc] of Object.entries(xmlDocs)) {
-      const suras = doc.getElementsByTagName('sura');
-      let found = false;
+    showLoading("🔎 Mencari kata...");
+    setTimeout(() => {
+      searchKata(keyword);
+      hideLoading();
+    }, 100);
+  }
 
-      for (let sura of suras) {
-        const suraNum = sura.getAttribute('number');
-        const ayas = sura.getElementsByTagName('aya');
-        for (let aya of ayas) {
-          const ayaNum = aya.getAttribute('number');
-          const translation = aya.getElementsByTagName('translation')[0]?.textContent || '';
-          if (translation.toLowerCase().includes(keyword)) {
-            if (!found) {
-              const langHeader = document.createElement('h4');
-              langHeader.textContent = `Hasil dalam: ${langKey.replace('_', ' ')}`;
-              resultDiv.appendChild(langHeader);
-              found = true;
-            }
-            const p = document.createElement('p');
-            p.innerHTML = `Surah ${suraNum}, Ayat ${ayaNum}: ${translation}
-              <button onclick="goToAyat(${suraNum}, ${ayaNum})">Menuju ke Ayat</button>`;
-            resultDiv.appendChild(p);
-          }
+  if (mulaiSearchBtn) {
+    mulaiSearchBtn.addEventListener("click", debounce(handleSearch, 500));
+  }
+
+  if (kataInput) {
+    kataInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleSearch();
+      }
+    });
+  }
+
+  // ==== Fungsi pencarian kata ====
+  function searchKata(keyword) {
+    const resultDiv = document.getElementById('searchResults');
+    resultDiv.innerHTML = '';
+
+    const suras = activeXMLDoc.getElementsByTagName('sura');
+    let totalHasil = 0;
+
+    for (let sura of suras) {
+      const suraNum = sura.getAttribute('number');
+      const ayas = sura.getElementsByTagName('aya');
+      for (let aya of ayas) {
+        const ayaNum = aya.getAttribute('number');
+        const text = aya.textContent || '';
+        if (text.toLowerCase().includes(keyword)) {
+          const p = document.createElement('p');
+          p.innerHTML = `
+            Surah ${suraNum}, Ayat ${ayaNum}: ${text}
+            <button onclick="goToAyat(${suraNum}, ${ayaNum})">Menuju Ayat</button>
+          `;
+          resultDiv.appendChild(p);
+          totalHasil++;
         }
       }
     }
-  });
+
+    if (totalHasil === 0) {
+      resultDiv.innerHTML = '<p style="color:red;">Tidak ditemukan hasil untuk kata tersebut.</p>';
+    }
+  }
 
   // ==== Fungsi "Menuju ke Ayat" ====
   function goToAyat(sura, aya) {
     const surahSelect = document.getElementById('surahSelect');
     const ayahSelect = document.getElementById('ayahSelect');
+
     if (surahSelect && ayahSelect) {
       surahSelect.value = sura;
       surahSelect.dispatchEvent(new Event('change'));
+
       setTimeout(() => {
         ayahSelect.value = aya;
         ayahSelect.dispatchEvent(new Event('change'));
       }, 300);
     }
-    document.getElementById('searchModal').style.display = 'none';
+
+    // Tutup modal
+    if (modal) modal.style.display = 'none';
+  }
+
+  // ==== Fungsi Error ====
+  function tampilkanError(msg) {
+    const resultDiv = document.getElementById('searchResults');
+    resultDiv.innerHTML = `<p style="color:red;">${msg}</p>`;
+  }
+
+  // ==== Debounce Helper ====
+  function debounce(fn, delay) {
+    let timeout;
+    return function (...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => fn.apply(this, args), delay);
+    };
   }
 </script>
+
 
   
 </body>
