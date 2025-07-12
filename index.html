@@ -1008,30 +1008,31 @@ backgroundColorPicker.addEventListener("input", () => {
 
   // ==== Muat XML sesuai pilihan ====
   async function loadSelectedXML(langKey) {
-    console.log(`⏳ Memuat terjemah: ${langKey}`);
-    const parser = new DOMParser();
-    tampilkanLoading(true);
+  console.log(`⏳ Memuat terjemah: ${langKey}`);
+  const parser = new DOMParser();
 
-    try {
-      // Hapus XML lama
-      Object.keys(xmlSources).forEach(key => localStorage.removeItem(key));
+  try {
+    // Hapus XML lama dari memori
+    activeXMLDoc = null;
 
-      const response = await fetch(xmlSources[langKey]);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    // Tambahkan query ?t=timestamp untuk memaksa fetch fresh
+    const noCacheUrl = xmlSources[langKey] + '?t=' + Date.now();
 
-      const text = await response.text();
-      localStorage.setItem(langKey, text);
-      localStorage.setItem('activeLang', langKey);
-      activeXMLDoc = parser.parseFromString(text, "application/xml");
+    const response = await fetch(noCacheUrl, { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-      console.log(`✅ Terjemah ${langKey} dimuat & disimpan`);
-    } catch (err) {
-      console.error(`❌ Gagal memuat ${langKey}:`, err);
-      activeXMLDoc = null;
-    } finally {
-      tampilkanLoading(false);
-    }
+    const text = await response.text();
+    activeXMLDoc = parser.parseFromString(text, "application/xml");
+
+    // Simpan hanya nama terjemah aktif, bukan isi XML
+    localStorage.setItem('activeLang', langKey);
+
+    console.log(`✅ Terjemah ${langKey} berhasil dimuat`);
+  } catch (err) {
+    console.error(`❌ Gagal memuat ${langKey}:`, err);
+    activeXMLDoc = null;
   }
+}
 
   // ==== Dropdown Change ====
   const translationSelect = document.getElementById('translationSelect');
