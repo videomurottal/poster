@@ -463,9 +463,8 @@ button:hover {
 <div class="controls">
   <!-- Dropdown Background -->
   <label><select id="backgroundSelect">
-    <option value="">Pilih Wallpaper</option>
       <option value="https://images.pexels.com/photos/1323550/pexels-photo-1323550.jpeg">Wallpaper 1</option>
-      <option value="https://images.pexels.com/photos/1170572/pexels-photo-1170572.jpeg">Wallpaper 3</option>
+      <option value="https://images.pexels.com/photos/1170572/pexels-photo-1170572.jpeg">Wallpaper 2</option>
     <option value="https://images.pexels.com/photos/163848/road-mountains-sunset-path-163848.jpeg">Wallpaper 3</option>
     <option value="https://images.pexels.com/photos/1819662/pexels-photo-1819662.jpeg">Wallpaper 4</option>
     </select>
@@ -644,7 +643,7 @@ function loadHistory() {
   if (history.version) currentVersion = history.version;
 
   // ✅ Default wallpaper jika belum ada data background
-  const defaultBg = "https://images.pexels.com/photos/163848/road-mountains-sunset-path-163848.jpeg";
+  const defaultBg = "https://images.pexels.com/photos/1323550/pexels-photo-1323550.jpeg";
   const bgToUse = history.background || defaultBg;
 
   backgroundSelect.value = bgToUse;
