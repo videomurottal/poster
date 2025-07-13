@@ -1362,7 +1362,6 @@ backgroundColorPicker.addEventListener("input", () => {
   const modal = document.querySelector('.modal-overlay');
 
   if (surahSelect && ayahSelect) {
-    // Set nilai dropdown surah dan ayat
     surahSelect.value = sura;
     surahSelect.dispatchEvent(new Event('change'));
 
@@ -1370,12 +1369,16 @@ backgroundColorPicker.addEventListener("input", () => {
       ayahSelect.value = aya;
       ayahSelect.dispatchEvent(new Event('change'));
 
-      // Jalankan ulang fungsi utama pemuat ayat dan jumlah kata
+      // Jalankan loadAyat jika tersedia
       if (typeof loadAyat === 'function') {
-        loadAyat(); // ⬅️ Pastikan fungsi ini mengatur teks, jumlah kata, dll
+        try {
+          loadAyat();
+        } catch (e) {
+          console.error("loadAyat error:", e);
+        }
       }
 
-      // Sinkronkan dropdown terjemahan jika tersedia
+      // Sinkronisasi dropdown terjemahan
       if (wordTranslationId && typeof activeLang === 'string') {
         const dropdownValue = "ayah_" + activeLang;
         const matchedOption = Array.from(wordTranslationId.options)
@@ -1388,6 +1391,21 @@ backgroundColorPicker.addEventListener("input", () => {
       }
     }, 300);
   }
+
+  // Reset input dan hasil pencarian
+  if (kataInput) kataInput.value = '';
+  if (searchResults) searchResults.innerHTML = '';
+
+  // Tutup modal aman
+  if (modal) {
+    modal.style.display = 'none';
+
+    // Pastikan tidak tertutup separuh
+    setTimeout(() => {
+      modal.style.display = 'none';
+    }, 10);
+  }
+}
 
   // Bersihkan hasil pencarian dan input kata
   if (kataInput) kataInput.value = '';
