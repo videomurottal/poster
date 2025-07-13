@@ -721,15 +721,18 @@ wordStart.addEventListener("change", () => {
 wordEnd.addEventListener("change", () => { loadAyat(); saveHistory(); });
 wordTranslationId.addEventListener("change", () => { loadAyat(); saveHistory(); });
 
-async function updateAyahDropdown(false) {
+async function updateAyahDropdown(callLoad = true) {
   const s = surahSelect.value;
   const res = await fetch(`https://api.quran.com/api/v4/chapters/${s}`);
   const json = await res.json();
   const max = json.chapter.verses_count;
   ayahSelect.innerHTML = "";
-  for (let i = 1; i <= max; i++) ayahSelect.appendChild(new Option(`Ayat ${i}`, i));
+  for (let i = 1; i <= max; i++) {
+    ayahSelect.appendChild(new Option(`Ayat ${i}`, i));
+  }
   ayahSelect.value = 1;
-  loadAyat();
+
+  if (callLoad) loadAyat(); // ✅ hanya dipanggil kalau diminta
 }
 
 async function loadAyat() {
