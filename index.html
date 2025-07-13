@@ -1002,6 +1002,8 @@ backgroundColorPicker.addEventListener("input", () => {
 </script>
 
 <script>
+  let isFromSearch = false;
+
   // ==== Modal Open/Close ====
   const btnOpen = document.getElementById('customLinkButton');
   const btnClose = document.querySelector('.search-close');
@@ -1027,7 +1029,6 @@ backgroundColorPicker.addEventListener("input", () => {
   let activeLang = localStorage.getItem('activeLang') || 'indonesian_complex';
   let activeXMLDoc = null;
 
-  // ==== Loading Indicator ====
   function showLoading(msg = "⏳ Memuat...") {
     const loader = document.getElementById('loadingIndicator');
     if (loader) {
@@ -1041,16 +1042,12 @@ backgroundColorPicker.addEventListener("input", () => {
     if (loader) loader.style.display = 'none';
   }
 
-  // ==== Muat XML sesuai pilihan ====
   async function loadSelectedXML(langKey) {
     showLoading(`⏳ Memuat terjemah: ${langKey}`);
     const parser = new DOMParser();
 
     try {
-      // Reset XML lama
       activeXMLDoc = null;
-
-      // Fetch fresh data (bypass cache)
       const noCacheUrl = xmlSources[langKey] + '?t=' + Date.now();
       const response = await fetch(noCacheUrl, { cache: "no-store" });
 
@@ -1059,7 +1056,7 @@ backgroundColorPicker.addEventListener("input", () => {
       const text = await response.text();
       activeXMLDoc = parser.parseFromString(text, "application/xml");
 
-      localStorage.setItem('activeLang', langKey); // hanya simpan nama bahasa aktif
+      localStorage.setItem('activeLang', langKey);
       console.log(`✅ Terjemah ${langKey} dimuat`);
     } catch (err) {
       console.error(`❌ Gagal memuat ${langKey}:`, err);
@@ -1070,20 +1067,17 @@ backgroundColorPicker.addEventListener("input", () => {
     }
   }
 
-  // ==== Dropdown Change ====
   const translationSelect = document.getElementById('translationSelect');
   if (translationSelect) {
-    translationSelect.value = activeLang; // set default
+    translationSelect.value = activeLang;
     translationSelect.addEventListener('change', (e) => {
       activeLang = e.target.value;
       loadSelectedXML(activeLang);
     });
   }
 
-  // ==== Saat Halaman Dimuat, Load XML aktif ====
   loadSelectedXML(activeLang);
 
-  // ==== Tombol "Mulai Search" & Enter Key ====
   const mulaiSearchBtn = document.getElementById("mulaiSearchBtn");
   const kataInput = document.getElementById("kataInput");
 
@@ -1118,7 +1112,6 @@ backgroundColorPicker.addEventListener("input", () => {
     });
   }
 
-  // ==== Fungsi pencarian kata ====
   function searchKata(keyword) {
     const resultDiv = document.getElementById('searchResults');
     resultDiv.innerHTML = '';
@@ -1149,54 +1142,40 @@ backgroundColorPicker.addEventListener("input", () => {
     }
   }
 
-  // ==== Fungsi "Menuju ke Ayat" ====
-async function goToAyat(sura, aya) {
-  const surahSelect = document.getElementById('surahSelect');
-  const ayahSelect = document.getElementById('ayahSelect');
-  const wordTranslationId = document.getElementById('wordTranslationId');
+  async function goToAyat(sura, aya) {
+    const surahSelect = document.getElementById('surahSelect');
+    const ayahSelect = document.getElementById('ayahSelect');
+    const wordTranslationId = document.getElementById('wordTranslationId');
 
-  if (surahSelect && ayahSelect) {
-    // ✅ Set flag agar loadAyat tahu ini dari hasil pencarian
-    isFromSearch = true;
+    if (surahSelect && ayahSelect) {
+      isFromSearch = true;
 
-    // Set dropdown
-    surahSelect.value = sura;
-    await updateAyahDropdown();
-    ayahSelect.value = aya;
+      surahSelect.value = sura;
+      await updateAyahDropdown();
+      ayahSelect.value = aya;
 
-    // Sinkronkan dropdown terjemahan dengan activeLang
-    if (wordTranslationId && typeof activeLang === 'string') {
-      const dropdownValue = "ayah_" + activeLang;
-      const matchedOption = Array.from(wordTranslationId.options)
-        .find(opt => opt.value === dropdownValue);
-      if (matchedOption) {
-        wordTranslationId.value = matchedOption.value;
+      if (wordTranslationId && typeof activeLang === 'string') {
+        const dropdownValue = "ayah_" + activeLang;
+        const matchedOption = Array.from(wordTranslationId.options)
+          .find(opt => opt.value === dropdownValue);
+        if (matchedOption) {
+          wordTranslationId.value = matchedOption.value;
+        }
       }
+
+      loadAyat();
+      isFromSearch = false;
     }
 
-    // ✅ Panggil loadAyat
-    loadAyat();
-
-    // ✅ Reset flag setelah selesai
-    isFromSearch = false;
+    const modal = document.querySelector('.modal-overlay');
+    if (modal) modal.style.display = 'none';
   }
 
-  // ✅ Tutup modal
-  const modal = document.querySelector('.modal-overlay');
-  if (modal) {
-    modal.style.display = 'none';
-  }
-
-
-
-
-  // ==== Fungsi Error ====
   function tampilkanError(msg) {
     const resultDiv = document.getElementById('searchResults');
     resultDiv.innerHTML = `<p style="color:red;">${msg}</p>`;
   }
 
-  // ==== Debounce Helper ====
   function debounce(fn, delay) {
     let timeout;
     return function (...args) {
@@ -1205,6 +1184,7 @@ async function goToAyat(sura, aya) {
     };
   }
 </script>
+
 
 
   
