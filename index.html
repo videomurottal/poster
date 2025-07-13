@@ -1148,17 +1148,20 @@ backgroundColorPicker.addEventListener("input", () => {
   }
 
   // ==== Fungsi "Menuju ke Ayat" ====
- function goToAyat(sura, aya) {
+function goToAyat(sura, aya) {
   const surahSelect = document.getElementById('surahSelect');
   const ayahSelect = document.getElementById('ayahSelect');
   const wordTranslationId = document.getElementById('wordTranslationId');
 
   if (surahSelect && ayahSelect) {
-    // Set Surah & Ayat tanpa trigger event
+    // Set Surah & Ayat
     surahSelect.value = sura;
     ayahSelect.value = aya;
 
-    // Sinkronkan dropdown terjemahan
+    // 🚀 Muat ayat baru
+    loadAyat();
+
+    // Sinkronkan dropdown terjemahan dengan activeLang
     if (wordTranslationId && typeof activeLang === 'string') {
       const dropdownValue = "ayah_" + activeLang; // prefix 'ayah_'
       const matchedOption = Array.from(wordTranslationId.options)
@@ -1168,15 +1171,13 @@ backgroundColorPicker.addEventListener("input", () => {
         wordTranslationId.value = matchedOption.value;
       }
     }
-
-    // ✅ Panggil loadAyat() sekali saja
-    loadAyat();
   }
 
   // Tutup modal
   const modal = document.querySelector('.modal-overlay');
   if (modal) modal.style.display = 'none';
 }
+
 
 
 
