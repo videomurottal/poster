@@ -353,59 +353,9 @@ button:hover {
     <option value="20">Perkata English Saheeh</option>
 
    <!-- Per-Ayat (QuranEnc.com), sorted by country name -->
-<option value="ayah_pashto_rwwad">Afghanistan – Pashto (Rwwad)</option>
-<option value="ayah_albanian_nahi">Albania – Albanian (Nahi)</option>
-<option value="ayah_azeri_musayev">Azerbaijan – Azeri (Musayev)</option>
-<option value="ayah_bosnian_rwwad">Bosnia – Bosnian (Rwwad)</option>
-<option value="ayah_moore_rwwad">Burkina Faso – Moore (Rwwad)</option>
-<option value="ayah_ikirundi_gehiti">Burundi – Kirundi (Gehiti)</option>
-<option value="ayah_khmer_rwwad">Cambodia – Khmer (Rwwad)</option>
-<option value="ayah_chinese_makin">China – Chinese (Makin)</option>
-<option value="ayah_lingala_zakaria">Congo – Lingala (Zakaria)</option>
-<option value="ayah_croatian_rwwad">Croatia – Croatian (Rwwad)</option>
-<option value="ayah_af ar_hamza">Djibouti – Afar (Hamza)</option>
-<option value="ayah_amharic_zain">Ethiopia – Amharic (Zain)</option>
-<option value="ayah_oromo_ababor">Ethiopia – Oromo (Ababor)</option>
 <option value="ayah_french_rashid">France – French (Rashid)</option>
-<option value="ayah_german_bubenheim">Germany – German (Bubenheim)</option>
-<option value="ayah_asante_harun">Ghana – Asante (Harun)</option>
-<option value="ayah_gujarati_omari">India – Gujarati (Omari)</option>
-<option value="ayah_hindi_omari">India – Hindi (Omari)</option>
-<option value="ayah_kannada_hamza">India – Kannada (Hamza)</option>
-<option value="ayah_malayalam_kunhi">India – Malayalam (Kunhi)</option>
-<option value="ayah_tamil_baqavi">India – Tamil (Baqavi)</option>
-<option value="ayah_telugu_muhammad">India – Telugu (Muhammad)</option>
-<option value="ayah_indonesian_complex">Indonesia – Indonesian (Complex)</option>
-<option value="ayah_kurdish_bamoki">Iraq – Kurdish (Bamoki)</option>
-<option value="ayah_persian_ih">Iran – Persian (IH)</option>
-<option value="ayah_japanese_saeedsato">Japan – Japanese (Saeed Sato)</option>
-<option value="ayah_kyrgyz_hakimov">Kyrgyzstan – Kyrgyz (Hakimov)</option>
-<option value="ayah_lithuanian_rwwad">Lithuania – Lithuanian (Rwwad)</option>
-<option value="ayah_ankobambara_dayyan">Mali – Bambara (Dayyan)</option>
-<option value="ayah_dutch_center">Netherlands – Dutch (Center)</option>
-<option value="ayah_hausa_gummi">Nigeria – Hausa (Gummi)</option>
-<option value="ayah_yoruba_mikail">Nigeria – Yoruba (Mikail)</option>
-<option value="ayah_macedonian_group">North Macedonia – Macedonian (Group)</option>
-<option value="ayah_punjabi_arif">Pakistan – Punjabi (Arif)</option>
-<option value="ayah_bisayan_rwwad">Philippines – Bisayan (Rwwad)</option>
-<option value="ayah_tagalog_rwwad">Philippines – Tagalog (Rwwad)</option>
-<option value="ayah_portuguese_nasr">Portugal/Brazil – Portuguese (Nasr)</option>
-<option value="ayah_romanian_project">Romania – Romanian (Project)</option>
-<option value="ayah_kinyarwanda_assoc">Rwanda – Kinyarwanda (Assoc)</option>
-<option value="ayah_serbian_rwwad">Serbia – Serbian (Rwwad)</option>
-<option value="ayah_sinhalese_mahir">Sri Lanka – Sinhalese (Mahir)</option>
-<option value="ayah_tamil_omar">Sri Lanka/India – Tamil (Omar)</option>
-<option value="ayah_somali_yacob">Somalia – Somali (Yacob)</option>
 <option value="ayah_spanish_montada_eu">Spain – Spanish (Montada EU)</option>
-<option value="ayah_spanish_montada_latin">Latin America – Spanish (Montada Latin)</option>
-<option value="ayah_swahili_barawani">Tanzania – Swahili (Barawani)</option>
-<option value="ayah_tajik_arifi">Tajikistan – Tajik (Arifi)</option>
-<option value="ayah_turkish_rwwad">Turkey – Turkish (Rwwad)</option>
-<option value="ayah_urdu_junagarhi">India/Pakistan – Urdu (Junagarhi)</option>
 <option value="ayah_english_rwwad">USA – English (Rwwad)</option>
-<option value="ayah_uyghur_saleh">Uyghur (Saleh)</option>
-<option value="ayah_uzbek_rwwad">Uzbekistan – Uzbek (Rwwad)</option>
-<option value="ayah_vietnamese_rwwad">Vietnam – Vietnamese (Rwwad)</option>
   </select>
 </label>
 
@@ -573,56 +523,6 @@ button:hover {
 
 <script>
 
-  async function loadAyat() {
-  showLoader();
-  try {
-    const s = surahSelect.value, a = ayahSelect.value, key = `${s}:${a}`;
-    const container = document.getElementById("pages");
-    container.innerHTML = "";
-
-    const pageMap = await fetch("https://raw.githubusercontent.com/dickymiswardi/tadabbur/main/ayah_page_map.json").then(r => r.json());
-    const page = pageMap[key];
-    const fontName = currentVersion === 'v1' ? `QCF_P${String(page).padStart(3, '0')}` : `QCF2${String(page).padStart(3, '0')}`;
-    const fontUrl = currentVersion === 'v1'
-      ? `https://cdn.jsdelivr.net/gh/dickymiswardi/quran/fonts/${fontName}.TTF`
-      : `https://cdn.jsdelivr.net/gh/tafsirnetlifyapp/quran@refs/heads/main/fontsglyphvs/${fontName}.ttf`;
-
-    const apiField = currentVersion === "v1" ? "code_v1" : "code_v2";
-    const data = await fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?words=true&word_fields=${apiField}`).then(r => r.json());
-    words = data.verse.words.map(w => ({ arabic: w[apiField] || w.text, id: w.id }));
-
-    const prevStart = +wordStart.value || 1, prevEnd = +wordEnd.value || 1;
-    wordStart.innerHTML = "";
-    for (let i = 1; i <= words.length; i++) wordStart.appendChild(new Option(`Word ${i}`, i));
-    wordStart.value = initialLoad ? 1 : Math.min(prevStart, words.length);
-    wordEnd.innerHTML = "";
-    for (let i = wordStart.value; i <= words.length; i++) wordEnd.appendChild(new Option(`To ${i}`, i));
-    wordEnd.value = initialLoad ? 1 : Math.min(prevEnd, words.length);
-    initialLoad = false;
-
-    const style = document.createElement("style");
-    style.textContent = `@font-face { font-family: '${fontName}'; src: url('${fontUrl}') format('truetype'); }`;
-    document.head.appendChild(style);
-
-    const div = document.createElement("div");
-    div.className = `page-container quran-${currentVersion} quran-text`;
-    div.style.fontFamily = fontName;
-    container.appendChild(div);
-
-    await document.fonts.load(`1em ${fontName}`);
-
-    const startIdx = (+wordStart.value || 1) - 1;
-    const endIdx = (+wordEnd.value || startIdx + 1);
-    const line = document.createElement("div");
-    words.slice(startIdx, endIdx).forEach(word => {
-      const span = document.createElement("span");
-      span.className = "word";
-      span.innerText = word.arabic;
-      line.appendChild(span);
-      line.appendChild(document.createTextNode(" "));
-    });
-    div.appendChild(line);
-
 const backgroundSelect = document.getElementById("backgroundSelect");
 const backgroundUpload = document.getElementById("backgroundUpload");
 const backgroundUrl = document.getElementById("backgroundUrl");
@@ -710,33 +610,6 @@ const translationLanguageMap = { "20": "en", "33": "id" };
 
 const surahList = {
   1:["Al-Fātiḥah"], 2:["Al-Baqarah"], 3:["Āl ʿImrān"], 4:["An-Nisāʾ"],
-  5:["Al-Māʾidah"], 6:["Al-Anʿām"], 7:["Al-Aʿrāf"], 8:["Al-Anfāl"],
-  9:["At-Tawbah"], 10:["Yūnus"], 11:["Hūd"], 12:["Yūsuf"], 13:["Ar-Raʿd"],
-  14:["Ibrāhīm"], 15:["Al-Ḥijr"], 16:["An-Naḥl"], 17:["Al-Isrāʾ"],
-  18:["Al-Kahf"], 19:["Maryam"], 20:["Ṭā-Hā"], 21:["Al-Anbiyāʾ"],
-  22:["Al-Ḥajj"], 23:["Al-Muʾminūn"], 24:["An-Nūr"], 25:["Al-Furqān"],
-  26:["Ash-Shuʿarāʾ"], 27:["An-Naml"], 28:["Al-Qaṣaṣ"], 29:["Al-ʿAnkabūt"],
-  30:["Ar-Rūm"], 31:["Luqmān"], 32:["As-Sajdah"], 33:["Al-Aḥzāb"],
-  34:["Sabaʾ"], 35:["Fāṭir"], 36:["Yā-Sīn"], 37:["As-Ṣāffāt"],
-  38:["Ṣād"], 39:["Az-Zumar"], 40:["Ghāfir"], 41:["Fuṣṣilat"], 42:["Ash-Shūrā"],
-  43:["Az-Zukhruf"], 44:["Ad-Dukhān"], 45:["Al-Jāthiyah"], 46:["Al-Aḥqāf"],
-  47:["Muḥammad"], 48:["Al-Fatḥ"], 49:["Al-Ḥujurāt"], 50:["Qāf"],
-  51:["Adh-Dhāriyāt"], 52:["Aṭ-Ṭūr"], 53:["An-Najm"], 54:["Al-Qamar"],
-  55:["Ar-Raḥmān"], 56:["Al-Wāqiʿah"], 57:["Al-Ḥadīd"], 58:["Al-Mujādilah"],
-  59:["Al-Ḥashr"], 60:["Al-Mumtaḥanah"], 61:["Aṣ-Ṣaff"], 62:["Al-Jumuʿah"],
-  63:["Al-Munāfiqūn"], 64:["At-Taghābun"], 65:["Aṭ-Ṭalāq"], 66:["At-Taḥrīm"],
-  67:["Al-Mulk"], 68:["Al-Qalam"], 69:["Al-Ḥāqqah"], 70:["Al-Maʿārij"],
-  71:["Nūḥ"], 72:["Al-Jinn"], 73:["Al-Muzzammil"], 74:["Al-Muddaththir"],
-  75:["Al-Qiyāmah"], 76:["Al-Insān"], 77:["Al-Mursalāt"], 78:["An-Nabaʾ"],
-  79:["An-Nāziʿāt"], 80:["ʿAbasa"], 81:["At-Takwīr"], 82:["Al-Infiṭār"],
-  83:["Al-Muṭaffifīn"], 84:["Al-Inshiqāq"], 85:["Al-Burūj"], 86:["Aṭ-Ṭāriq"],
-  87:["Al-Aʿlā"], 88:["Al-Ghāshiyah"], 89:["Al-Fajr"], 90:["Al-Balad"],
-  91:["Ash-Shams"], 92:["Al-Layl"], 93:["Aḍ-Ḍuḥā"], 94:["Ash-Sharḥ"],
-  95:["At-Tīn"], 96:["Al-ʿAlaq"], 97:["Al-Qadr"], 98:["Al-Bayyinah"],
-  99:["Az-Zalzalah"], 100:["Al-ʿĀdiyāt"], 101:["Al-Qāriʿah"], 102:["At-Takāthur"],
-  103:["Al-ʿAṣr"], 104:["Al-Humazah"], 105:["Al-Fīl"], 106:["Quraysh"],
-  107:["Al-Māʿūn"], 108:["Al-Kawthar"], 109:["Al-Kāfirūn"], 110:["An-Naṣr"],
-  111:["Al-Masad"], 112:["Al-Ikhlāṣ"], 113:["Al-Falaq"], 114:["An-Nās"]
 };
 
 const surahSelect = document.getElementById("surahSelect");
@@ -781,6 +654,56 @@ async function updateAyahDropdown() {
   ayahSelect.value = 1;
   loadAyat();
 }
+
+async function loadAyat() {
+  showLoader();
+  try {
+    const s = surahSelect.value, a = ayahSelect.value, key = `${s}:${a}`;
+    const container = document.getElementById("pages");
+    container.innerHTML = "";
+
+    const pageMap = await fetch("https://raw.githubusercontent.com/dickymiswardi/tadabbur/main/ayah_page_map.json").then(r => r.json());
+    const page = pageMap[key];
+    const fontName = currentVersion === 'v1' ? `QCF_P${String(page).padStart(3, '0')}` : `QCF2${String(page).padStart(3, '0')}`;
+    const fontUrl = currentVersion === 'v1'
+      ? `https://cdn.jsdelivr.net/gh/dickymiswardi/quran/fonts/${fontName}.TTF`
+      : `https://cdn.jsdelivr.net/gh/tafsirnetlifyapp/quran@refs/heads/main/fontsglyphvs/${fontName}.ttf`;
+
+    const apiField = currentVersion === "v1" ? "code_v1" : "code_v2";
+    const data = await fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?words=true&word_fields=${apiField}`).then(r => r.json());
+    words = data.verse.words.map(w => ({ arabic: w[apiField] || w.text, id: w.id }));
+
+    const prevStart = +wordStart.value || 1, prevEnd = +wordEnd.value || 1;
+    wordStart.innerHTML = "";
+    for (let i = 1; i <= words.length; i++) wordStart.appendChild(new Option(`Word ${i}`, i));
+    wordStart.value = initialLoad ? 1 : Math.min(prevStart, words.length);
+    wordEnd.innerHTML = "";
+    for (let i = wordStart.value; i <= words.length; i++) wordEnd.appendChild(new Option(`To ${i}`, i));
+    wordEnd.value = initialLoad ? 1 : Math.min(prevEnd, words.length);
+    initialLoad = false;
+
+    const style = document.createElement("style");
+    style.textContent = `@font-face { font-family: '${fontName}'; src: url('${fontUrl}') format('truetype'); }`;
+    document.head.appendChild(style);
+
+    const div = document.createElement("div");
+    div.className = `page-container quran-${currentVersion} quran-text`;
+    div.style.fontFamily = fontName;
+    container.appendChild(div);
+
+    await document.fonts.load(`1em ${fontName}`);
+
+    const startIdx = (+wordStart.value || 1) - 1;
+    const endIdx = (+wordEnd.value || startIdx + 1);
+    const line = document.createElement("div");
+    words.slice(startIdx, endIdx).forEach(word => {
+      const span = document.createElement("span");
+      span.className = "word";
+      span.innerText = word.arabic;
+      line.appendChild(span);
+      line.appendChild(document.createTextNode(" "));
+    });
+    div.appendChild(line);
 
 
     
@@ -1109,45 +1032,69 @@ backgroundColorPicker.addEventListener("input", () => {
   }
 
   // ==== Fungsi pencarian kata ====
-  function goToAyat(sura, aya) {
+  function searchKata(keyword) {
+    const resultDiv = document.getElementById('searchResults');
+    resultDiv.innerHTML = '';
+
+    const suras = activeXMLDoc.getElementsByTagName('sura');
+    let totalHasil = 0;
+
+    for (let sura of suras) {
+      const suraNum = sura.getAttribute('number');
+      const ayas = sura.getElementsByTagName('aya');
+      for (let aya of ayas) {
+        const ayaNum = aya.getAttribute('number');
+        const text = aya.textContent || '';
+        if (text.toLowerCase().includes(keyword)) {
+          const p = document.createElement('p');
+          p.innerHTML = `
+            Surah ${suraNum}, Ayat ${ayaNum}: ${text}
+            <button onclick="goToAyat(${suraNum}, ${ayaNum})">Menuju Ayat</button>
+          `;
+          resultDiv.appendChild(p);
+          totalHasil++;
+        }
+      }
+    }
+
+    if (totalHasil === 0) {
+      resultDiv.innerHTML = '<p style="color:red;">Tidak ditemukan hasil untuk kata tersebut.</p>';
+    }
+  }
+
+  // ==== Fungsi "Menuju ke Ayat" ====
+ function goToAyat(sura, aya) {
   const surahSelect = document.getElementById('surahSelect');
   const ayahSelect = document.getElementById('ayahSelect');
   const wordTranslationId = document.getElementById('wordTranslationId');
 
   if (surahSelect && ayahSelect) {
-    // Set Surah
+    // Set Surah & Ayat
     surahSelect.value = sura;
+    surahSelect.dispatchEvent(new Event('change'));
 
-    // Update dropdown ayat lalu set ayat & load
-    updateAyahDropdown().then(() => {
+    setTimeout(() => {
       ayahSelect.value = aya;
+      ayahSelect.dispatchEvent(new Event('change'));
 
-      // Sinkronkan dropdown terjemahan jika ada
+      // Sinkronkan dropdown terjemahan dengan activeLang
       if (wordTranslationId && typeof activeLang === 'string') {
-        const dropdownValue = "ayah_" + activeLang;
+        const dropdownValue = "ayah_" + activeLang; // prefix 'ayah_'
         const matchedOption = Array.from(wordTranslationId.options)
           .find(opt => opt.value === dropdownValue);
+
         if (matchedOption) {
           wordTranslationId.value = matchedOption.value;
+          wordTranslationId.dispatchEvent(new Event('change'));
         }
       }
-
-      // ✅ Load hanya sekali
-      loadAyat();
-    });
+    }, 300);
   }
-
-  // ❌ Tutup modal
-  const modal = document.querySelector('.modal-overlay');
-  if (modal) modal.style.display = 'none';
-}
-
 
   // Tutup modal
   const modal = document.querySelector('.modal-overlay');
   if (modal) modal.style.display = 'none';
 }
-
 
 
   // ==== Fungsi Error ====
