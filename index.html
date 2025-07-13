@@ -993,112 +993,122 @@ backgroundColorPicker.addEventListener("input", () => {
 </script>
 
 
-  <script>
-// ✅ Pemetaan ID → URL XML
-const translationXmlMap = {
-  "indonesian_complex": "https://raw.githubusercontent.com/tafsirnetlifyapp/quran/refs/heads/main/terjemahId.xml",
-  "english_rwwad": "https://raw.githubusercontent.com/tafsirnetlifyapp/quran/refs/heads/main/terjemahEng.xml",
-  "french_rashid": "https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/terjemahFr.xml",
-  "spanish_montada_eu": "https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/terjemahSpain.xml"
-};
+  <!-- Tambahkan ini di bagian <head> atau sebelum </body> -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 
-let loadedXml = null;
-let loadedLang = null;
+<script>
+  const saveImageTrigger = document.getElementById("saveImageTrigger");
 
-const modal = document.getElementById("searchModal");
-const openModalBtn = document.getElementById("customLinkButton");
-const closeModalBtn = document.querySelector(".search-close");
-const translationSelect = document.getElementById("translationSelect");
-const kataInput = document.getElementById("kataInput");
-const mulaiSearchBtn = document.getElementById("mulaiSearchBtn");
-const resultsContainer = document.getElementById("searchResults");
-const loader = document.getElementById("loadingIndicator");
+  saveImageTrigger.addEventListener("click", () => {
+    const node = document.getElementById("pages");
+    const s = surahSelect.value;
+    const a = ayahSelect.value;
+    const surahName = surahList[s][0].replace(/[^a-zA-Z0-9]/g, "-");
+    const filename = `${surahName}-${a}.png`;
 
-// ✅ Tampilkan modal
-openModalBtn.addEventListener("click", () => {
-  modal.style.display = "flex";
+    // Gunakan DPI perangkat
+    const scale = window.devicePixelRatio || 2;
+
+    html2canvas(node, {
+      scale: scale,
+      useCORS: true, // jika ada gambar dari URL lain
+      backgroundColor: null // agar background transparan jika ingin
+    }).then(canvas => {
+      canvas.toBlob(blob => {
+        saveAs(blob, filename);
+      }, 'image/png');
+    }).catch(err => {
+      alert("Gagal menyimpan gambar: " + err.message);
+      console.error(err);
+    });
+  });
+
+    
+    const colorTarget = document.getElementById("colorTarget");
+const colorPicker = document.getElementById("colorPicker");
+
+colorPicker.addEventListener("input", () => {
+  const targetClass = colorTarget.value;
+  const color = colorPicker.value;
+  document.querySelectorAll(`.${targetClass}`).forEach(el => {
+    el.style.color = color;
+  });
 });
 
-// ✅ Tutup modal
-closeModalBtn.addEventListener("click", () => {
-  modal.style.display = "none";
-  resetSearch();
+// Trigger input file saat tombol diklik
+document.getElementById("uploadTrigger").addEventListener("click", function () {
+  document.getElementById("backgroundUpload").click();
 });
 
-// ✅ Reset pencarian
-function resetSearch() {
-  resultsContainer.innerHTML = "";
-  kataInput.value = "";
-  loader.style.display = "none";
-  loadedXml = null;
-  loadedLang = null;
+const showUrlInput = document.getElementById("showUrlInput");
+const urlInputWrapper = document.getElementById("urlInputWrapper");
+const applyUrlButton = document.getElementById("applyUrlButton");
+
+showUrlInput.addEventListener("click", () => {
+  urlInputWrapper.style.display = "flex";
+});
+
+applyUrlButton.addEventListener("click", () => {
+  const url = document.getElementById("backgroundUrl").value.trim();
+  if (url) {
+    pagesContainer.style.backgroundImage = `url('${url}')`;
+    backgroundSelect.value = "";
+    saveHistory();
+  }
+});
+
+const translationFontSelect = document.getElementById("translationFontSelect");
+const translationFontSize = document.getElementById("translationFontSize");
+
+function loadFontFromUrl(fontUrl, fontName) {
+  const style = document.createElement("style");
+  style.textContent = `
+    @font-face {
+      font-family: '${fontName}';
+      src: url('${fontUrl}');
+    }
+  `;
+  document.head.appendChild(style);
+  document.fonts.load(`1em ${fontName}`);
 }
 
-// ✅ Muat XML saat dropdown berubah
-translationSelect.addEventListener("change", async () => {
-  const lang = translationSelect.value;
-  const url = translationXmlMap[lang];
-  if (!url) return;
-  loader.style.display = "block";
-  try {
-    const res = await fetch(url);
-    const text = await res.text();
-    const parser = new DOMParser();
-    loadedXml = parser.parseFromString(text, "application/xml");
-    loadedLang = lang;
-  } catch (e) {
-    resultsContainer.innerHTML = `<p>Gagal memuat XML.</p>`;
-  }
-  loader.style.display = "none";
-  resultsContainer.innerHTML = '';
+translationFontSelect.addEventListener("change", () => {
+  const fontUrl = translationFontSelect.value;
+  const fontName = "customTranslationFont";
+  loadFontFromUrl(fontUrl, fontName);
+  document.querySelectorAll(".translation").forEach(el => {
+    el.style.fontFamily = fontName;
+  });
 });
 
-// ✅ Tombol cari ditekan
-mulaiSearchBtn.addEventListener("click", () => {
-  if (!loadedXml) return alert("Pilih terjemahan dan tunggu hingga selesai dimuat.");
-
-  const keyword = kataInput.value.trim().toLowerCase();
-  if (!keyword) return;
-
-  loader.style.display = "block";
-  resultsContainer.innerHTML = "";
-
-  const ayatList = loadedXml.querySelectorAll("ayah");
-  let count = 0;
-
-  ayatList.forEach(ayat => {
-    const text = ayat.textContent.toLowerCase();
-    if (text.includes(keyword)) {
-      const surah = ayat.getAttribute("surah");
-      const number = ayat.getAttribute("number");
-
-      const div = document.createElement("div");
-      div.innerHTML = `
-        <p><strong>Surah ${surah}, Ayat ${number}</strong><br>${ayat.textContent}</p>
-        <button onclick="goToAyat('${surah}', '${number}')">Pergi ke Ayat</button>
-      `;
-      resultsContainer.appendChild(div);
-      count++;
-    }
+ document.getElementById("quranFontSize").addEventListener("input", e => {
+   document.querySelectorAll(".quran-v1, .quran-v2").forEach(el => {
+     el.style.fontSize = `${e.target.value}px`;
   });
-
-  if (count === 0) resultsContainer.innerHTML = '<p>Tidak ditemukan.</p>';
-  loader.style.display = "none";
 });
 
-// ✅ Fungsi menuju ayat
-function goToAyat(surah, ayah) {
-  document.getElementById("surahSelect").value = surah;
-  updateAyahDropdown().then(() => {
-    document.getElementById("ayahSelect").value = ayah;
-    document.getElementById("wordStart").value = 1;
-    document.getElementById("wordEnd").value = 1;
-    document.getElementById("wordTranslationId").value = 33; // Default terjemah
-    loadAyat();
-    modal.style.display = "none";
-    resetSearch();
+document.getElementById("translationFontSize").addEventListener("input", e => {
+  document.querySelectorAll(".translation").forEach(el => {
+    el.style.fontSize = `${e.target.value}px`;
   });
-} // Akhir
+});
+
+document.getElementById("infoFontSize").addEventListener("input", e => {
+  document.querySelectorAll(".surah-info").forEach(el => {
+    el.style.fontSize = `${e.target.value}px`;
+  });
+});
+
+  const backgroundColorPicker = document.getElementById("backgroundColorPicker");
+
+backgroundColorPicker.addEventListener("input", () => {
+  const color = backgroundColorPicker.value;
+  pagesContainer.style.backgroundColor = color;
+
+  // Otomatis hapus gambar background (termasuk pattern) jika ada
+  pagesContainer.style.backgroundImage = "none";
+});
 </script>
   
 </body>
