@@ -737,11 +737,15 @@ async function loadAyat() {
   try {
     const s = surahSelect.value, a = ayahSelect.value, key = `${s}:${a}`;
     const container = document.getElementById("pages");
+
+    // 🧹 Bersihkan isi container biar tidak DOUBEL
     container.innerHTML = "";
 
     const pageMap = await fetch("https://raw.githubusercontent.com/dickymiswardi/tadabbur/main/ayah_page_map.json").then(r => r.json());
     const page = pageMap[key];
-    const fontName = currentVersion === 'v1' ? `QCF_P${String(page).padStart(3, '0')}` : `QCF2${String(page).padStart(3, '0')}`;
+    const fontName = currentVersion === 'v1'
+      ? `QCF_P${String(page).padStart(3, '0')}`
+      : `QCF2${String(page).padStart(3, '0')}`;
     const fontUrl = currentVersion === 'v1'
       ? `https://cdn.jsdelivr.net/gh/dickymiswardi/quran/fonts/${fontName}.TTF`
       : `https://cdn.jsdelivr.net/gh/tafsirnetlifyapp/quran@refs/heads/main/fontsglyphvs/${fontName}.ttf`;
@@ -750,19 +754,26 @@ async function loadAyat() {
     const data = await fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?words=true&word_fields=${apiField}`).then(r => r.json());
     words = data.verse.words.map(w => ({ arabic: w[apiField] || w.text, id: w.id }));
 
+    // 🔄 Update word dropdown
     const prevStart = +wordStart.value || 1, prevEnd = +wordEnd.value || 1;
     wordStart.innerHTML = "";
     for (let i = 1; i <= words.length; i++) wordStart.appendChild(new Option(`Word ${i}`, i));
     wordStart.value = initialLoad ? 1 : Math.min(prevStart, words.length);
+
     wordEnd.innerHTML = "";
     for (let i = wordStart.value; i <= words.length; i++) wordEnd.appendChild(new Option(`To ${i}`, i));
     wordEnd.value = initialLoad ? 1 : Math.min(prevEnd, words.length);
     initialLoad = false;
 
-    const style = document.createElement("style");
-    style.textContent = `@font-face { font-family: '${fontName}'; src: url('${fontUrl}') format('truetype'); }`;
-    document.head.appendChild(style);
+    // ✅ Inject font hanya sekali (cek jika sudah ada)
+    if (!document.getElementById(`font-${fontName}`)) {
+      const style = document.createElement("style");
+      style.id = `font-${fontName}`;
+      style.textContent = `@font-face { font-family: '${fontName}'; src: url('${fontUrl}') format('truetype'); }`;
+      document.head.appendChild(style);
+    }
 
+    // 📝 Buat container ayat
     const div = document.createElement("div");
     div.className = `page-container quran-${currentVersion} quran-text`;
     div.style.fontFamily = fontName;
@@ -770,6 +781,7 @@ async function loadAyat() {
 
     await document.fonts.load(`1em ${fontName}`);
 
+    // ✨ Tampilkan kata-kata ayat
     const startIdx = (+wordStart.value || 1) - 1;
     const endIdx = (+wordEnd.value || startIdx + 1);
     const line = document.createElement("div");
@@ -782,73 +794,68 @@ async function loadAyat() {
     });
     div.appendChild(line);
 
-
-    
+    // 🌐 Tampilkan terjemahan
     const transVal = wordTranslationId.value;
-if (transVal) {
-  if (transVal.startsWith("ayah_")) {
-    // ✅ Terjemahan Per-Ayat (QuranEnc)
-    const transKey = transVal.replace("ayah_", "");
-    try {
-      const res = await fetch(`https://quranenc.com/api/v1/translation/aya/${transKey}/${s}/${a}`);
-      const json = await res.json();
-      const fullTranslation = json.result.translation;
+    if (transVal) {
+      if (transVal.startsWith("ayah_")) {
+        // 📖 Terjemahan Per-Ayat (QuranEnc)
+        const transKey = transVal.replace("ayah_", "");
+        try {
+          const res = await fetch(`https://quranenc.com/api/v1/translation/aya/${transKey}/${s}/${a}`);
+          const json = await res.json();
+          const fullTranslation = json.result.translation;
 
-      const ayahTransDiv = document.createElement("div");
-      ayahTransDiv.className = "translation";
-      ayahTransDiv.contentEditable = true;
-      ayahTransDiv.innerText = fullTranslation;
-      ayahTransDiv.style.userSelect = "text";
-      ayahTransDiv.setAttribute("draggable", "false");
-      div.appendChild(ayahTransDiv);
-    } catch (e) {
-      console.error("Gagal ambil terjemahan per-ayat:", e);
+          const ayahTransDiv = document.createElement("div");
+          ayahTransDiv.className = "translation";
+          ayahTransDiv.contentEditable = true;
+          ayahTransDiv.innerText = fullTranslation;
+          ayahTransDiv.style.userSelect = "text";
+          ayahTransDiv.setAttribute("draggable", "false");
+          div.appendChild(ayahTransDiv);
+        } catch (e) {
+          console.error("Gagal ambil terjemahan per-ayat:", e);
+        }
+      } else {
+        // 📖 Terjemahan Per-Kata (Quran.com)
+        const langCode = translationLanguageMap[transVal];
+        try {
+          const r = await fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?words=true&language=${langCode}&translations=${transVal}`);
+          const j = await r.json();
+          const wordsData = j.verse.words;
+          const wordTranslations = wordsData.map(w => w.translation?.text || "").slice(startIdx, endIdx);
+
+          const perKataDiv = document.createElement("div");
+          perKataDiv.className = "translation";
+          perKataDiv.textContent = wordTranslations.join(" ");
+          perKataDiv.contentEditable = true;
+          perKataDiv.style.userSelect = "text";
+          perKataDiv.setAttribute("draggable", "false");
+          div.appendChild(perKataDiv);
+        } catch (e) {
+          console.error("Gagal ambil terjemah perkata:", e);
+        }
+      }
     }
-  } else {
-    // ✅ Terjemahan Per-Kata (Quran.com)
-    const langCode = translationLanguageMap[transVal];
-    try {
-      const r = await fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?words=true&language=${langCode}&translations=${transVal}`);
-      const j = await r.json();
-      const wordsData = j.verse.words;
-      const wordTranslations = wordsData.map(w => w.translation?.text || "").slice(startIdx, endIdx);
 
-      const perKataDiv = document.createElement("div");
-      perKataDiv.className = "translation";
-      perKataDiv.textContent = wordTranslations.join(" ");
-      perKataDiv.contentEditable = true;
-      perKataDiv.style.userSelect = "text";
-      perKataDiv.setAttribute("draggable", "false");
-      div.appendChild(perKataDiv);
-    } catch (e) {
-      console.error("Gagal ambil terjemah perkata:", e);
-    }
-  }
+    // 📌 Tampilkan info surah & ayat
+    const surahName = surahList[s][0];
+    const referenceDiv = document.createElement("div");
+    referenceDiv.className = "surah-info";
+    referenceDiv.textContent = `${surahName}: ${a}`;
+    div.appendChild(referenceDiv);
 
-  // ✅ Tampilkan info surah dan ayat
-  const surahName = surahList[s][0];
-  const referenceDiv = document.createElement("div");
-  referenceDiv.className = "surah-info";
-  referenceDiv.textContent = `${surahName}: ${a}`;
-  div.appendChild(referenceDiv);
+    // 🖋 Atur ukuran font
+    div.style.fontSize = document.getElementById("quranFontSize").value + "px";
+    document.querySelectorAll(".translation").forEach(el => {
+      el.style.fontSize = document.getElementById("translationFontSize").value + "px";
+    });
+    referenceDiv.style.fontSize = document.getElementById("infoFontSize").value + "px";
 
-  // ✅ Atur font size
-  div.style.fontSize = document.getElementById("quranFontSize").value + "px";
-  document.querySelectorAll(".translation").forEach(el => {
-    el.style.fontSize = document.getElementById("translationFontSize").value + "px";
-  });
-  referenceDiv.style.fontSize = document.getElementById("infoFontSize").value + "px";
-
-  // ✅ Tambah watermark
-  const brandDiv = document.createElement("div");
-  brandDiv.className = "brand-watermark";
-  brandDiv.textContent = "videomurottal.com";
-  pagesContainer.appendChild(brandDiv);
-}
-
-
-
-    
+    // 🏷 Tambahkan watermark
+    const brandDiv = document.createElement("div");
+    brandDiv.className = "brand-watermark";
+    brandDiv.textContent = "videomurottal.com";
+    container.appendChild(brandDiv);
 
     div.style.display = "block";
     requestAnimationFrame(() => div.style.opacity = "1");
@@ -866,6 +873,7 @@ updateAyahDropdown().then(() => {
   if (last.wordEnd) wordEnd.value = last.wordEnd;
   if (last.translation) wordTranslationId.value = last.translation;
 });
+
   
 </script>
 
@@ -1146,32 +1154,30 @@ backgroundColorPicker.addEventListener("input", () => {
   const wordTranslationId = document.getElementById('wordTranslationId');
 
   if (surahSelect && ayahSelect) {
-    // Set Surah & Ayat
+    // Set Surah & Ayat tanpa trigger event
     surahSelect.value = sura;
-    surahSelect.dispatchEvent(new Event('change'));
+    ayahSelect.value = aya;
 
-    setTimeout(() => {
-      ayahSelect.value = aya;
-      ayahSelect.dispatchEvent(new Event('change'));
+    // Sinkronkan dropdown terjemahan
+    if (wordTranslationId && typeof activeLang === 'string') {
+      const dropdownValue = "ayah_" + activeLang; // prefix 'ayah_'
+      const matchedOption = Array.from(wordTranslationId.options)
+        .find(opt => opt.value === dropdownValue);
 
-      // Sinkronkan dropdown terjemahan dengan activeLang
-      if (wordTranslationId && typeof activeLang === 'string') {
-        const dropdownValue = "ayah_" + activeLang; // prefix 'ayah_'
-        const matchedOption = Array.from(wordTranslationId.options)
-          .find(opt => opt.value === dropdownValue);
-
-        if (matchedOption) {
-          wordTranslationId.value = matchedOption.value;
-          wordTranslationId.dispatchEvent(new Event('change'));
-        }
+      if (matchedOption) {
+        wordTranslationId.value = matchedOption.value;
       }
-    }, 300);
+    }
+
+    // ✅ Panggil loadAyat() sekali saja
+    loadAyat();
   }
 
   // Tutup modal
   const modal = document.querySelector('.modal-overlay');
   if (modal) modal.style.display = 'none';
 }
+
 
 
   // ==== Fungsi Error ====
