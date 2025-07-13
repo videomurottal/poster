@@ -1162,27 +1162,26 @@ async function goToAyat(sura, aya) {
   const wordTranslationId = document.getElementById('wordTranslationId');
 
   if (surahSelect && ayahSelect) {
-    // Set Surah & trigger update Ayah dropdown
+    // ✅ Set Surah & tunggu update Ayat
     surahSelect.value = sura;
-    await updateAyahDropdown();
+    await updateAyahDropdown(); // hanya update ayahSelect, tidak panggil loadAyat()
 
-    // Set Ayah setelah dropdown Ayah selesai diisi
+    // ✅ Set Ayat
     ayahSelect.value = aya;
 
-    // Sinkronkan dropdown terjemahan dengan activeLang
+    // ✅ Sinkronkan terjemah jika pakai ayah_
     if (wordTranslationId && typeof activeLang === 'string') {
-      const dropdownValue = "ayah_" + activeLang; // prefix 'ayah_'
+      const dropdownValue = "ayah_" + activeLang;
       const matchedOption = Array.from(wordTranslationId.options)
         .find(opt => opt.value === dropdownValue);
-
-      if (matchedOption) {
-        wordTranslationId.value = matchedOption.value;
-      }
+      if (matchedOption) wordTranslationId.value = matchedOption.value;
     }
 
-    // 🚀 Muat ayat
+    // ✅ Panggil loadAyat secara eksplisit
     loadAyat();
   }
+}
+
 
   // Tutup modal
   const modal = document.querySelector('.modal-overlay');
