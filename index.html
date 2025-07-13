@@ -463,10 +463,10 @@ button:hover {
 <div class="controls">
   <!-- Dropdown Background -->
   <label><select id="backgroundSelect">
-      <option value="https://images.pexels.com/photos/1323550/pexels-photo-1323550.jpeg">Wallpaper 1</option>
-      <option value="https://images.pexels.com/photos/1170572/pexels-photo-1170572.jpeg">Wallpaper 2</option>
-    <option value="https://images.pexels.com/photos/163848/road-mountains-sunset-path-163848.jpeg">Wallpaper 3</option>
-    <option value="https://images.pexels.com/photos/1819662/pexels-photo-1819662.jpeg">Wallpaper 4</option>
+      <option value="https://images.pexels.com/photos/6068385/pexels-photo-6068385.jpeg">Wallpaper 1</option>
+      <option value="https://images.pexels.com/photos/673020/pexels-photo-673020.jpeg">Wallpaper 2</option>
+    <option value="https://images.pexels.com/photos/10257141/pexels-photo-10257141.jpeg">Wallpaper 3</option>
+    <option value="https://images.pexels.com/photos/13922651/pexels-photo-13922651.jpeg">Wallpaper 4</option>
     </select>
   </label>
 
@@ -643,7 +643,7 @@ function loadHistory() {
   if (history.version) currentVersion = history.version;
 
   // ✅ Default wallpaper jika belum ada data background
-  const defaultBg = "https://images.pexels.com/photos/1323550/pexels-photo-1323550.jpeg";
+  const defaultBg = "https://images.pexels.com/photos/6068385/pexels-photo-6068385.jpeg";
   const bgToUse = history.background || defaultBg;
 
   backgroundSelect.value = bgToUse;
@@ -937,17 +937,20 @@ const urlInputWrapper = document.getElementById("urlInputWrapper");
 const applyUrlButton = document.getElementById("applyUrlButton");
 
 showUrlInput.addEventListener("click", () => {
-  urlInputWrapper.style.display = "flex";
+  const isVisible = urlInputWrapper.style.display === "flex";
+  urlInputWrapper.style.display = isVisible ? "none" : "flex";
 });
 
 applyUrlButton.addEventListener("click", () => {
-  const url = document.getElementById("backgroundUrl").value.trim();
+  const url = backgroundUrl.value.trim();
   if (url) {
     pagesContainer.style.backgroundImage = `url('${url}')`;
     backgroundSelect.value = "";
     saveHistory();
+    urlInputWrapper.style.display = "none"; // ✅ Langsung tutup setelah diterapkan
   }
 });
+
 
 const translationFontSelect = document.getElementById("translationFontSelect");
 const translationFontSize = document.getElementById("translationFontSize");
