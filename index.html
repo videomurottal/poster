@@ -1198,6 +1198,44 @@ async function goToAyat(sura, aya) {
       timeout = setTimeout(() => fn.apply(this, args), delay);
     };
   }
+
+
+async function init() {
+  // ✅ Inisialisasi dropdown surah
+  for (let i in surahList) {
+    const [name] = surahList[i];
+    surahSelect.appendChild(new Option(`${i}. ${name}`, i));
+  }
+
+  // ✅ Set default Surah dan Ayat (tapi tanpa langsung load ayat)
+  surahSelect.value = "1";
+  await updateAyahDropdown(true); // Lewatkan loadAyat
+  ayahSelect.value = "1";
+
+  // ✅ Set default WordStart dan WordEnd manual tanpa trigger load
+  wordStart.innerHTML = "<option value='1'>Word 1</option>";
+  wordEnd.innerHTML = "<option value='1'>To 1</option>";
+  wordStart.value = "1";
+  wordEnd.value = "1";
+
+  // ✅ Set default translation dari localStorage
+  if (wordTranslationId && activeLang) {
+    const defaultVal = "ayah_" + activeLang;
+    const match = Array.from(wordTranslationId.options).find(opt => opt.value === defaultVal);
+    if (match) wordTranslationId.value = defaultVal;
+  }
+
+  // ✅ Load XML terjemahan aktif tanpa load ayat
+  await loadSelectedXML(activeLang);
+
+  // 🔔 Tidak memanggil loadAyat() di sini
+}
+
+  document.addEventListener("DOMContentLoaded", () => {
+  init();
+});
+
+  
 </script>
 
 
