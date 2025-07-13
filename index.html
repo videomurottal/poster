@@ -463,10 +463,10 @@ button:hover {
 <div class="controls">
   <!-- Dropdown Background -->
   <label><select id="backgroundSelect">
-      <option value="https://images.pexels.com/photos/2307196/pexels-photo-2307196.jpeg">Wallpaper 1</option>
-      <option value="https://images.pexels.com/photos/933054/pexels-photo-933054.jpeg">Wallpaper 2</option>
-      <option value="https://images.pexels.com/photos/2793175/pexels-photo-2793175.jpeg">Wallpaper 3</option>
-      <option value="https://images.pexels.com/photos/9807412/pexels-photo-9807412.jpeg">Wallpaper 4</option>
+      <option value="https://images.pexels.com/photos/1819662/pexels-photo-1819662.jpeg">Wallpaper 1</option>
+      <option value="https://images.pexels.com/photos/13861001/pexels-photo-13861001.jpeg">Wallpaper 2</option>
+      <option value="https://images.pexels.com/photos/28883533/pexels-photo-28883533.jpeg">Wallpaper 3</option>
+      <option value="https://images.pexels.com/photos/18945829/pexels-photo-18945829.jpeg">Wallpaper 4</option>
     </select>
   </label>
 
@@ -1139,32 +1139,37 @@ backgroundColorPicker.addEventListener("input", () => {
     }
   }
 
-  function goToAyat(sura, aya) {
+  // ==== Fungsi "Menuju ke Ayat" ====
+ function goToAyat(sura, aya) {
   const surahSelect = document.getElementById('surahSelect');
   const ayahSelect = document.getElementById('ayahSelect');
-  const translationDropdown = document.getElementById('wordTranslationId');
+  const wordTranslationId = document.getElementById('wordTranslationId');
 
   if (surahSelect && ayahSelect) {
+    // Set Surah & Ayat
     surahSelect.value = sura;
     surahSelect.dispatchEvent(new Event('change'));
 
     setTimeout(() => {
       ayahSelect.value = aya;
       ayahSelect.dispatchEvent(new Event('change'));
+
+      // Sinkronkan dropdown terjemahan dengan activeLang
+      if (wordTranslationId && typeof activeLang === 'string') {
+        const dropdownValue = "ayah_" + activeLang; // prefix 'ayah_'
+        const matchedOption = Array.from(wordTranslationId.options)
+          .find(opt => opt.value === dropdownValue);
+
+        if (matchedOption) {
+          wordTranslationId.value = matchedOption.value;
+          wordTranslationId.dispatchEvent(new Event('change'));
+        }
+      }
     }, 300);
   }
 
-  // ✅ Set dropdown terjemahan sesuai modal
-  if (translationDropdown && activeLang) {
-    const targetValue = 'ayah_' + activeLang;
-    const optionExists = Array.from(translationDropdown.options).some(opt => opt.value === targetValue);
-    if (optionExists) {
-      translationDropdown.value = targetValue;
-      translationDropdown.dispatchEvent(new Event('change'));
-    }
-  }
-
-  // ✅ Tutup modal
+  // Tutup modal
+  const modal = document.querySelector('.modal-overlay');
   if (modal) modal.style.display = 'none';
 }
 
