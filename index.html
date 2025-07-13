@@ -729,7 +729,6 @@ async function updateAyahDropdown() {
   ayahSelect.innerHTML = "";
   for (let i = 1; i <= max; i++) ayahSelect.appendChild(new Option(`Ayat ${i}`, i));
   ayahSelect.value = 1;
-  loadAyat();
 }
 
 async function loadAyat() {
