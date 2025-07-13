@@ -1357,12 +1357,12 @@ backgroundColorPicker.addEventListener("input", () => {
   const surahSelect = document.getElementById('surahSelect');
   const ayahSelect = document.getElementById('ayahSelect');
   const wordTranslationId = document.getElementById('wordTranslationId');
-  const modal = document.querySelector('.modal-overlay');
   const kataInput = document.getElementById('kataInput');
-  const resultDiv = document.getElementById('searchResults');
+  const searchResults = document.getElementById('searchResults');
+  const modal = document.querySelector('.modal-overlay');
 
   if (surahSelect && ayahSelect) {
-    // Set Surah & Ayat
+    // Set nilai dropdown surah dan ayat
     surahSelect.value = sura;
     surahSelect.dispatchEvent(new Event('change'));
 
@@ -1370,7 +1370,12 @@ backgroundColorPicker.addEventListener("input", () => {
       ayahSelect.value = aya;
       ayahSelect.dispatchEvent(new Event('change'));
 
-      // Sinkronkan dropdown terjemahan dengan activeLang
+      // Jalankan ulang fungsi utama pemuat ayat dan jumlah kata
+      if (typeof loadAyat === 'function') {
+        loadAyat(); // ⬅️ Pastikan fungsi ini mengatur teks, jumlah kata, dll
+      }
+
+      // Sinkronkan dropdown terjemahan jika tersedia
       if (wordTranslationId && typeof activeLang === 'string') {
         const dropdownValue = "ayah_" + activeLang;
         const matchedOption = Array.from(wordTranslationId.options)
@@ -1383,6 +1388,15 @@ backgroundColorPicker.addEventListener("input", () => {
       }
     }, 300);
   }
+
+  // Bersihkan hasil pencarian dan input kata
+  if (kataInput) kataInput.value = '';
+  if (searchResults) searchResults.innerHTML = '';
+
+  // Tutup modal
+  if (modal) modal.style.display = 'none';
+}
+
 
   // 🔁 Reset modal: hapus hasil + kosongkan input + scroll ke atas
   if (modal) {
