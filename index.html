@@ -708,18 +708,41 @@ for (let i in surahList) {
   surahSelect.appendChild(new Option(`${i}. ${name}`, i));
 }
 
-surahSelect.addEventListener("change", () => { updateAyahDropdown(); saveHistory(); });
-ayahSelect.addEventListener("change", () => { loadAyat(); saveHistory(); });
+surahSelect.addEventListener("change", async () => {
+  await updateAyahDropdown();   // Tunggu dropdown ayat selesai
+  await loadAyat();             // Kemudian tampilkan ayat
+  saveHistory();                // Simpan riwayat
+});
+
+ayahSelect.addEventListener("change", async () => {
+  await loadAyat();             // Muat ayat baru
+  saveHistory();
+});
+
 wordStart.addEventListener("change", () => {
   const startVal = +wordStart.value;
   wordEnd.innerHTML = "";
-  for (let i = startVal; i <= words.length; i++) wordEnd.appendChild(new Option(i, i));
+
+  for (let i = startVal; i <= words.length; i++) {
+    wordEnd.appendChild(new Option(i, i));
+  }
+
   wordEnd.value = startVal;
+
   loadAyat();
   saveHistory();
 });
-wordEnd.addEventListener("change", () => { loadAyat(); saveHistory(); });
-wordTranslationId.addEventListener("change", () => { loadAyat(); saveHistory(); });
+
+wordEnd.addEventListener("change", () => {
+  loadAyat();
+  saveHistory();
+});
+
+wordTranslationId.addEventListener("change", () => {
+  loadAyat();
+  saveHistory();
+});
+
 
 async function updateAyahDropdown() {
   const s = surahSelect.value;
@@ -1152,10 +1175,12 @@ async function goToAyat(sura, aya) {
   const ayahSelect = document.getElementById('ayahSelect');
   const wordTranslationId = document.getElementById('wordTranslationId');
 
-  if (surahSelect && ayahSelect) {
-    // Set Surah & trigger update Ayah dropdown
-    surahSelect.value = sura;
-    await updateAyahDropdown();
+ if (surahSelect && ayahSelect) {
+  // Set Surah & trigger update Ayah dropdown
+  surahSelect.value = sura;
+  await updateAyahDropdown();
+}
+
 
     // Set Ayah setelah dropdown Ayah selesai diisi
     ayahSelect.value = aya;
