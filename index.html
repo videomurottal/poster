@@ -1159,7 +1159,7 @@ async function goToAyat(sura, aya) {
   if (surahSelect && ayahSelect) {
     // Set Surah & trigger update Ayah dropdown
     surahSelect.value = sura;
-    await updateAyahDropdown();
+    await updateAyahDropdown(false);
 
     // Set Ayah setelah dropdown Ayah selesai diisi
     ayahSelect.value = aya;
