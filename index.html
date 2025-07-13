@@ -573,6 +573,56 @@ button:hover {
 
 <script>
 
+  async function loadAyat() {
+  showLoader();
+  try {
+    const s = surahSelect.value, a = ayahSelect.value, key = `${s}:${a}`;
+    const container = document.getElementById("pages");
+    container.innerHTML = "";
+
+    const pageMap = await fetch("https://raw.githubusercontent.com/dickymiswardi/tadabbur/main/ayah_page_map.json").then(r => r.json());
+    const page = pageMap[key];
+    const fontName = currentVersion === 'v1' ? `QCF_P${String(page).padStart(3, '0')}` : `QCF2${String(page).padStart(3, '0')}`;
+    const fontUrl = currentVersion === 'v1'
+      ? `https://cdn.jsdelivr.net/gh/dickymiswardi/quran/fonts/${fontName}.TTF`
+      : `https://cdn.jsdelivr.net/gh/tafsirnetlifyapp/quran@refs/heads/main/fontsglyphvs/${fontName}.ttf`;
+
+    const apiField = currentVersion === "v1" ? "code_v1" : "code_v2";
+    const data = await fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?words=true&word_fields=${apiField}`).then(r => r.json());
+    words = data.verse.words.map(w => ({ arabic: w[apiField] || w.text, id: w.id }));
+
+    const prevStart = +wordStart.value || 1, prevEnd = +wordEnd.value || 1;
+    wordStart.innerHTML = "";
+    for (let i = 1; i <= words.length; i++) wordStart.appendChild(new Option(`Word ${i}`, i));
+    wordStart.value = initialLoad ? 1 : Math.min(prevStart, words.length);
+    wordEnd.innerHTML = "";
+    for (let i = wordStart.value; i <= words.length; i++) wordEnd.appendChild(new Option(`To ${i}`, i));
+    wordEnd.value = initialLoad ? 1 : Math.min(prevEnd, words.length);
+    initialLoad = false;
+
+    const style = document.createElement("style");
+    style.textContent = `@font-face { font-family: '${fontName}'; src: url('${fontUrl}') format('truetype'); }`;
+    document.head.appendChild(style);
+
+    const div = document.createElement("div");
+    div.className = `page-container quran-${currentVersion} quran-text`;
+    div.style.fontFamily = fontName;
+    container.appendChild(div);
+
+    await document.fonts.load(`1em ${fontName}`);
+
+    const startIdx = (+wordStart.value || 1) - 1;
+    const endIdx = (+wordEnd.value || startIdx + 1);
+    const line = document.createElement("div");
+    words.slice(startIdx, endIdx).forEach(word => {
+      const span = document.createElement("span");
+      span.className = "word";
+      span.innerText = word.arabic;
+      line.appendChild(span);
+      line.appendChild(document.createTextNode(" "));
+    });
+    div.appendChild(line);
+
 const backgroundSelect = document.getElementById("backgroundSelect");
 const backgroundUpload = document.getElementById("backgroundUpload");
 const backgroundUrl = document.getElementById("backgroundUrl");
@@ -731,56 +781,6 @@ async function updateAyahDropdown() {
   ayahSelect.value = 1;
   loadAyat();
 }
-
-async function loadAyat() {
-  showLoader();
-  try {
-    const s = surahSelect.value, a = ayahSelect.value, key = `${s}:${a}`;
-    const container = document.getElementById("pages");
-    container.innerHTML = "";
-
-    const pageMap = await fetch("https://raw.githubusercontent.com/dickymiswardi/tadabbur/main/ayah_page_map.json").then(r => r.json());
-    const page = pageMap[key];
-    const fontName = currentVersion === 'v1' ? `QCF_P${String(page).padStart(3, '0')}` : `QCF2${String(page).padStart(3, '0')}`;
-    const fontUrl = currentVersion === 'v1'
-      ? `https://cdn.jsdelivr.net/gh/dickymiswardi/quran/fonts/${fontName}.TTF`
-      : `https://cdn.jsdelivr.net/gh/tafsirnetlifyapp/quran@refs/heads/main/fontsglyphvs/${fontName}.ttf`;
-
-    const apiField = currentVersion === "v1" ? "code_v1" : "code_v2";
-    const data = await fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?words=true&word_fields=${apiField}`).then(r => r.json());
-    words = data.verse.words.map(w => ({ arabic: w[apiField] || w.text, id: w.id }));
-
-    const prevStart = +wordStart.value || 1, prevEnd = +wordEnd.value || 1;
-    wordStart.innerHTML = "";
-    for (let i = 1; i <= words.length; i++) wordStart.appendChild(new Option(`Word ${i}`, i));
-    wordStart.value = initialLoad ? 1 : Math.min(prevStart, words.length);
-    wordEnd.innerHTML = "";
-    for (let i = wordStart.value; i <= words.length; i++) wordEnd.appendChild(new Option(`To ${i}`, i));
-    wordEnd.value = initialLoad ? 1 : Math.min(prevEnd, words.length);
-    initialLoad = false;
-
-    const style = document.createElement("style");
-    style.textContent = `@font-face { font-family: '${fontName}'; src: url('${fontUrl}') format('truetype'); }`;
-    document.head.appendChild(style);
-
-    const div = document.createElement("div");
-    div.className = `page-container quran-${currentVersion} quran-text`;
-    div.style.fontFamily = fontName;
-    container.appendChild(div);
-
-    await document.fonts.load(`1em ${fontName}`);
-
-    const startIdx = (+wordStart.value || 1) - 1;
-    const endIdx = (+wordEnd.value || startIdx + 1);
-    const line = document.createElement("div");
-    words.slice(startIdx, endIdx).forEach(word => {
-      const span = document.createElement("span");
-      span.className = "word";
-      span.innerText = word.arabic;
-      line.appendChild(span);
-      line.appendChild(document.createTextNode(" "));
-    });
-    div.appendChild(line);
 
 
     
@@ -1109,50 +1109,20 @@ backgroundColorPicker.addEventListener("input", () => {
   }
 
   // ==== Fungsi pencarian kata ====
-  function searchKata(keyword) {
-    const resultDiv = document.getElementById('searchResults');
-    resultDiv.innerHTML = '';
-
-    const suras = activeXMLDoc.getElementsByTagName('sura');
-    let totalHasil = 0;
-
-    for (let sura of suras) {
-      const suraNum = sura.getAttribute('number');
-      const ayas = sura.getElementsByTagName('aya');
-      for (let aya of ayas) {
-        const ayaNum = aya.getAttribute('number');
-        const text = aya.textContent || '';
-        if (text.toLowerCase().includes(keyword)) {
-          const p = document.createElement('p');
-          p.innerHTML = `
-            Surah ${suraNum}, Ayat ${ayaNum}: ${text}
-            <button onclick="goToAyat(${suraNum}, ${ayaNum})">Menuju Ayat</button>
-          `;
-          resultDiv.appendChild(p);
-          totalHasil++;
-        }
-      }
-    }
-
-    if (totalHasil === 0) {
-      resultDiv.innerHTML = '<p style="color:red;">Tidak ditemukan hasil untuk kata tersebut.</p>';
-    }
-  }
-
   function goToAyat(sura, aya) {
   const surahSelect = document.getElementById('surahSelect');
   const ayahSelect = document.getElementById('ayahSelect');
   const wordTranslationId = document.getElementById('wordTranslationId');
 
   if (surahSelect && ayahSelect) {
-    // Atur Surah
+    // Set Surah
     surahSelect.value = sura;
 
-    // Jalankan updateAyahDropdown lalu set ayat setelah dropdown diperbarui
+    // Update dropdown ayat lalu set ayat & load
     updateAyahDropdown().then(() => {
       ayahSelect.value = aya;
 
-      // Sinkronkan dropdown terjemahan dengan activeLang
+      // Sinkronkan dropdown terjemahan jika ada
       if (wordTranslationId && typeof activeLang === 'string') {
         const dropdownValue = "ayah_" + activeLang;
         const matchedOption = Array.from(wordTranslationId.options)
@@ -1162,10 +1132,16 @@ backgroundColorPicker.addEventListener("input", () => {
         }
       }
 
-      // ✅ Load ayat hanya sekali
+      // ✅ Load hanya sekali
       loadAyat();
     });
   }
+
+  // ❌ Tutup modal
+  const modal = document.querySelector('.modal-overlay');
+  if (modal) modal.style.display = 'none';
+}
+
 
   // Tutup modal
   const modal = document.querySelector('.modal-overlay');
