@@ -728,7 +728,8 @@ async function updateAyahDropdown() {
   const max = json.chapter.verses_count;
   ayahSelect.innerHTML = "";
   for (let i = 1; i <= max; i++) ayahSelect.appendChild(new Option(`Ayat ${i}`, i));
-  // ⛔ loadAyat() dipanggil manual di tempat lain
+  ayahSelect.value = 1;
+  loadAyat();
 }
 
 async function loadAyat() {
@@ -737,7 +738,7 @@ async function loadAyat() {
     const s = surahSelect.value, a = ayahSelect.value, key = `${s}:${a}`;
     const container = document.getElementById("pages");
 
-    // 🔄 Bersihkan container biar tidak dobel
+    // 🧹 Bersihkan isi container biar tidak DOUBEL
     container.innerHTML = "";
 
     const pageMap = await fetch("https://raw.githubusercontent.com/dickymiswardi/tadabbur/main/ayah_page_map.json").then(r => r.json());
@@ -750,8 +751,6 @@ async function loadAyat() {
       : `https://cdn.jsdelivr.net/gh/tafsirnetlifyapp/quran@refs/heads/main/fontsglyphvs/${fontName}.ttf`;
 
     const apiField = currentVersion === "v1" ? "code_v1" : "code_v2";
-
-    // 🟡 Ambil data kata Arab SELALU (agar dropdown tetap terisi meski pakai ayah_...)
     const data = await fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?words=true&word_fields=${apiField}`).then(r => r.json());
     words = data.verse.words.map(w => ({ arabic: w[apiField] || w.text, id: w.id }));
 
@@ -766,7 +765,7 @@ async function loadAyat() {
     wordEnd.value = initialLoad ? 1 : Math.min(prevEnd, words.length);
     initialLoad = false;
 
-    // ✅ Inject font jika belum
+    // ✅ Inject font hanya sekali (cek jika sudah ada)
     if (!document.getElementById(`font-${fontName}`)) {
       const style = document.createElement("style");
       style.id = `font-${fontName}`;
@@ -774,7 +773,7 @@ async function loadAyat() {
       document.head.appendChild(style);
     }
 
-    // 📝 Buat kontainer
+    // 📝 Buat container ayat
     const div = document.createElement("div");
     div.className = `page-container quran-${currentVersion} quran-text`;
     div.style.fontFamily = fontName;
@@ -782,7 +781,7 @@ async function loadAyat() {
 
     await document.fonts.load(`1em ${fontName}`);
 
-    // ✨ Tampilkan kata-kata Arab
+    // ✨ Tampilkan kata-kata ayat
     const startIdx = (+wordStart.value || 1) - 1;
     const endIdx = (+wordEnd.value || startIdx + 1);
     const line = document.createElement("div");
@@ -817,7 +816,7 @@ async function loadAyat() {
           console.error("Gagal ambil terjemahan per-ayat:", e);
         }
       } else {
-        // 📖 Terjemahan Per-Kata
+        // 📖 Terjemahan Per-Kata (Quran.com)
         const langCode = translationLanguageMap[transVal];
         try {
           const r = await fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?words=true&language=${langCode}&translations=${transVal}`);
@@ -838,19 +837,12 @@ async function loadAyat() {
       }
     }
 
-    // 📌 Info surah dan ayat
+    // 📌 Tampilkan info surah & ayat
     const surahName = surahList[s][0];
     const referenceDiv = document.createElement("div");
     referenceDiv.className = "surah-info";
     referenceDiv.textContent = `${surahName}: ${a}`;
     div.appendChild(referenceDiv);
-  } catch (err) {
-    console.error("Gagal memuat ayat:", err);
-  } finally {
-    hideLoader();
-  }
-}
-
 
     // 🖋 Atur ukuran font
     div.style.fontSize = document.getElementById("quranFontSize").value + "px";
@@ -1162,26 +1154,27 @@ async function goToAyat(sura, aya) {
   const wordTranslationId = document.getElementById('wordTranslationId');
 
   if (surahSelect && ayahSelect) {
-    // ✅ Set Surah & tunggu update Ayat
+    // Set Surah & trigger update Ayah dropdown
     surahSelect.value = sura;
-    await updateAyahDropdown(); // hanya update ayahSelect, tidak panggil loadAyat()
+    await updateAyahDropdown();
 
-    // ✅ Set Ayat
+    // Set Ayah setelah dropdown Ayah selesai diisi
     ayahSelect.value = aya;
 
-    // ✅ Sinkronkan terjemah jika pakai ayah_
+    // Sinkronkan dropdown terjemahan dengan activeLang
     if (wordTranslationId && typeof activeLang === 'string') {
-      const dropdownValue = "ayah_" + activeLang;
+      const dropdownValue = "ayah_" + activeLang; // prefix 'ayah_'
       const matchedOption = Array.from(wordTranslationId.options)
         .find(opt => opt.value === dropdownValue);
-      if (matchedOption) wordTranslationId.value = matchedOption.value;
+
+      if (matchedOption) {
+        wordTranslationId.value = matchedOption.value;
+      }
     }
 
-    // ✅ Panggil loadAyat secara eksplisit
+    // 🚀 Muat ayat
     loadAyat();
   }
-}
-
 
   // Tutup modal
   const modal = document.querySelector('.modal-overlay');
