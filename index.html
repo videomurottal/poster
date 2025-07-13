@@ -1148,18 +1148,18 @@ backgroundColorPicker.addEventListener("input", () => {
   }
 
   // ==== Fungsi "Menuju ke Ayat" ====
-function goToAyat(sura, aya) {
+async function goToAyat(sura, aya) {
   const surahSelect = document.getElementById('surahSelect');
   const ayahSelect = document.getElementById('ayahSelect');
   const wordTranslationId = document.getElementById('wordTranslationId');
 
   if (surahSelect && ayahSelect) {
-    // Set Surah & Ayat
+    // Set Surah & trigger update Ayah dropdown
     surahSelect.value = sura;
-    ayahSelect.value = aya;
+    await updateAyahDropdown();
 
-    // 🚀 Muat ayat baru
-    loadAyat();
+    // Set Ayah setelah dropdown Ayah selesai diisi
+    ayahSelect.value = aya;
 
     // Sinkronkan dropdown terjemahan dengan activeLang
     if (wordTranslationId && typeof activeLang === 'string') {
@@ -1171,6 +1171,9 @@ function goToAyat(sura, aya) {
         wordTranslationId.value = matchedOption.value;
       }
     }
+
+    // 🚀 Muat ayat
+    loadAyat();
   }
 
   // Tutup modal
