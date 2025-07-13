@@ -778,7 +778,8 @@ const urlInputWrapper = document.getElementById("urlInputWrapper");
 const applyUrlButton = document.getElementById("applyUrlButton");
 
 showUrlInput.addEventListener("click", () => {
-  urlInputWrapper.style.display = "flex";
+  const isVisible = urlInputWrapper.style.display === "flex";
+  urlInputWrapper.style.display = isVisible ? "none" : "flex";
 });
 
 applyUrlButton.addEventListener("click", () => {
@@ -787,8 +788,10 @@ applyUrlButton.addEventListener("click", () => {
     pagesContainer.style.backgroundImage = `url('${url}')`;
     backgroundSelect.value = "";
     saveHistory();
+    urlInputWrapper.style.display = "none"; // ✅ Auto-close setelah OK
   }
 });
+
 
 const translationFontSelect = document.getElementById("translationFontSelect");
 const translationFontSize = document.getElementById("translationFontSize");
