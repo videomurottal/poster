@@ -728,8 +728,7 @@ async function updateAyahDropdown() {
   const max = json.chapter.verses_count;
   ayahSelect.innerHTML = "";
   for (let i = 1; i <= max; i++) ayahSelect.appendChild(new Option(`Ayat ${i}`, i));
-  ayahSelect.value = 1;
-  loadAyat();
+  // ❌ Jangan panggil loadAyat() di sini
 }
 
 async function loadAyat() {
