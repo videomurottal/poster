@@ -716,7 +716,6 @@ wordStart.addEventListener("change", () => {
   for (let i = startVal; i <= words.length; i++) wordEnd.appendChild(new Option(i, i));
   wordEnd.value = startVal;
   loadAyat();
-  saveHistory();
 });
 wordEnd.addEventListener("change", () => { loadAyat(); });
 wordTranslationId.addEventListener("change", () => { loadAyat(); });
