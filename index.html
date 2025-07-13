@@ -1140,33 +1140,33 @@ backgroundColorPicker.addEventListener("input", () => {
   }
 
   // ==== Fungsi "Menuju ke Ayat" ====
-function goToAyat(sura, aya, wordTranslationId) {
-  surahSelect.value = sura;
-  surahSelect.dispatchEvent(new Event('change'));
+ function goToAyat(sura, aya) {
+  const surahSelect = document.getElementById('surahSelect');
+  const ayahSelect = document.getElementById('ayahSelect');
+  const wordTranslationId = document.getElementById('wordTranslationId');
 
-  // Tunggu sampai dropdown ayat terisi ulang
-  setTimeout(() => {
-    // ✅ Set ayat setelah surah berubah
-    ayahSelect.value = aya;
-    ayahSelect.dispatchEvent(new Event('change'));
+  if (surahSelect && ayahSelect) {
+    // Set Surah & Ayat
+    surahSelect.value = sura;
+    surahSelect.dispatchEvent(new Event('change'));
 
-    // ✅ Sync dropdown word-translation juga
-    if (wordTranslationId && typeof activeLang === 'string') {
-      const dropdownValue = "ayah_" + activeLang;
-      const matchedOption = Array.from(wordTranslationId.options)
-        .find(opt => opt.value === dropdownValue);
+    setTimeout(() => {
+      ayahSelect.value = aya;
+      ayahSelect.dispatchEvent(new Event('change'));
 
-      if (matchedOption) {
-        wordTranslationId.value = matchedOption.value;
-        wordTranslationId.dispatchEvent(new Event('change'));
+      // Sinkronkan dropdown terjemahan dengan activeLang
+      if (wordTranslationId && typeof activeLang === 'string') {
+        const dropdownValue = "ayah_" + activeLang; // prefix 'ayah_'
+        const matchedOption = Array.from(wordTranslationId.options)
+          .find(opt => opt.value === dropdownValue);
+
+        if (matchedOption) {
+          wordTranslationId.value = matchedOption.value;
+          wordTranslationId.dispatchEvent(new Event('change'));
+        }
       }
-    }
-
-    // ✅ Simpan sebagai default ayat
-    saveHistory();
-
-  }, 500); // kasih delay sedikit biar aman
-}
+    }, 300);
+  }
 
   // Tutup modal
   const modal = document.querySelector('.modal-overlay');
