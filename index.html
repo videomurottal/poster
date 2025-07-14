@@ -1066,9 +1066,22 @@ async function loadFontFromUrl(fontUrl, fontName) {
   `;
   document.head.appendChild(style);
 
-  // Tunggu hingga font selesai dimuat sebelum diterapkan
   try {
+    // Tunggu sampai font benar-benar ter-load
     await document.fonts.load(`1em ${fontName}`);
+    await document.fonts.ready;  // pastikan semua font siap
+
+    // Paksa reflow dengan membuat elemen dummy pakai font tersebut
+    const dummy = document.createElement("span");
+    dummy.style.fontFamily = fontName;
+    dummy.textContent = ".";
+    dummy.style.visibility = "hidden";
+    document.body.appendChild(dummy);
+    // Trigger reflow
+    void dummy.offsetWidth;
+    dummy.remove();
+
+    // Sekarang terapkan font
     document.querySelectorAll(".translation").forEach(el => {
       el.style.fontFamily = fontName;
     });
@@ -1077,11 +1090,6 @@ async function loadFontFromUrl(fontUrl, fontName) {
   }
 }
 
-document.getElementById("translationFontSelect").addEventListener("change", async () => {
-  const fontUrl = translationFontSelect.value;
-  const fontName = "customTranslationFont";
-  await loadFontFromUrl(fontUrl, fontName);
-});
 
  document.getElementById("quranFontSize").addEventListener("input", e => {
    document.querySelectorAll(".quran-v1, .quran-v2").forEach(el => {
