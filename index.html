@@ -372,7 +372,9 @@ button:hover {
   <select id="wordTranslationId">
   <!-- Per-Kata (Quran.com) -->
     <option value="33">Perkata Indonesian Affairs</option>
+    <option value="ayah_indonesian_complex">Indonesia – Indonesian (Complex)</option>
     <option value="20">Perkata English Saheeh</option>
+    <option value="ayah_quran_text">Saudi Arabia - Arabic</option>
 
    <!-- Per-Ayat (QuranEnc.com), sorted by country name -->
 <option value="ayah_pashto_rwwad">Afghanistan – Pashto (Rwwad)</option>
@@ -397,7 +399,6 @@ button:hover {
 <option value="ayah_malayalam_kunhi">India – Malayalam (Kunhi)</option>
 <option value="ayah_tamil_baqavi">India – Tamil (Baqavi)</option>
 <option value="ayah_telugu_muhammad">India – Telugu (Muhammad)</option>
-<option value="ayah_indonesian_complex">Indonesia – Indonesian (Complex)</option>
 <option value="ayah_kurdish_bamoki">Iraq – Kurdish (Bamoki)</option>
 <option value="ayah_persian_ih">Iran – Persian (IH)</option>
 <option value="ayah_japanese_saeedsato">Japan – Japanese (Saeed Sato)</option>
@@ -428,7 +429,6 @@ button:hover {
 <option value="ayah_uyghur_saleh">Uyghur (Saleh)</option>
 <option value="ayah_uzbek_rwwad">Uzbekistan – Uzbek (Rwwad)</option>
 <option value="ayah_vietnamese_rwwad">Vietnam – Vietnamese (Rwwad)</option>
-<option value="ayah_quran_text">Saudi Arabia - Arabic</option>
   </select>
 </label>
 
@@ -1056,7 +1056,7 @@ applyUrlButton.addEventListener("click", () => {
 const translationFontSelect = document.getElementById("translationFontSelect");
 const translationFontSize = document.getElementById("translationFontSize");
 
-function loadFontFromUrl(fontUrl, fontName) {
+async function loadFontFromUrl(fontUrl, fontName) {
   const style = document.createElement("style");
   style.textContent = `
     @font-face {
@@ -1065,16 +1065,22 @@ function loadFontFromUrl(fontUrl, fontName) {
     }
   `;
   document.head.appendChild(style);
-  document.fonts.load(`1em ${fontName}`);
+
+  // Tunggu hingga font selesai dimuat sebelum diterapkan
+  try {
+    await document.fonts.load(`1em ${fontName}`);
+    document.querySelectorAll(".translation").forEach(el => {
+      el.style.fontFamily = fontName;
+    });
+  } catch (e) {
+    console.error("Gagal memuat font:", fontName, e);
+  }
 }
 
-translationFontSelect.addEventListener("change", () => {
+document.getElementById("translationFontSelect").addEventListener("change", async () => {
   const fontUrl = translationFontSelect.value;
   const fontName = "customTranslationFont";
-  loadFontFromUrl(fontUrl, fontName);
-  document.querySelectorAll(".translation").forEach(el => {
-    el.style.fontFamily = fontName;
-  });
+  await loadFontFromUrl(fontUrl, fontName);
 });
 
  document.getElementById("quranFontSize").addEventListener("input", e => {
