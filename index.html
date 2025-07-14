@@ -22,9 +22,24 @@ h2 {
 
 
 #pages {
-  background-color: #82615f; /* default warna latar */
-  background-blend-mode: normal;
-  transition: background 0.3s ease, opacity 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+#pages::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url('GAMBAR_BACKGROUND_URL'); /* ganti URL sesuai */
+  background-size: cover;
+  background-position: center;
+  opacity: 1; /* ini yang akan dikontrol slider */
+  z-index: 0;
+}
+
+#pages * {
+  position: relative;
+  z-index: 1; /* pastikan teks di atas background */
 }
 
 
@@ -1261,11 +1276,13 @@ document.getElementById("translationWordSpacing").addEventListener("input", e =>
 
 
   const backgroundOpacity = document.getElementById("backgroundOpacity");
+const pagesContainer = document.querySelector("#pages::before");
 
 backgroundOpacity.addEventListener("input", () => {
-  const opacityValue = backgroundOpacity.value / 100; // dari 0-1
-  pagesContainer.style.opacity = opacityValue;
+  const opacityValue = backgroundOpacity.value / 100;
+  document.querySelector("#pages::before").style.opacity = opacityValue;
 });
+
 </script>
   
 </body>
