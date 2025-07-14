@@ -595,12 +595,13 @@ button:hover {
 
 
 <!-- Pilihan Font Terjemah -->
-<label><select id="translationFontSelect">
-    <option value="https://fonts.gstatic.com/s/bebasneue/v10/JTUSjIg1_i6t8kCHKm459Wlhzg.ttf">Bebas Neue</option>
-    <option value="https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxP.ttf">Roboto</option>
-    <option value="https://fonts.gstatic.com/s/nunito/v25/XRXV3I6Li01BKofA-seUbQ.ttf">Nunito</option>
-  </select>
-</label>
+<label for="translationFontSelect">Pilih Font Terjemahan:</label>
+<select id="translationFontSelect">
+  <option value="Roboto">Roboto</option>
+  <option value="Nunito">Nunito</option>
+  <option value="Bebas Neue">Bebas Neue</option>
+</select>
+
 
 <!-- Ukuran Font Terjemah -->
 
@@ -1056,47 +1057,43 @@ applyUrlButton.addEventListener("click", () => {
 const translationFontSelect = document.getElementById("translationFontSelect");
 const translationFontSize = document.getElementById("translationFontSize");
 
-async function loadFontFromUrl(fontUrl, fontName) {
-  const loader = document.getElementById("fontLoading");
-  loader.style.display = "block";
+const fontLinks = {
+    "Roboto": "https://fonts.googleapis.com/css2?family=Roboto",
+    "Nunito": "https://fonts.googleapis.com/css2?family=Nunito",
+    "Bebas Neue": "https://fonts.googleapis.com/css2?family=Bebas+Neue"
+  };
 
-  const style = document.createElement("style");
-  style.textContent = `
-    @font-face {
-      font-family: '${fontName}';
-      src: url('${fontUrl}');
-    }
-  `;
-  document.head.appendChild(style);
+  const translationFontSelect = document.getElementById("translationFontSelect");
 
-  try {
-    await document.fonts.load(`1em ${fontName}`);
-    await document.fonts.ready;
+  function loadGoogleFont(fontName) {
+    // Hapus link lama kalau ada
+    const oldLink = document.getElementById("dynamicFontLink");
+    if (oldLink) oldLink.remove();
 
-    const dummy = document.createElement("span");
-    dummy.style.fontFamily = fontName;
-    dummy.textContent = ".";
-    dummy.style.visibility = "hidden";
-    document.body.appendChild(dummy);
-    void dummy.offsetWidth;
-    dummy.remove();
+    const link = document.createElement("link");
+    link.id = "dynamicFontLink";
+    link.rel = "stylesheet";
+    link.href = fontLinks[fontName];
+    document.head.appendChild(link);
 
-    document.querySelectorAll(".translation").forEach(el => {
-      el.style.fontFamily = fontName;
+    // Tunggu sampai font siap
+    document.fonts.load(`1em ${fontName}`).then(() => {
+      document.querySelectorAll(".translation").forEach(el => {
+        el.style.fontFamily = `'${fontName}', sans-serif`;
+      });
     });
-
-  } catch (e) {
-    console.error("Gagal memuat font:", fontName, e);
-  } finally {
-    loader.style.display = "none";
   }
-}
 
-translationFontSelect.addEventListener("change", async () => {
-  const fontUrl = translationFontSelect.value;
-  const fontName = "customTranslationFont";
-  await loadFontFromUrl(fontUrl, fontName);
-});
+  translationFontSelect.addEventListener("change", () => {
+    const selectedFont = translationFontSelect.value;
+    loadGoogleFont(selectedFont);
+  });
+
+  // Optional: muat default saat pertama kali
+  window.addEventListener("DOMContentLoaded", () => {
+    const defaultFont = translationFontSelect.value;
+    loadGoogleFont(defaultFont);
+  });
 
 
 
