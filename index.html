@@ -428,6 +428,7 @@ button:hover {
 <option value="ayah_uyghur_saleh">Uyghur (Saleh)</option>
 <option value="ayah_uzbek_rwwad">Uzbekistan – Uzbek (Rwwad)</option>
 <option value="ayah_vietnamese_rwwad">Vietnam – Vietnamese (Rwwad)</option>
+<option value="ayah_quran_text">Saudi Arabia - Arabic</option>
   </select>
 </label>
 
@@ -449,7 +450,7 @@ button:hover {
     <label for="translationSelect">Pilih Terjemahan:</label>
     <select id="translationSelect" style="width: 100%; margin-bottom: 10px;">
       <option value="indonesian_complex">🇮🇩 Indonesian</option>
-      <option value="indonesian_complex">sa Arab Saudi</option>
+      <option value="quran_text">🇸🇦 Saudi Arabia – Arabic</option>
       <option value="english_rwwad">🇬🇧 English</option>
       <option value="pashto_rwwad">🇦🇫 Afghanistan – Pashto (Rwwad)</option>
       <option value="albanian_nahi">🇦🇱 Albania – Albanian (Nahi)</option>
@@ -1123,7 +1124,7 @@ backgroundColorPicker.addEventListener("input", () => {
   // ==== Sumber XML ====
   const xmlSources = {
     indonesian_complex: 'https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/indonesian_complex.xml',
-    indonesian_complex: 'https://raw.githubusercontent.com/tafsirnetlifyapp/quran/refs/heads/main/quran.xml',
+    quran_text: 'https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/quran_text.xml',
     english_rwwad: 'https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/english_rwwad.xml',
     french_rashid: 'https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/french_rashid.xml',
     spanish_montada_eu: 'https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/spanish_montada_eu.xml',
@@ -1303,26 +1304,6 @@ backgroundColorPicker.addEventListener("input", () => {
     }
   }
 
-  function tampilkanHasilPencarian(hasil) {
-  const container = document.getElementById("hasilPencarian");
-  container.innerHTML = "";
-
-  if (hasil.length === 0) {
-    container.innerHTML = "<p>Tidak ditemukan</p>";
-    return;
-  }
-
-  hasil.forEach(item => {
-    const elemen = document.createElement("div");
-    elemen.className = "hasil-item";
-    elemen.innerHTML = `
-      <strong>Surah ${item.surah} (${item.namaSurah}) : Ayat ${item.ayat}</strong><br/>
-      <div style="font-family: 'Scheherazade', serif; font-size: 24px; direction: rtl;">${item.text}</div>
-    `;
-    container.appendChild(elemen);
-  });
-}
-
   // ==== Fungsi "Menuju ke Ayat" ====
 async function goToAyat(sura, aya) {
   const surahSelect = document.getElementById('surahSelect');
@@ -1402,14 +1383,6 @@ backgroundOpacitySlider.addEventListener("input", () => {
   document.getElementById("pages").style.setProperty("--bg-opacity", opacityValue);
 });
 
-</script>
-
-<script>
-function prosesPencarianArab() {
-  const kata = document.getElementById("inputKata").value.trim();
-  const hasil = cariAyatArab(xmlArab, kata);
-  tampilkanHasilPencarian(hasil);
-}
 </script>
   
 </body>
