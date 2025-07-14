@@ -1417,81 +1417,77 @@ backgroundOpacitySlider.addEventListener("input", () => {
   });
 </script>
 
-<script>
-async function fetchPagesJsonWithToken() {
-  const token = localStorage.getItem("github_token");
-  if (!token) {
-    document.getElementById("tokenModal").style.display = "flex";
-    return null;
-  }
-
-  try {
-    const res = await fetch("https://api.github.com/repos/tafsirnetlifyapp/qurantext/contents/pages.json", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/vnd.github.v3.raw"
-      }
-    });
-
-    if (!res.ok) {
-      throw new Error("Token tidak valid atau tidak punya izin.");
-    }
-
-    const pageMap = await res.json();
-    console.log("pages.json berhasil dimuat:", pageMap);
-    return pageMap;
-
-  } catch (err) {
-    alert("Gagal memuat data: " + err.message);
-    localStorage.removeItem("github_token");
-    location.reload();
-  }
-}
-
-document.getElementById("saveGithubTokenBtn").addEventListener("click", () => {
-  const tokenInput = document.getElementById("githubTokenInput").value.trim();
-  if (tokenInput.startsWith("gh") && tokenInput.length > 20) {
-    localStorage.setItem("github_token", tokenInput);
-    document.getElementById("tokenModal").style.display = "none";
-    fetchPagesJsonWithToken(); // Langsung fetch setelah simpan
-  } else {
-    alert("Token tidak valid.");
-  }
-});
-
-// Panggil saat halaman dimuat
-window.addEventListener("DOMContentLoaded", () => {
-  fetchPagesJsonWithToken();
-});
-</script>
 
 
 
-<!-- Modal Token GitHub -->
-<div id="tokenModal" style="
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-">
-  <div style="
-    background: white;
-    padding: 2em;
-    border-radius: 10px;
-    max-width: 400px;
-    width: 90%;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    text-align: center;
-  ">
+
+
+
+  <!-- Modal Input Token GitHub -->
+<div id="tokenModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center;">
+  <div id="tokenModalContent" style="background:white; padding:2em; border-radius:8px; max-width:400px; width:90%;">
     <h3>Masukkan GitHub Token</h3>
-    <input type="password" id="githubTokenInput" placeholder="ghp_..." style="width:100%; padding: 0.5em; margin-top: 1em;">
-    <button id="saveGithubTokenBtn" style="margin-top: 1em;">Simpan Token</button>
+    <input type="password" id="githubTokenInput" placeholder="github_pat_..." style="width:100%; padding:0.5em; margin-top:1em;">
+    <button id="saveTokenBtn" style="margin-top:1em; width:100%; padding:0.5em;">Simpan Token</button>
   </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const modal = document.getElementById("tokenModal");
+  const input = document.getElementById("githubTokenInput");
+  const saveBtn = document.getElementById("saveTokenBtn");
+
+  const savedToken = localStorage.getItem("github_token");
+  if (!savedToken) {
+    modal.style.display = "flex";
+  }
+
+  saveBtn.addEventListener("click", () => {
+    const token = input.value.trim();
+    if (token.startsWith("ghp_") || token.startsWith("github_pat_")) {
+      localStorage.setItem("github_token", token);
+      modal.style.display = "none";
+      location.reload();
+    } else {
+      alert("Token harus diawali dengan 'ghp_' atau 'github_pat_'");
+    }
+  });
+});
+
+// Fungsi untuk ambil font URL & fontName dari GitHub privat
+async function getFontUrlByKey(key, currentVersion = 'v2') {
+  const token = localStorage.getItem("github_token");
+  if (!token) {
+    alert("Token GitHub belum tersedia.");
+    throw new Error("GitHub token belum diset.");
+  }
+
+  const pageMap = await fetch("https://api.github.com/repos/tafsirnetlifyapp/qurantext/contents/pages.json", {
+    headers: {
+      Authorization: `token ${token}`,
+      Accept: "application/vnd.github.v3.raw"
+    }
+  }).then(r => {
+    if (!r.ok) throw new Error("Gagal memuat pages.json");
+    return r.json();
+  });
+
+  const page = pageMap[key];
+  if (!page) throw new Error(`Page untuk key ${key} tidak ditemukan`);
+
+  const fontName = currentVersion === 'v1'
+    ? `QCF_P${String(page).padStart(3, '0')}`
+    : `QCF2${String(page).padStart(3, '0')}`;
+
+  const fontUrl = currentVersion === 'v1'
+    ? `https://cdn.jsdelivr.net/gh/dickymiswardi/quran/fonts/${fontName}.TTF`
+    : `https://cdn.jsdelivr.net/gh/tafsirnetlifyapp/quran@refs/heads/main/fontsglyphvs/${fontName}.ttf`;
+
+  return { fontUrl, fontName };
+}
+</script>
+
 
   
 </body>
