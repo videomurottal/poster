@@ -865,7 +865,7 @@ async function loadAyat() {
     const surahName = surahList[s][0];
     const referenceDiv = document.createElement("div");
     referenceDiv.className = "surah-info";
-    referenceDiv.textContent = `${surahName}:${a}`;
+    referenceDiv.textContent = `${surahName}: ${a}`;
     div.appendChild(referenceDiv);
     referenceDiv.style.fontSize = document.getElementById("infoFontSize").value + "px";
 
