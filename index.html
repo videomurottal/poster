@@ -851,6 +851,15 @@ async function loadAyat() {
     // 🧹 Bersihkan isi container biar tidak DOUBEL
     container.innerHTML = "";
 
+    const pageMap = await fetch("https://raw.githubusercontent.com/dickymiswardi/tadabbur/main/ayah_page_map.json").then(r => r.json());
+    const page = pageMap[key];
+    const fontName = currentVersion === 'v1'
+      ? `QCF_P${String(page).padStart(3, '0')}`
+      : `QCF2${String(page).padStart(3, '0')}`;
+    const fontUrl = currentVersion === 'v1'
+      ? `https://cdn.jsdelivr.net/gh/dickymiswardi/quran/fonts/${fontName}.TTF`
+      : `https://cdn.jsdelivr.net/gh/tafsirnetlifyapp/quran@refs/heads/main/fontsglyphvs/${fontName}.ttf`;
+
     const apiField = currentVersion === "v1" ? "code_v1" : "code_v2";
     const data = await fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?words=true&word_fields=${apiField}`).then(r => r.json());
     words = data.verse.words.map(w => ({ arabic: w[apiField] || w.text, id: w.id }));
@@ -1416,116 +1425,6 @@ backgroundOpacitySlider.addEventListener("input", () => {
     document.getElementById("focusDummy").focus();
   });
 </script>
-
-
-
-
-
-
-
-
-
-
-
-<div id="tokenModal" style="display: none;">
-  <h3>Masukkan GitHub Token</h3>
-  <input type="password" id="githubTokenInput" placeholder="github_pat_..." style="width:100%">
-  <button id="saveTokenBtn">Simpan Token</button>
-</div>
-
-
-  <script>
-document.addEventListener("DOMContentLoaded", () => {
-  const modal = document.getElementById("tokenModal");
-  const input = document.getElementById("githubTokenInput");
-  const saveBtn = document.getElementById("saveTokenBtn");
-
-  const savedToken = localStorage.getItem("github_token");
-  if (!savedToken) {
-    modal.style.display = "flex";
-  }
-
-  saveBtn.addEventListener("click", () => {
-    const token = input.value.trim();
-    if (token.startsWith("github_pat_")) {
-      localStorage.setItem("github_token", token);
-      modal.style.display = "none";
-      location.reload();
-    } else {
-      alert("Token harus diawali dengan 'github_pat_'");
-    }
-  });
-
-  // Kalau token sudah tersedia, mulai render
-  if (savedToken) {
-    initApp();
-  }
-});
-
-// Fungsi ambil font dan pageMap
-async function getFontUrlByKey(key, currentVersion = 'v2') {
-  const token = localStorage.getItem("github_token");
-  if (!token) throw new Error("Token belum diset");
-
-  const res = await fetch("https://api.github.com/repos/tafsirnetlifyapp/qurantext/contents/pages.json", {
-    headers: {
-      Authorization: `token ${token}`,
-      Accept: "application/vnd.github.v3.raw"
-    }
-  });
-
-  if (!res.ok) throw new Error("Gagal memuat pages.json");
-
-  const pageMap = await res.json();
-  const page = pageMap[key];
-  if (!page) throw new Error(`Page untuk key ${key} tidak ditemukan`);
-
-  const fontName = currentVersion === 'v1'
-    ? `QCF_P${String(page).padStart(3, '0')}`
-    : `QCF2${String(page).padStart(3, '0')}`;
-
-  const fontUrl = currentVersion === 'v1'
-    ? `https://cdn.jsdelivr.net/gh/dickymiswardi/quran/fonts/${fontName}.TTF`
-    : `https://cdn.jsdelivr.net/gh/tafsirnetlifyapp/quran@refs/heads/main/fontsglyphvs/${fontName}.ttf`;
-
-  return { fontUrl, fontName };
-}
-
-// Inisialisasi aplikasi
-async function initApp() {
-  try {
-    const key = "2:255"; // contoh: Al-Baqarah ayat 255
-    const { fontUrl, fontName } = await getFontUrlByKey(key, "v2");
-
-    const style = document.createElement("style");
-    style.textContent = `
-      @font-face {
-        font-family: '${fontName}';
-        src: url('${fontUrl}');
-      }
-    `;
-    document.head.appendChild(style);
-    await document.fonts.load(`1em ${fontName}`);
-    await document.fonts.ready;
-
-    // Misalnya ada div dengan class .ayah-text
-    document.querySelectorAll(".ayah-text").forEach(el => {
-      el.style.fontFamily = `'${fontName}'`;
-    });
-
-    // Tampilkan teks contoh
-    document.body.insertAdjacentHTML("beforeend", `
-      <div class="ayah-text" style="font-size: 28px;">اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ</div>
-      <div class="translation">Allah, tidak ada Tuhan selain Dia, Yang Maha Hidup, Maha Mengurus.</div>
-    `);
-
-  } catch (err) {
-    console.error("Gagal memuat ayat:", err);
-    alert("Gagal memuat ayat: " + err.message);
-  }
-}
-</script>
-
 
 
   
