@@ -23,6 +23,35 @@ h2 {
 
 
 
+#backgroundContainer {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+}
+
+#backgroundOverlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: black;
+  opacity: 0.4; /* Default */
+  pointer-events: none;
+  z-index: 1;
+}
+
+
+
+
+
+
+
+    
+
+
+
+
+
 
 #kataInput, #searchInput, #translationSelect, #mulaiSearchBtn {
   width: 100%;
@@ -458,18 +487,7 @@ button:hover {
 </div>
 
 
-<div id="posterContainer" style="position: relative; width: 1080px; height: 1080px;">
-  <!-- Gambar latar -->
-  <img id="bgImage" src="default.jpg" style="position: absolute; width: 100%; height: 100%; object-fit: cover; z-index: 0;" />
-
-  <!-- Overlay transparan -->
-  <div id="bgOverlay" style="position: absolute; width: 100%; height: 100%; background: #fff; opacity: 0; z-index: 1; pointer-events: none;"></div>
-
-  <!-- Kontainer teks ayat, terjemahan, watermark -->
-  <div id="pages" style="position: relative; z-index: 2;">
-    <!-- Teks Arab dan terjemahan akan di-render di sini lewat JS -->
-  </div>
-</div>
+<div id="pages"></div>
 
 <div class="controls">
   <!-- Dropdown Background -->
@@ -480,6 +498,26 @@ button:hover {
     <option value="https://images.pexels.com/photos/13922651/pexels-photo-13922651.jpeg">Wallpaper 4</option>
     </select>
   </label>
+
+  <label>
+  Pilih Latar Belakang:
+  <select id="backgroundSelect">
+    <option value="bg1.jpg">Gambar 1</option>
+    <option value="bg2.jpg">Gambar 2</option>
+    <option value="bg3.jpg">Gambar 3</option>
+  </select>
+</label>
+
+<!-- Slider Opacity -->
+<div>
+  <label>Background Overlay Opacity: <span id="opacityValue">40%</span></label>
+  <input type="range" id="opacitySlider" min="0" max="100" value="40">
+</div>
+
+<!-- Elemen background -->
+<div id="backgroundContainer">
+  <div id="backgroundOverlay"></div>
+</div>
 
 <!-- Warna Background -->
 <label>
@@ -563,10 +601,6 @@ button:hover {
   Jarak Kata Terjemah:
   <input type="range" id="translationWordSpacing" min="0" max="1" step="0.05" value="0.2">
 </label>
-
-  <label for="overlayOpacity">Transparansi Latar:</label>
-<input type="range" id="overlayOpacity" min="0" max="1" step="0.01" value="0">
-
   
 </div>
 
@@ -1258,13 +1292,35 @@ document.getElementById("translationWordSpacing").addEventListener("input", e =>
     el.style.wordSpacing = spacing;
   });
 });
-
-
-document.getElementById("overlayOpacity").addEventListener("input", function () {
-  document.getElementById("bgOverlay").style.opacity = this.value;
-});
-  
 </script>
+
+
+
+<script>
+  const backgroundSelect = document.getElementById("backgroundSelect");
+  const opacitySlider = document.getElementById("opacitySlider");
+  const opacityValue = document.getElementById("opacityValue");
+  const backgroundContainer = document.getElementById("backgroundContainer");
+  const backgroundOverlay = document.getElementById("backgroundOverlay");
+
+  // Saat dropdown diganti → ubah background
+  backgroundSelect.addEventListener("change", function () {
+    const selected = this.value;
+    backgroundContainer.style.backgroundImage = `url('${selected}')`;
+  });
+
+  // Saat slider digeser → ubah opacity
+  opacitySlider.addEventListener("input", function () {
+    const val = this.value;
+    opacityValue.textContent = val + "%";
+    backgroundOverlay.style.opacity = val / 100;
+  });
+
+  // Set default background saat awal
+  backgroundContainer.style.backgroundImage = `url('${backgroundSelect.value}')`;
+</script>
+
+
   
 </body>
 </html>
