@@ -597,19 +597,27 @@ button:hover {
 <!-- Pilihan Font Terjemah -->
 
 
-  <!-- Pilihan Font Terjemah -->
-<label for="translationFontSelect">Pilih Font Terjemahan:</label>
-<select id="translationFontSelect">
-  <option value="https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxP.ttf">Roboto</option>
-  <option value="https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/Anton-Regular.ttf">Anton</option>
-  <option value="https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/BebasNeue-Regular.ttf">Bebas Neue</option>
-</select>
-<button id="applyFontBtn">Terapkan</button>
-<!-- Fokus akan pindah ke sini agar dropdown tertutup -->
-<button id="focusDummy" style="opacity:0; position:absolute; pointer-events:none;">.</button>
 
+<!-- Pilihan Font Terjemah -->
+<div class="button-wrapper">
+  <button id="showFontSelectBtn" class="button">Pilih Font Terjemahan</button>
+</div>
 
-<!-- Ukuran Font Terjemah -->
+<div id="fontSelectWrapper" style="display: none; flex-direction: column; gap: 0.5em; margin-top: 0.5em;">
+  <label for="translationFontSelect">Pilih Font:</label>
+  <select id="translationFontSelect">
+    <option value="https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxP.ttf">Roboto</option>
+    <option value="https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/Anton-Regular.ttf">Anton</option>
+    <option value="https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/BebasNeue-Regular.ttf">Bebas Neue</option>
+  </select>
+  <button id="applyFontBtn" class="button">Terapkan</button>
+</div>
+
+<!-- Untuk trik menutup select -->
+<input type="text" id="focusDummy" style="position:absolute;left:-9999px;top:-9999px;" tabindex="-1">
+
+  
+
 
 <!-- Ukuran Font Ayat -->
 <label>
@@ -1060,44 +1068,6 @@ applyUrlButton.addEventListener("click", () => {
 });
 
 
-async function loadFontFromUrl(fontUrl, fontName) {
-  const styleId = "dynamicFontStyle";
-  const oldStyle = document.getElementById(styleId);
-  if (oldStyle) oldStyle.remove();
-
-  const style = document.createElement("style");
-  style.id = styleId;
-  style.textContent = `
-    @font-face {
-      font-family: '${fontName}';
-      src: url('${fontUrl}');
-    }
-  `;
-  document.head.appendChild(style);
-
-  try {
-    await document.fonts.load(`1em ${fontName}`);
-    await document.fonts.ready;
-
-    document.querySelectorAll(".translation").forEach(el => {
-      el.style.fontFamily = `'${fontName}'`;
-    });
-  } catch (e) {
-    console.error("Gagal memuat font:", fontName, e);
-  }
-}
-
-document.getElementById("applyFontBtn").addEventListener("click", () => {
-  const select = document.getElementById("translationFontSelect");
-  const fontUrl = select.value;
-  const fontName = select.options[select.selectedIndex].text.trim();
-
-  loadFontFromUrl(fontUrl, fontName);
-
-  // Pindahkan fokus agar <select> tertutup (khusus untuk mobile/Chrome)
-  document.getElementById("focusDummy").focus();
-});
-
  document.getElementById("quranFontSize").addEventListener("input", e => {
    document.querySelectorAll(".quran-v1, .quran-v2").forEach(el => {
      el.style.fontSize = `${e.target.value}px`;
@@ -1405,6 +1375,58 @@ backgroundOpacitySlider.addEventListener("input", () => {
 });
 
 </script>
+
+
+<script>
+  // Toggle tampilan pilihan font
+  document.getElementById("showFontSelectBtn").addEventListener("click", () => {
+    const wrapper = document.getElementById("fontSelectWrapper");
+    wrapper.style.display = (wrapper.style.display === "none") ? "flex" : "none";
+  });
+
+  // Fungsi memuat dan menerapkan font
+  async function loadFontFromUrl(fontUrl, fontName) {
+    const styleId = "dynamicFontStyle";
+    const oldStyle = document.getElementById(styleId);
+    if (oldStyle) oldStyle.remove();
+
+    const style = document.createElement("style");
+    style.id = styleId;
+    style.textContent = `
+      @font-face {
+        font-family: '${fontName}';
+        src: url('${fontUrl}');
+      }
+    `;
+    document.head.appendChild(style);
+
+    try {
+      await document.fonts.load(`1em ${fontName}`);
+      await document.fonts.ready;
+
+      document.querySelectorAll(".translation").forEach(el => {
+        el.style.fontFamily = `'${fontName}'`;
+      });
+    } catch (e) {
+      console.error("Gagal memuat font:", fontName, e);
+    }
+  }
+
+  // Terapkan font saat tombol diklik
+  document.getElementById("applyFontBtn").addEventListener("click", () => {
+    const select = document.getElementById("translationFontSelect");
+    const fontUrl = select.value;
+    const fontName = select.options[select.selectedIndex].text.trim();
+
+    loadFontFromUrl(fontUrl, fontName);
+
+    // Sembunyikan menu dan kembalikan fokus
+    document.getElementById("fontSelectWrapper").style.display = "none";
+    document.getElementById("focusDummy").focus();
+  });
+</script>
+
+
   
 </body>
 </html>
