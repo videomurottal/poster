@@ -526,6 +526,10 @@ button:hover {
   <button id="applyUrlButton" class="button">OK</button>
 </div>
 
+  <div class="button-wrapper">
+  <button id="saveImageTrigger">Download Gambar</button>
+</div>
+
 <label>
   <select id="colorTarget">
     <option value="quran-text">Warna Ayat</option>
@@ -537,10 +541,6 @@ button:hover {
 <label>
   <input type="color" id="colorPicker" value="#e83fb0">
 </label>
-
-  <div class="button-wrapper">
-  <button id="saveImageTrigger">Download Gambar</button>
-</div>
 
 
 <!-- Pilihan Font Terjemah -->
@@ -1072,10 +1072,10 @@ backgroundColorPicker.addEventListener("input", () => {
 
   // ==== Sumber XML ====
   const xmlSources = {
-    indonesian_complex: 'https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/terjemahID.xml',
-    english_rwwad: 'https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/terjemahEng.xml',
-    french_rashid: 'https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/terjemahFr.xml',
-    spanish_montada_eu: 'https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/terjemahSpain.xml'
+    indonesian_complex: 'https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/indonesian_complex.xml',
+    english_rwwad: 'https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/english_rwwad.xml',
+    french_rashid: 'https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/french_rashid.xml',
+    spanish_montada_eu: 'https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/spanish_montada_eu.xml'
   };
 
   let activeLang = localStorage.getItem('activeLang') || 'indonesian_complex';
