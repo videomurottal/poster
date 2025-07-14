@@ -261,7 +261,7 @@ button:hover {
 .quran-v2 {
   font-size: clamp(1.8em, 5vw, 2.5em);
   line-height: 1.5;
-  word-spacing: 0em;
+  word-spacing: 0.1em;
   text-align: center;
   user-select: text;
   margin: 2em auto;
@@ -539,18 +539,6 @@ button:hover {
 <label>
   Ukuran Info Surah:
   <input type="range" id="infoFontSize" min="10" max="32" value="16">
-</label>
-
-  <!-- Jarak Kata Ayat -->
-<label>
-  Jarak Kata Ayat:
-  <input type="range" id="quranWordSpacing" min="0" max="1" step="0.05" value="0.1">
-</label>
-
-<!-- Jarak Kata Terjemah -->
-<label>
-  Jarak Kata Terjemah:
-  <input type="range" id="translationWordSpacing" min="0" max="2" step="0.1" value="0.2">
 </label>
   
 </div>
@@ -866,17 +854,11 @@ async function loadAyat() {
     });
     referenceDiv.style.fontSize = document.getElementById("infoFontSize").value + "px";
 
-    
-
     // 🏷 Tambahkan watermark
     const brandDiv = document.createElement("div");
     brandDiv.className = "brand-watermark";
     brandDiv.textContent = "videomurottal.com";
-    brandDiv.contentEditable = true; // ✅ bisa diedit
-    brandDiv.style.userSelect = "text";
-    brandDiv.setAttribute("draggable", "false");
     container.appendChild(brandDiv);
-
 
     div.style.display = "block";
     requestAnimationFrame(() => div.style.opacity = "1");
@@ -973,15 +955,6 @@ applyUrlButton.addEventListener("click", () => {
 const translationFontSelect = document.getElementById("translationFontSelect");
 const translationFontSize = document.getElementById("translationFontSize");
 
-// 🖋 Atur jarak kata juga
-const quranSpacing = document.getElementById("quranWordSpacing").value;
-div.style.wordSpacing = quranSpacing + "em";
-
-const translationSpacing = document.getElementById("translationWordSpacing").value;
-document.querySelectorAll(".translation").forEach(el => {
-  el.style.wordSpacing = translationSpacing + "em";
-});
-  
 function loadFontFromUrl(fontUrl, fontName) {
   const style = document.createElement("style");
   style.textContent = `
@@ -1231,23 +1204,6 @@ async function goToAyat(sura, aya) {
       timeout = setTimeout(() => fn.apply(this, args), delay);
     };
   }
-
-
-document.getElementById("quranWordSpacing").addEventListener("input", e => {
-  const spacing = e.target.value + "em";
-  document.querySelectorAll(".quran-v1, .quran-v2").forEach(el => {
-    el.style.wordSpacing = spacing;
-  });
-});
-
-
-document.getElementById("translationWordSpacing").addEventListener("input", e => {
-  const spacing = e.target.value + "em";
-  document.querySelectorAll(".translation").forEach(el => {
-    el.style.wordSpacing = spacing;
-  });
-});
-  
 </script>
 
 
