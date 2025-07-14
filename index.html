@@ -20,30 +20,39 @@ h2 {
 }
 
 
+
+
 #pages {
   position: relative;
-  width: 500px;
-  height: 500px;
+  width: 100%;
+  height: 100vh;
   background-size: cover;
   background-position: center;
-  overflow: hidden;
-}
-
-#overlayLayer {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(0, 0, 0, 0.3); /* default overlay */
-  z-index: 2;
+  background-repeat: no-repeat;
 }
 
 #pages .content {
-  position: relative;
-  z-index: 3; /* teks tetap di atas overlay */
+  position: relative; /* pastikan teks di atas */
+  z-index: 2;
   color: white;
   text-align: center;
+  padding-top: 20%;
   font-size: 2em;
 }
 
+.controls {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  z-index: 3;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  border-radius: 8px;
+  color: white;
+}
+
+
+    
 
 
 
@@ -482,52 +491,50 @@ button:hover {
 
 
 <div id="pages">
-  <div id="overlayLayer"></div>
   <div class="content">
-    <h1>بسم الله</h1>
-    <p>Al-Fatihah: 1</p>
+    <h1>Teks Quran di sini</h1>
+    <p>Dan teks ini tidak akan terkena efek background.</p>
   </div>
 </div>
 
 <div class="controls">
-  <!-- Dropdown Background -->
   <label>
+    Pilih Background:
     <select id="backgroundSelect">
       <option value="https://images.pexels.com/photos/6068385/pexels-photo-6068385.jpeg">Wallpaper 1</option>
       <option value="https://images.pexels.com/photos/673020/pexels-photo-673020.jpeg">Wallpaper 2</option>
       <option value="https://images.pexels.com/photos/10257141/pexels-photo-10257141.jpeg">Wallpaper 3</option>
-      <option value="https://images.pexels.com/photos/13922651/pexels-photo-13922651.jpeg">Wallpaper 4</option>
     </select>
-  </label>
-
-  <!-- Upload File -->
-  <div class="button-wrapper">
-    <button id="uploadTrigger">Background Upload</button>
-    <input type="file" id="backgroundUpload" accept="image/*" style="display: none;">
-  </div>
-
-  <!-- Input URL -->
-  <div class="button-wrapper">
-    <button id="showUrlInput" class="button">Background Link</button>
-  </div>
-  <div id="urlInputWrapper" style="display:none; flex-direction: column; gap: 0.5em;">
-    <label>
-      <span style="font-size: 0.9em;">Masukkan URL Gambar:</span>
-      <input type="url" id="backgroundUrl" placeholder="Pastekan https://" style="width: 100%;">
-    </label>
-    <button id="applyUrlButton" class="button">OK</button>
-  </div>
-
-  <!-- Overlay Controls -->
-  <label>Overlay Color:
-    <input type="color" id="overlayColorPicker" value="#000000">
-  </label>
-  <label>Overlay Opacity:
-    <input type="range" id="overlayOpacity" min="0" max="1" step="0.05" value="0.3">
   </label>
 </div>
 
-<!-- Warna Background --> <label> <input type="color" id="backgroundColorPicker" value="#23eb55"> </label>
+
+<!-- Warna Background -->
+<label>
+  <input type="color" id="backgroundColorPicker" value="#23eb55">
+</label>
+
+  <!-- Upload File -->
+  <div class="button-wrapper">
+  <button id="uploadTrigger">Background Upload</button>
+  <input type="file" id="backgroundUpload" accept="image/*" style="display: none;">
+</div>
+
+  <!-- Input URL di awal -->
+  <div class="button-wrapper">
+  <button id="showUrlInput" class="button">Background Link</button>
+</div>
+
+  
+
+
+<div id="urlInputWrapper" style="display:none; flex-direction: column; gap: 0.5em;">
+  <label>
+    <span style="font-size: 0.9em;">Masukkan URL Gambar:</span>
+    <input type="url" id="backgroundUrl" placeholder="Pastekan https://" style="width: 100%;">
+  </label>
+  <button id="applyUrlButton" class="button">OK</button>
+</div>
 
 <label>
   <select id="colorTarget">
@@ -1279,64 +1286,15 @@ document.getElementById("translationWordSpacing").addEventListener("input", e =>
 
   const pages = document.getElementById("pages");
 const backgroundSelect = document.getElementById("backgroundSelect");
-const backgroundUpload = document.getElementById("backgroundUpload");
-const uploadTrigger = document.getElementById("uploadTrigger");
-const showUrlInput = document.getElementById("showUrlInput");
-const urlInputWrapper = document.getElementById("urlInputWrapper");
-const backgroundUrl = document.getElementById("backgroundUrl");
-const applyUrlButton = document.getElementById("applyUrlButton");
-const overlayColorPicker = document.getElementById("overlayColorPicker");
-const overlayOpacity = document.getElementById("overlayOpacity");
-const overlayLayer = document.getElementById("overlayLayer");
 
-// Apply background from dropdown
+// Set default background
+pages.style.backgroundImage = `url(${backgroundSelect.value})`;
+
+// Update background on change
 backgroundSelect.addEventListener("change", () => {
-  pages.style.backgroundImage = `url('${backgroundSelect.value}')`;
+  const selectedImage = backgroundSelect.value;
+  pages.style.backgroundImage = `url(${selectedImage})`;
 });
-
-// Apply background from uploaded file
-uploadTrigger.addEventListener("click", () => backgroundUpload.click());
-backgroundUpload.addEventListener("change", () => {
-  const file = backgroundUpload.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      pages.style.backgroundImage = `url('${e.target.result}')`;
-    };
-    reader.readAsDataURL(file);
-  }
-});
-
-// Show URL input
-showUrlInput.addEventListener("click", () => {
-  urlInputWrapper.style.display = "flex";
-});
-
-// Apply background from URL
-applyUrlButton.addEventListener("click", () => {
-  if (backgroundUrl.value) {
-    pages.style.backgroundImage = `url('${backgroundUrl.value}')`;
-    urlInputWrapper.style.display = "none";
-    backgroundUrl.value = "";
-  }
-});
-
-// Overlay color & opacity
-function updateOverlay() {
-  const color = overlayColorPicker.value;
-  const alpha = overlayOpacity.value;
-  overlayLayer.style.backgroundColor = hexToRGBA(color, alpha);
-}
-overlayColorPicker.addEventListener("input", updateOverlay);
-overlayOpacity.addEventListener("input", updateOverlay);
-
-function hexToRGBA(hex, alpha) {
-  let r = parseInt(hex.slice(1, 3), 16);
-  let g = parseInt(hex.slice(3, 5), 16);
-  let b = parseInt(hex.slice(5, 7), 16);
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
-
 </script>
   
 </body>
