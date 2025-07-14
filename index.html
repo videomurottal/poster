@@ -21,53 +21,14 @@ h2 {
 
 
 
-
 #pages {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  overflow: hidden;
+  background-color: #82615f; /* default warna latar */
+  background-blend-mode: normal;
+  transition: background 0.3s ease, opacity 0.3s ease;
 }
-
-#overlayLayer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* default overlay hitam 50% */
-  pointer-events: none; /* biar gak ganggu klik */
-  z-index: 1;
-  display: none; /* awalnya off */
-}
-
-#pages .content {
-  position: relative;
-  z-index: 2;
-  color: white;
-  text-align: center;
-  padding-top: 20%;
-  font-size: 2em;
-}
-
-.controls {
-  position: fixed;
-  bottom: 10px;
-  left: 10px;
-  z-index: 3;
-  background: rgba(0, 0, 0, 0.6);
-  padding: 10px;
-  border-radius: 8px;
-  color: white;
-}
-
 
 
     
-
 
 
 #kataInput, #searchInput, #translationSelect, #mulaiSearchBtn {
@@ -504,32 +465,23 @@ button:hover {
 </div>
 
 
-<div id="pages">
-  <div id="overlayLayer"></div>
-  <div class="content">
-    <h1>Teks Quran di sini</h1>
-    <p>Ini teks contoh yang tidak kena efek overlay.</p>
-  </div>
-</div>
+<div id="pages"></div>
 
 <div class="controls">
-  <label>
-    Pilih Background:
-    <select id="backgroundSelect">
+  <!-- Dropdown Background -->
+  <label><select id="backgroundSelect">
       <option value="https://images.pexels.com/photos/6068385/pexels-photo-6068385.jpeg">Wallpaper 1</option>
       <option value="https://images.pexels.com/photos/673020/pexels-photo-673020.jpeg">Wallpaper 2</option>
-      <option value="https://images.pexels.com/photos/10257141/pexels-photo-10257141.jpeg">Wallpaper 3</option>
+    <option value="https://images.pexels.com/photos/10257141/pexels-photo-10257141.jpeg">Wallpaper 3</option>
+    <option value="https://images.pexels.com/photos/13922651/pexels-photo-13922651.jpeg">Wallpaper 4</option>
     </select>
   </label>
 
-  <br><br>
-
-  <!-- Toggle Overlay -->
-  <label>
-    <input type="checkbox" id="toggleOverlay"> Aktifkan Overlay
-  </label>
-</div>
-
+  <!-- Opacity Background -->
+<label>
+  Opacity Background:
+  <input type="range" id="backgroundOpacity" min="0" max="100" value="100">
+</label>
 
 
 <!-- Warna Background -->
@@ -1290,28 +1242,30 @@ async function goToAyat(sura, aya) {
 </script>
 
 <script>
-const pages = document.getElementById("pages");
-const backgroundSelect = document.getElementById("backgroundSelect");
-const overlayLayer = document.getElementById("overlayLayer");
-const toggleOverlay = document.getElementById("toggleOverlay");
-
-// Set default background
-pages.style.backgroundImage = `url(${backgroundSelect.value})`;
-
-// Update background on change
-backgroundSelect.addEventListener("change", () => {
-  pages.style.backgroundImage = `url(${backgroundSelect.value})`;
+// Word spacing untuk Quran V1 dan V2
+document.getElementById("quranWordSpacing").addEventListener("input", e => {
+  const spacing = `${e.target.value}em`;
+  document.querySelectorAll(".quran-v1, .quran-v2").forEach(el => {
+    el.style.wordSpacing = spacing;
+  });
 });
 
-// Toggle overlay ON/OFF
-toggleOverlay.addEventListener("change", () => {
-  if (toggleOverlay.checked) {
-    overlayLayer.style.display = "block";
-  } else {
-    overlayLayer.style.display = "none";
-  }
+// Word spacing untuk terjemahan
+document.getElementById("translationWordSpacing").addEventListener("input", e => {
+  const spacing = `${e.target.value}em`;
+  document.querySelectorAll(".translation").forEach(el => {
+    el.style.wordSpacing = spacing;
+  });
 });
 
+
+
+  const backgroundOpacity = document.getElementById("backgroundOpacity");
+
+backgroundOpacity.addEventListener("input", () => {
+  const opacityValue = backgroundOpacity.value / 100; // dari 0-1
+  pagesContainer.style.opacity = opacityValue;
+});
 </script>
   
 </body>
