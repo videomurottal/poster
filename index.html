@@ -20,45 +20,9 @@ h2 {
 }
 
 
-    
-
-
-body {
-  position: relative;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-}
-
-#backgroundOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: white; /* Ubah ke warna overlay yang diinginkan */
-  opacity: 0; /* default transparan penuh */
-  pointer-events: none;
-  z-index: 0;
-}
-
 #pages {
-  position: relative;
-  z-index: 1;
+  position: relative; /* penting untuk layer overlay */
 }
-
-
-
-
-
-
-
-
-
-
-
-    
-
 
 
 
@@ -497,7 +461,13 @@ button:hover {
 
 
 <div id="pages">
-  <div id="backgroundOverlay"></div>
+  <div id="overlayLayer" style="
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0);
+    pointer-events: none;
+    border-radius: inherit;
+  "></div>
 </div>
 
 <div class="controls">
@@ -510,10 +480,26 @@ button:hover {
     </select>
   </label>
 
-<label for="backgroundOpacity">Transparansi Latar:</label>
-<input type="range" id="backgroundOpacity" min="0" max="1" step="0.05" value="1">
 
-  
+  <!-- Transparansi Background -->
+<label>
+  Transparansi Background:
+  <input type="range" id="backgroundOpacity" min="0" max="1" step="0.05" value="1">
+</label>
+
+<!-- Warna Overlay -->
+<label>
+  Warna Overlay:
+  <input type="color" id="overlayColorPicker" value="#000000">
+</label>
+
+<!-- Transparansi Overlay -->
+<label>
+  Transparansi Overlay:
+  <input type="range" id="overlayOpacity" min="0" max="1" step="0.05" value="0">
+</label>
+
+
 <!-- Warna Background -->
 <label>
   <input type="color" id="backgroundColorPicker" value="#23eb55">
@@ -1287,26 +1273,39 @@ document.getElementById("translationWordSpacing").addEventListener("input", e =>
     el.style.wordSpacing = spacing;
   });
 });
-</script>
 
 
-<script>
-  const backgroundSelect = document.getElementById("backgroundSelect");
-  const backgroundOverlay = document.getElementById("backgroundOverlay");
-  const backgroundOpacity = document.getElementById("backgroundOpacity");
+const backgroundOpacity = document.getElementById("backgroundOpacity");
+const overlayColorPicker = document.getElementById("overlayColorPicker");
+const overlayOpacity = document.getElementById("overlayOpacity");
+const overlayLayer = document.getElementById("overlayLayer");
 
-  backgroundSelect.addEventListener("change", function () {
-    document.body.style.backgroundImage = `url(${this.value})`;
-    document.body.style.backgroundSize = "cover";
-    document.body.style.backgroundPosition = "center";
-  });
+// Atur transparansi background
+backgroundOpacity.addEventListener("input", () => {
+  const opacity = backgroundOpacity.value;
+  pagesContainer.style.opacity = opacity;
+  saveHistory();
+});
 
-  backgroundOpacity.addEventListener("input", function () {
-    backgroundOverlay.style.opacity = 1 - parseFloat(this.value); // 0 = full, 1 = none
-  });
-</script>
+// Atur overlay color + transparansi
+function updateOverlay() {
+  const color = overlayColorPicker.value;
+  const alpha = overlayOpacity.value;
+  overlayLayer.style.backgroundColor = hexToRGBA(color, alpha);
+  saveHistory();
+}
 
+overlayColorPicker.addEventListener("input", updateOverlay);
+overlayOpacity.addEventListener("input", updateOverlay);
+
+function hexToRGBA(hex, alpha) {
+  let r = parseInt(hex.slice(1, 3), 16);
+  let g = parseInt(hex.slice(3, 5), 16);
+  let b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
   
+</script>
   
 </body>
 </html>
