@@ -540,6 +540,18 @@ button:hover {
   Ukuran Info Surah:
   <input type="range" id="infoFontSize" min="10" max="32" value="16">
 </label>
+
+  <!-- Jarak Kata Quran -->
+<label>
+  Jarak Kata Quran:
+  <input type="range" id="quranWordSpacing" min="0" max="1" step="0.05" value="0.1">
+</label>
+
+<!-- Jarak Kata Terjemah -->
+<label>
+  Jarak Kata Terjemah:
+  <input type="range" id="translationWordSpacing" min="0" max="1" step="0.05" value="0.2">
+</label>
   
 </div>
 
@@ -722,7 +734,7 @@ wordEnd.addEventListener("change", () => { loadAyat(); saveHistory(); });
 wordTranslationId.addEventListener("change", () => { loadAyat(); saveHistory(); });
 
 async function updateAyahDropdown(callLoad = true) {
-  const s = surahSelect.value;
+  const s = surahSelect.value
   const res = await fetch(`https://api.quran.com/api/v4/chapters/${s}`);
   const json = await res.json();
   const max = json.chapter.verses_count;
@@ -1210,7 +1222,23 @@ async function goToAyat(sura, aya) {
   }
 </script>
 
+<script>
+// Word spacing untuk Quran V1 dan V2
+document.getElementById("quranWordSpacing").addEventListener("input", e => {
+  const spacing = `${e.target.value}em`;
+  document.querySelectorAll(".quran-v1, .quran-v2").forEach(el => {
+    el.style.wordSpacing = spacing;
+  });
+});
 
+// Word spacing untuk terjemahan
+document.getElementById("translationWordSpacing").addEventListener("input", e => {
+  const spacing = `${e.target.value}em`;
+  document.querySelectorAll(".translation").forEach(el => {
+    el.style.wordSpacing = spacing;
+  });
+});
+</script>
   
 </body>
 </html>
