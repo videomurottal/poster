@@ -1423,16 +1423,18 @@ backgroundOpacitySlider.addEventListener("input", () => {
 
 
 
-  <!-- Modal Input Token GitHub -->
-<div id="tokenModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center;">
-  <div id="tokenModalContent" style="background:white; padding:2em; border-radius:8px; max-width:400px; width:90%;">
-    <h3>Masukkan GitHub Token</h3>
-    <input type="password" id="githubTokenInput" placeholder="github_pat_..." style="width:100%; padding:0.5em; margin-top:1em;">
-    <button id="saveTokenBtn" style="margin-top:1em; width:100%; padding:0.5em;">Simpan Token</button>
-  </div>
+
+
+
+
+<div id="tokenModal" style="display: none;">
+  <h3>Masukkan GitHub Token</h3>
+  <input type="password" id="githubTokenInput" placeholder="github_pat_..." style="width:100%">
+  <button id="saveTokenBtn">Simpan Token</button>
 </div>
 
-<script>
+
+  <script>
 document.addEventListener("DOMContentLoaded", () => {
   const modal = document.getElementById("tokenModal");
   const input = document.getElementById("githubTokenInput");
@@ -1445,34 +1447,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
   saveBtn.addEventListener("click", () => {
     const token = input.value.trim();
-    if (token.startsWith("ghp_") || token.startsWith("github_pat_")) {
+    if (token.startsWith("github_pat_")) {
       localStorage.setItem("github_token", token);
       modal.style.display = "none";
       location.reload();
     } else {
-      alert("Token harus diawali dengan 'ghp_' atau 'github_pat_'");
+      alert("Token harus diawali dengan 'github_pat_'");
     }
   });
+
+  // Kalau token sudah tersedia, mulai render
+  if (savedToken) {
+    initApp();
+  }
 });
 
-// Fungsi untuk ambil font URL & fontName dari GitHub privat
+// Fungsi ambil font dan pageMap
 async function getFontUrlByKey(key, currentVersion = 'v2') {
   const token = localStorage.getItem("github_token");
-  if (!token) {
-    alert("Token GitHub belum tersedia.");
-    throw new Error("GitHub token belum diset.");
-  }
+  if (!token) throw new Error("Token belum diset");
 
-  const pageMap = await fetch("https://api.github.com/repos/tafsirnetlifyapp/qurantext/contents/pages.json", {
+  const res = await fetch("https://api.github.com/repos/tafsirnetlifyapp/qurantext/contents/pages.json", {
     headers: {
       Authorization: `token ${token}`,
       Accept: "application/vnd.github.v3.raw"
     }
-  }).then(r => {
-    if (!r.ok) throw new Error("Gagal memuat pages.json");
-    return r.json();
   });
 
+  if (!res.ok) throw new Error("Gagal memuat pages.json");
+
+  const pageMap = await res.json();
   const page = pageMap[key];
   if (!page) throw new Error(`Page untuk key ${key} tidak ditemukan`);
 
@@ -1486,7 +1490,42 @@ async function getFontUrlByKey(key, currentVersion = 'v2') {
 
   return { fontUrl, fontName };
 }
+
+// Inisialisasi aplikasi
+async function initApp() {
+  try {
+    const key = "2:255"; // contoh: Al-Baqarah ayat 255
+    const { fontUrl, fontName } = await getFontUrlByKey(key, "v2");
+
+    const style = document.createElement("style");
+    style.textContent = `
+      @font-face {
+        font-family: '${fontName}';
+        src: url('${fontUrl}');
+      }
+    `;
+    document.head.appendChild(style);
+    await document.fonts.load(`1em ${fontName}`);
+    await document.fonts.ready;
+
+    // Misalnya ada div dengan class .ayah-text
+    document.querySelectorAll(".ayah-text").forEach(el => {
+      el.style.fontFamily = `'${fontName}'`;
+    });
+
+    // Tampilkan teks contoh
+    document.body.insertAdjacentHTML("beforeend", `
+      <div class="ayah-text" style="font-size: 28px;">اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ</div>
+      <div class="translation">Allah, tidak ada Tuhan selain Dia, Yang Maha Hidup, Maha Mengurus.</div>
+    `);
+
+  } catch (err) {
+    console.error("Gagal memuat ayat:", err);
+    alert("Gagal memuat ayat: " + err.message);
+  }
+}
 </script>
+
 
 
   
