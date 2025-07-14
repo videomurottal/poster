@@ -22,8 +22,32 @@ h2 {
 
 #pages {
   position: relative; /* penting untuk layer overlay */
+  overflow: hidden;   /* supaya ::before tidak keluar area */
 }
 
+#pages::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url('background.jpg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.5; /* transparansi background */
+  z-index: 1;   /* di bawah teks */
+}
+
+#overlayLayer {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.2); /* overlay semi-transparan */
+  z-index: 2;   /* di atas background */
+  pointer-events: none; /* biar tidak mengganggu klik */
+}
+
+#pages > * {
+  position: relative;
+  z-index: 3; /* semua konten di atas overlay & bg */
+}
 
 
 #kataInput, #searchInput, #translationSelect, #mulaiSearchBtn {
@@ -1280,10 +1304,10 @@ const overlayColorPicker = document.getElementById("overlayColorPicker");
 const overlayOpacity = document.getElementById("overlayOpacity");
 const overlayLayer = document.getElementById("overlayLayer");
 
-// Atur transparansi background
+// Atur transparansi background (hanya ::before)
 backgroundOpacity.addEventListener("input", () => {
   const opacity = backgroundOpacity.value;
-  pagesContainer.style.opacity = opacity;
+  pagesContainer.style.setProperty('--background-opacity', opacity);
   saveHistory();
 });
 
@@ -1304,6 +1328,7 @@ function hexToRGBA(hex, alpha) {
   let b = parseInt(hex.slice(5, 7), 16);
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
+
   
 </script>
   
