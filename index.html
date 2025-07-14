@@ -1057,6 +1057,9 @@ const translationFontSelect = document.getElementById("translationFontSelect");
 const translationFontSize = document.getElementById("translationFontSize");
 
 async function loadFontFromUrl(fontUrl, fontName) {
+  const loader = document.getElementById("fontLoading");
+  loader.style.display = "block";
+
   const style = document.createElement("style");
   style.textContent = `
     @font-face {
@@ -1067,28 +1070,34 @@ async function loadFontFromUrl(fontUrl, fontName) {
   document.head.appendChild(style);
 
   try {
-    // Tunggu sampai font benar-benar ter-load
     await document.fonts.load(`1em ${fontName}`);
-    await document.fonts.ready;  // pastikan semua font siap
+    await document.fonts.ready;
 
-    // Paksa reflow dengan membuat elemen dummy pakai font tersebut
     const dummy = document.createElement("span");
     dummy.style.fontFamily = fontName;
     dummy.textContent = ".";
     dummy.style.visibility = "hidden";
     document.body.appendChild(dummy);
-    // Trigger reflow
     void dummy.offsetWidth;
     dummy.remove();
 
-    // Sekarang terapkan font
     document.querySelectorAll(".translation").forEach(el => {
       el.style.fontFamily = fontName;
     });
+
   } catch (e) {
     console.error("Gagal memuat font:", fontName, e);
+  } finally {
+    loader.style.display = "none";
   }
 }
+
+translationFontSelect.addEventListener("change", async () => {
+  const fontUrl = translationFontSelect.value;
+  const fontName = "customTranslationFont";
+  await loadFontFromUrl(fontUrl, fontName);
+});
+
 
 
  document.getElementById("quranFontSize").addEventListener("input", e => {
@@ -1398,6 +1407,8 @@ backgroundOpacitySlider.addEventListener("input", () => {
 });
 
 </script>
-  
+  <div id="fontLoading" style="display:none; position:fixed; top:0; left:0; right:0; padding:1em; background:#fff; text-align:center; z-index:9999;">
+  Memuat font...
+</div>
 </body>
 </html>
