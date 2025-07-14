@@ -858,7 +858,11 @@ async function loadAyat() {
     const brandDiv = document.createElement("div");
     brandDiv.className = "brand-watermark";
     brandDiv.textContent = "videomurottal.com";
+    brandDiv.contentEditable = true; // ✅ bisa diedit
+    brandDiv.style.userSelect = "text";
+    brandDiv.setAttribute("draggable", "false");
     container.appendChild(brandDiv);
+
 
     div.style.display = "block";
     requestAnimationFrame(() => div.style.opacity = "1");
