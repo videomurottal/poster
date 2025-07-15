@@ -760,35 +760,20 @@ function hideLoader() { loaderOverlay.style.display = 'none'; }
 
 const translationLanguageMap = { "20": "en", "33": "id" };
 
-const surahList = {
-  1:["Al-Fātiḥah"], 2:["Al-Baqarah"], 3:["Āl ʿImrān"], 4:["An-Nisāʾ"],
-  5:["Al-Māʾidah"], 6:["Al-Anʿām"], 7:["Al-Aʿrāf"], 8:["Al-Anfāl"],
-  9:["At-Tawbah"], 10:["Yūnus"], 11:["Hūd"], 12:["Yūsuf"], 13:["Ar-Raʿd"],
-  14:["Ibrāhīm"], 15:["Al-Ḥijr"], 16:["An-Naḥl"], 17:["Al-Isrāʾ"],
-  18:["Al-Kahf"], 19:["Maryam"], 20:["Ṭā-Hā"], 21:["Al-Anbiyāʾ"],
-  22:["Al-Ḥajj"], 23:["Al-Muʾminūn"], 24:["An-Nūr"], 25:["Al-Furqān"],
-  26:["Ash-Shuʿarāʾ"], 27:["An-Naml"], 28:["Al-Qaṣaṣ"], 29:["Al-ʿAnkabūt"],
-  30:["Ar-Rūm"], 31:["Luqmān"], 32:["As-Sajdah"], 33:["Al-Aḥzāb"],
-  34:["Sabaʾ"], 35:["Fāṭir"], 36:["Yā-Sīn"], 37:["As-Ṣāffāt"],
-  38:["Ṣād"], 39:["Az-Zumar"], 40:["Ghāfir"], 41:["Fuṣṣilat"], 42:["Ash-Shūrā"],
-  43:["Az-Zukhruf"], 44:["Ad-Dukhān"], 45:["Al-Jāthiyah"], 46:["Al-Aḥqāf"],
-  47:["Muḥammad"], 48:["Al-Fatḥ"], 49:["Al-Ḥujurāt"], 50:["Qāf"],
-  51:["Adh-Dhāriyāt"], 52:["Aṭ-Ṭūr"], 53:["An-Najm"], 54:["Al-Qamar"],
-  55:["Ar-Raḥmān"], 56:["Al-Wāqiʿah"], 57:["Al-Ḥadīd"], 58:["Al-Mujādilah"],
-  59:["Al-Ḥashr"], 60:["Al-Mumtaḥanah"], 61:["Aṣ-Ṣaff"], 62:["Al-Jumuʿah"],
-  63:["Al-Munāfiqūn"], 64:["At-Taghābun"], 65:["Aṭ-Ṭalāq"], 66:["At-Taḥrīm"],
-  67:["Al-Mulk"], 68:["Al-Qalam"], 69:["Al-Ḥāqqah"], 70:["Al-Maʿārij"],
-  71:["Nūḥ"], 72:["Al-Jinn"], 73:["Al-Muzzammil"], 74:["Al-Muddaththir"],
-  75:["Al-Qiyāmah"], 76:["Al-Insān"], 77:["Al-Mursalāt"], 78:["An-Nabaʾ"],
-  79:["An-Nāziʿāt"], 80:["ʿAbasa"], 81:["At-Takwīr"], 82:["Al-Infiṭār"],
-  83:["Al-Muṭaffifīn"], 84:["Al-Inshiqāq"], 85:["Al-Burūj"], 86:["Aṭ-Ṭāriq"],
-  87:["Al-Aʿlā"], 88:["Al-Ghāshiyah"], 89:["Al-Fajr"], 90:["Al-Balad"],
-  91:["Ash-Shams"], 92:["Al-Layl"], 93:["Aḍ-Ḍuḥā"], 94:["Ash-Sharḥ"],
-  95:["At-Tīn"], 96:["Al-ʿAlaq"], 97:["Al-Qadr"], 98:["Al-Bayyinah"],
-  99:["Az-Zalzalah"], 100:["Al-ʿĀdiyāt"], 101:["Al-Qāriʿah"], 102:["At-Takāthur"],
-  103:["Al-ʿAṣr"], 104:["Al-Humazah"], 105:["Al-Fīl"], 106:["Quraysh"],
-  107:["Al-Māʿūn"], 108:["Al-Kawthar"], 109:["Al-Kāfirūn"], 110:["An-Naṣr"],
-  111:["Al-Masad"], 112:["Al-Ikhlāṣ"], 113:["Al-Falaq"], 114:["An-Nās"]
+const surahAyahCount = {
+  1: 7, 2: 286, 3: 200, 4: 176, 5: 120, 6: 165, 7: 206, 8: 75, 9: 129, 10: 109,
+  11: 123, 12: 111, 13: 43, 14: 52, 15: 99, 16: 128, 17: 111, 18: 110, 19: 98,
+  20: 135, 21: 112, 22: 78, 23: 118, 24: 64, 25: 77, 26: 227, 27: 93, 28: 88,
+  29: 69, 30: 60, 31: 34, 32: 30, 33: 73, 34: 54, 35: 45, 36: 83, 37: 182,
+  38: 88, 39: 75, 40: 85, 41: 54, 42: 53, 43: 89, 44: 59, 45: 37, 46: 35,
+  47: 38, 48: 29, 49: 18, 50: 45, 51: 60, 52: 49, 53: 62, 54: 55, 55: 78,
+  56: 96, 57: 29, 58: 22, 59: 24, 60: 13, 61: 14, 62: 11, 63: 11, 64: 18,
+  65: 12, 66: 12, 67: 30, 68: 52, 69: 52, 70: 44, 71: 28, 72: 28, 73: 20,
+  74: 56, 75: 40, 76: 31, 77: 50, 78: 40, 79: 46, 80: 42, 81: 29, 82: 19,
+  83: 36, 84: 25, 85: 22, 86: 17, 87: 19, 88: 26, 89: 30, 90: 20, 91: 15,
+  92: 21, 93: 11, 94: 8, 95: 8, 96: 19, 97: 5, 98: 8, 99: 8, 100: 11,
+  101: 11, 102: 8, 103: 3, 104: 9, 105: 5, 106: 4, 107: 7, 108: 3, 109: 6,
+  110: 3, 111: 5, 112: 4, 113: 5, 114: 6
 };
 
 const surahSelect = document.getElementById("surahSelect");
