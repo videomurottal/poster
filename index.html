@@ -1260,53 +1260,35 @@ backgroundColorPicker.addEventListener("input", () => {
   }
 
   // ==== Fungsi pencarian kata ====
-  function decodeEntities(encodedString) {
-  const textarea = document.createElement('textarea');
-  textarea.innerHTML = encodedString;
-  return textarea.value;
-}
+  function searchKata(keyword) {
+    const resultDiv = document.getElementById('searchResults');
+    resultDiv.innerHTML = '';
 
-function searchKata(keyword) {
-  const resultDiv = document.getElementById('searchResults');
-  resultDiv.innerHTML = '';
+    const suras = activeXMLDoc.getElementsByTagName('sura');
+    let totalHasil = 0;
 
-  const suras = activeXMLDoc.getElementsByTagName('sura');
-  let totalHasil = 0;
-
-  for (let sura of suras) {
-    const suraNum = sura.getAttribute('number');
-    const ayas = sura.getElementsByTagName('aya');
-
-    for (let aya of ayas) {
-      const ayaNum = aya.getAttribute('number');
-
-      // Ambil isi <translation>
-      const translationEl = aya.getElementsByTagName('translation')[0];
-      if (!translationEl) continue;
-
-      let text = translationEl.textContent || "";
-      text = decodeEntities(text);
-
-      if (text.toLowerCase().includes(keyword)) {
-        const p = document.createElement('p');
-        p.innerHTML = `
-          <div style="background:#f5f5f5;padding:0.5em;border-radius:4px;margin-bottom:0.5em">
-            <div style="font-weight:bold;margin-bottom:0.3em;">Surah ${suraNum}, Ayat ${ayaNum}</div>
-            <div style="font-size:1.4em;direction:rtl;text-align:right;">${text}</div>
-            <button onclick="goToAyat(${suraNum}, ${ayaNum})" style="margin-top:0.5em;" class="button">Menuju Ayat</button>
-          </div>
-        `;
-        resultDiv.appendChild(p);
-        totalHasil++;
+    for (let sura of suras) {
+      const suraNum = sura.getAttribute('number');
+      const ayas = sura.getElementsByTagName('aya');
+      for (let aya of ayas) {
+        const ayaNum = aya.getAttribute('number');
+        const text = aya.textContent || '';
+        if (text.toLowerCase().includes(keyword)) {
+          const p = document.createElement('p');
+          p.innerHTML = `
+            Surah ${suraNum}, Ayat ${ayaNum}: ${text}
+            <button onclick="goToAyat(${suraNum}, ${ayaNum})">Menuju Ayat</button>
+          `;
+          resultDiv.appendChild(p);
+          totalHasil++;
+        }
       }
     }
-  }
 
-  if (totalHasil === 0) {
-    resultDiv.innerHTML = '<p style="color:red;">Tidak ditemukan hasil untuk kata tersebut.</p>';
+    if (totalHasil === 0) {
+      resultDiv.innerHTML = '<p style="color:red;">Tidak ditemukan hasil untuk kata tersebut.</p>';
+    }
   }
-}
-
 
   // ==== Fungsi "Menuju ke Ayat" ====
 async function goToAyat(sura, aya) {
