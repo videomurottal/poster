@@ -825,9 +825,7 @@ wordTranslationId.addEventListener("change", () => { loadAyat(); saveHistory(); 
 
 async function updateAyahDropdown(callLoad = true) {
   const s = surahSelect.value
-  const res = await fetch(`https://api.quran.com/api/v4/chapters/${s}`);
-  const json = await res.json();
-  const max = json.chapter.verses_count;
+  const max = surahList[s][1]; // Pakai array lokal yang sudah ada
   ayahSelect.innerHTML = "";
   for (let i = 1; i <= max; i++) {
     ayahSelect.appendChild(new Option(`Ayat ${i}`, i));
@@ -865,9 +863,17 @@ async function loadAyat() {
 
     
 
-    const apiField = currentVersion === "v1" ? "code_v1" : "code_v2";
-    const data = await fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?words=true&word_fields=${apiField}`).then(r => r.json());
-    words = data.verse.words.map(w => ({ arabic: w[apiField] || w.text, id: w.id }));
+    const arabSource = currentVersion === "v1"
+  ? "https://api.github.com/repos/tafsirnetlifyapp/qurantext/contents/symbol1.json"
+  : "https://api.github.com/repos/tafsirnetlifyapp/qurantext/contents/symbol2.json";
+
+const arabJson = await fetch(arabSource).then(r => r.json());
+const content = atob(arabJson.content);
+const arabMap = JSON.parse(content);
+const arabAyat = arabMap[key] || "";
+const wordArray = arabAyat.split(" | ");
+words = wordArray.map((w, i) => ({ arabic: w, id: i + 1 }));
+
 
     // 🔄 Update word dropdown
     const prevStart = +wordStart.value || 1, prevEnd = +wordEnd.value || 1;
@@ -932,12 +938,12 @@ async function loadAyat() {
         }
       } else {
         // 📖 Terjemahan Per-Kata (Quran.com)
-        const langCode = translationLanguageMap[transVal];
-        try {
-          const r = await fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?words=true&language=${langCode}&translations=${transVal}`);
-          const j = await r.json();
-          const wordsData = j.verse.words;
-          const wordTranslations = wordsData.map(w => w.translation?.text || "").slice(startIdx, endIdx);
+        const transRes = await fetch("https://raw.githubusercontent.com/tafsirnetlifyapp/quran/refs/heads/main/terjemah_wbw_77429.json");
+        const transJson = await transRes.json();
+        const transLine = transJson[key] || "";
+        const transArray = transLine.split(" | ");
+        const wordTranslations = transArray.slice(startIdx, endIdx);
+
 
           const perKataDiv = document.createElement("div");
           perKataDiv.className = "translation";
