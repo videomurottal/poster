@@ -20,13 +20,6 @@ h2 {
 }
 
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-    
-
-
 #pages::before {
   content: "";
   position: absolute;
@@ -356,27 +349,6 @@ button:hover {
   </style>
 </head>
 <body>
-
-<!-- Splash Loader -->
-<div id="initialLoader" style="
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background-color: white;
-  z-index: 9999;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-">
-  <div style="
-    border: 8px solid #f3f3f3;
-    border-top: 8px solid #4cafef;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    animation: spin 1s linear infinite;">
-  </div>
-</div>
 
   
 
@@ -1288,35 +1260,53 @@ backgroundColorPicker.addEventListener("input", () => {
   }
 
   // ==== Fungsi pencarian kata ====
-  function searchKata(keyword) {
-    const resultDiv = document.getElementById('searchResults');
-    resultDiv.innerHTML = '';
+  function decodeEntities(encodedString) {
+  const textarea = document.createElement('textarea');
+  textarea.innerHTML = encodedString;
+  return textarea.value;
+}
 
-    const suras = activeXMLDoc.getElementsByTagName('sura');
-    let totalHasil = 0;
+function searchKata(keyword) {
+  const resultDiv = document.getElementById('searchResults');
+  resultDiv.innerHTML = '';
 
-    for (let sura of suras) {
-      const suraNum = sura.getAttribute('number');
-      const ayas = sura.getElementsByTagName('aya');
-      for (let aya of ayas) {
-        const ayaNum = aya.getAttribute('number');
-        const text = aya.textContent || '';
-        if (text.toLowerCase().includes(keyword)) {
-          const p = document.createElement('p');
-          p.innerHTML = `
-            Surah ${suraNum}, Ayat ${ayaNum}: ${text}
-            <button onclick="goToAyat(${suraNum}, ${ayaNum})">Menuju Ayat</button>
-          `;
-          resultDiv.appendChild(p);
-          totalHasil++;
-        }
+  const suras = activeXMLDoc.getElementsByTagName('sura');
+  let totalHasil = 0;
+
+  for (let sura of suras) {
+    const suraNum = sura.getAttribute('number');
+    const ayas = sura.getElementsByTagName('aya');
+
+    for (let aya of ayas) {
+      const ayaNum = aya.getAttribute('number');
+
+      // Ambil isi <translation>
+      const translationEl = aya.getElementsByTagName('translation')[0];
+      if (!translationEl) continue;
+
+      let text = translationEl.textContent || "";
+      text = decodeEntities(text);
+
+      if (text.toLowerCase().includes(keyword)) {
+        const p = document.createElement('p');
+        p.innerHTML = `
+          <div style="background:#f5f5f5;padding:0.5em;border-radius:4px;margin-bottom:0.5em">
+            <div style="font-weight:bold;margin-bottom:0.3em;">Surah ${suraNum}, Ayat ${ayaNum}</div>
+            <div style="font-size:1.4em;direction:rtl;text-align:right;">${text}</div>
+            <button onclick="goToAyat(${suraNum}, ${ayaNum})" style="margin-top:0.5em;" class="button">Menuju Ayat</button>
+          </div>
+        `;
+        resultDiv.appendChild(p);
+        totalHasil++;
       }
     }
-
-    if (totalHasil === 0) {
-      resultDiv.innerHTML = '<p style="color:red;">Tidak ditemukan hasil untuk kata tersebut.</p>';
-    }
   }
+
+  if (totalHasil === 0) {
+    resultDiv.innerHTML = '<p style="color:red;">Tidak ditemukan hasil untuk kata tersebut.</p>';
+  }
+}
+
 
   // ==== Fungsi "Menuju ke Ayat" ====
 async function goToAyat(sura, aya) {
@@ -1454,18 +1444,6 @@ backgroundOpacitySlider.addEventListener("input", () => {
     });
   });
 </script>
-
-<script>
-window.addEventListener("load", () => {
-  const loader = document.getElementById("initialLoader");
-  if (loader) {
-    loader.style.transition = "opacity 0.4s ease";
-    loader.style.opacity = "0";
-    setTimeout(() => loader.remove(), 400);
-  }
-});
-</script>
-
 
   
 </body>
