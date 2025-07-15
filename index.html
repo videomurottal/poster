@@ -5,12 +5,10 @@
 <link rel="icon" href="./icon-192.png" type="image/png" sizes="192x192">
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/iconposter.png">
 
-  
   <meta charset="UTF-8">
   <title>Poster Quran</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <style>
-    
     body {
   background: #fefcf8;
   padding: 1em;
@@ -852,14 +850,24 @@ async function loadAyat() {
     // 🧹 Bersihkan isi container biar tidak DOUBEL
     container.innerHTML = "";
 
-    const pageMap = await fetch("https://raw.githubusercontent.com/dickymiswardi/tadabbur/main/ayah_page_map.json").then(r => r.json());
+
+
+    const pageMap = await fetch('/.netlify/functions/fetchPageMap').then(r => r.json());
+
     const page = pageMap[key];
+
     const fontName = currentVersion === 'v1'
       ? `QCF_P${String(page).padStart(3, '0')}`
       : `QCF2${String(page).padStart(3, '0')}`;
+
     const fontUrl = currentVersion === 'v1'
       ? `https://cdn.jsdelivr.net/gh/dickymiswardi/quran/fonts/${fontName}.TTF`
       : `https://cdn.jsdelivr.net/gh/tafsirnetlifyapp/quran@refs/heads/main/fontsglyphvs/${fontName}.ttf`;
+
+
+
+
+    
 
     const apiField = currentVersion === "v1" ? "code_v1" : "code_v2";
     const data = await fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?words=true&word_fields=${apiField}`).then(r => r.json());
