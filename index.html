@@ -995,12 +995,15 @@ async function loadAyat() {
 }
 
 const last = loadHistory();
-updateAyahDropdown().then(() => {
+updateAyahDropdown(false).then(() => {
   if (last.ayah) ayahSelect.value = last.ayah;
   if (last.wordStart) wordStart.value = last.wordStart;
   if (last.wordEnd) wordEnd.value = last.wordEnd;
   if (last.translation) wordTranslationId.value = last.translation;
+
+  loadAyat(); // ✅ PENTING! Tampilkan ayat yang benar
 });
+
 
   
 </script>
