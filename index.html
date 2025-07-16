@@ -29,6 +29,32 @@ h2 {
 }
 
 
+
+body.blurred *:not(#authModal):not(#authModal *) {
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+}
+#authModal {
+  position: fixed;
+  z-index: 9999;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.5);
+}
+.modal-content {
+  background: white;
+  padding: 2em;
+  border-radius: 12px;
+  width: 300px;
+}
+
+
+
+    
+
 #pages::before {
   content: "";
   position: absolute;
@@ -1505,6 +1531,17 @@ backgroundOpacitySlider.addEventListener("input", () => {
     });
   }
 </script>
+
+
+  <div id="authModal" class="modal-overlay">
+  <form id="authForm" class="modal-content">
+    <h2>Masukkan Password 🔒</h2>
+    <input type="password" id="authPassword" required>
+    <button type="submit">Masuk</button>
+    <div id="authError" style="color: red; margin-top: 10px;"></div>
+  </form>
+</div>
+<script src="auth.js"></script>
 
   
 </body>
