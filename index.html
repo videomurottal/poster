@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  
+
 <link rel="icon" href="./icon-192.png" type="image/png" sizes="192x192">
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/iconposter.png">
 
@@ -843,7 +843,7 @@ async function updateAyahDropdown(callLoad = true) {
   if (callLoad) loadAyat(); // ✅ hanya dipanggil kalau diminta
 }
 
-async function loadAyat({ wordStart: forceStart, wordEnd: forceEnd } = {}) {
+async function loadAyat() {
   showLoader();
   try {
     const s = surahSelect.value, a = ayahSelect.value, key = `${s}:${a}`;
@@ -866,8 +866,7 @@ async function loadAyat({ wordStart: forceStart, wordEnd: forceEnd } = {}) {
     words = data.verse.words.map(w => ({ arabic: w[apiField] || w.text, id: w.id }));
 
     // 🔄 Update word dropdown
-    const prevStart = forceStart ? +forceStart : (+wordStart.value || 1);
-    const prevEnd = forceEnd ? +forceEnd : (+wordEnd.value || 1);
+    const prevStart = +wordStart.value || 1, prevEnd = +wordEnd.value || 1;
     wordStart.innerHTML = "";
     for (let i = 1; i <= words.length; i++) wordStart.appendChild(new Option(`Word ${i}`, i));
     wordStart.value = initialLoad ? 1 : Math.min(prevStart, words.length);
@@ -990,16 +989,12 @@ async function loadAyat({ wordStart: forceStart, wordEnd: forceEnd } = {}) {
 const last = loadHistory();
 updateAyahDropdown(false).then(() => {
   if (last.ayah) ayahSelect.value = last.ayah;
+  if (last.wordStart) wordStart.value = last.wordStart;
+  if (last.wordEnd) wordEnd.value = last.wordEnd;
   if (last.translation) wordTranslationId.value = last.translation;
 
-  // 💡 Kirim wordStart dan wordEnd dari histori ke loadAyat
-  loadAyat({
-    wordStart: last.wordStart,
-    wordEnd: last.wordEnd
-  });
+  loadAyat(); // ✅ PENTING! Tampilkan ayat yang benar
 });
-
-
 
 
   
@@ -1441,54 +1436,61 @@ backgroundOpacitySlider.addEventListener("input", () => {
   });
 </script>
 
+
   <!-- 🌟 Tombol Install PWA -->
-<div id="installPwaWrapper" style="position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 10000;">
-  <button id="installPwaButton" style="
-    background-color: #007bff;
+<div id="installPWAWrapper" style="position: fixed; bottom: 1em; left: 50%; transform: translateX(-50%); z-index: 10000;">
+  <button id="installPWAButton" style="
+    padding: 0.7em 1.5em;
+    background: linear-gradient(to right, #06beb6, #48b1bf);
     color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 12px;
-    font-size: 16px;
     font-weight: bold;
+    border: none;
+    border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.2);
     cursor: pointer;
-    display: none;
-    transition: background-color 0.3s;">
-    ➕ Install Aplikasi
+    font-size: 1em;
+    transition: all 0.3s ease;
+  ">
+    📲 Install Poster Quran
   </button>
 </div>
 
   <script>
   let deferredPrompt;
-  const installBtn = document.getElementById('installPwaButton');
+  const installBtn = document.getElementById("installPWAButton");
+  const installWrapper = document.getElementById("installPWAWrapper");
 
+  // Sembunyikan tombol saat awal
+  installWrapper.style.display = "none";
+
+  // Simpan event install
   window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault(); // Blok prompt otomatis
+    e.preventDefault(); // jangan langsung munculkan prompt
     deferredPrompt = e;
-    installBtn.style.display = 'inline-block';
+    installWrapper.style.display = "block"; // tampilkan tombol
   });
 
   installBtn.addEventListener('click', async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const choice = await deferredPrompt.userChoice;
-      if (choice.outcome === 'accepted') {
-        console.log('✅ User accepted install');
-      } else {
-        console.log('❌ User dismissed install');
-      }
-      deferredPrompt = null;
-      installBtn.style.display = 'none';
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt(); // tampilkan prompt
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      console.log('✅ PWA diinstall!');
+    } else {
+      console.log('❌ PWA dibatalkan.');
     }
+    deferredPrompt = null;
+    installWrapper.style.display = "none"; // sembunyikan lagi
   });
 
-  // Jika sudah terinstal, sembunyikan tombol
+  // Sembunyikan tombol jika sudah terinstall
   window.addEventListener('appinstalled', () => {
-    installBtn.style.display = 'none';
-    console.log("✅ Aplikasi terinstal");
+    console.log('✅ App telah terinstall');
+    deferredPrompt = null;
+    installWrapper.style.display = "none";
   });
 </script>
+
   
 </body>
 </html>
