@@ -2,6 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
 
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#23eb55">
 <link rel="icon" href="./icon-192.png" type="image/png" sizes="192x192">
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/iconposter.png">
 
@@ -650,23 +652,31 @@ button:hover {
 </label>
 
 
-  <!-- 🌟 Tombol Install PWA -->
-<div id="installPWAWrapper" style="position: fixed; bottom: 1em; left: 50%; transform: translateX(-50%); z-index: 10000;">
+
+<label>
+  Jarak Kata Terjemah:
+  <input type="range" id="translationWordSpacing" min="0" max="1" step="0.05" value="0.2">
+</label>
+
+  <!-- 📲 Tombol Install PWA -->
+<div class="button-wrapper" style="margin-top: 1em;">
   <button id="installPWAButton" style="
-    padding: 0.7em 1.5em;
+    padding: 0.6em 1.2em;
     background: linear-gradient(to right, #06beb6, #48b1bf);
     color: white;
-    font-weight: bold;
-    border: none;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-    cursor: pointer;
+    font-weight: 600;
     font-size: 1em;
-    transition: all 0.3s ease;
-  ">
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+  " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
     📲 Install Poster Quran
   </button>
 </div>
+
+  
   
 </div>
 
@@ -1456,41 +1466,37 @@ backgroundOpacitySlider.addEventListener("input", () => {
 </script>
 
 
-  
-
   <script>
   let deferredPrompt;
   const installBtn = document.getElementById("installPWAButton");
-  const installWrapper = document.getElementById("installPWAWrapper");
 
-  // Sembunyikan tombol saat awal
-  installWrapper.style.display = "none";
+  // Sembunyikan tombol jika belum siap
+  installBtn.style.display = "none";
 
   // Simpan event install
   window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault(); // jangan langsung munculkan prompt
+    e.preventDefault(); // Jangan munculkan prompt otomatis
     deferredPrompt = e;
-    installWrapper.style.display = "block"; // tampilkan tombol
+    installBtn.style.display = "inline-block"; // Tampilkan tombol
   });
 
   installBtn.addEventListener('click', async () => {
     if (!deferredPrompt) return;
-    deferredPrompt.prompt(); // tampilkan prompt
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-      console.log('✅ PWA diinstall!');
+    deferredPrompt.prompt(); // Munculkan prompt install
+    const result = await deferredPrompt.userChoice;
+    if (result.outcome === 'accepted') {
+      console.log("✅ Pengguna setuju install");
     } else {
-      console.log('❌ PWA dibatalkan.');
+      console.log("❌ Pengguna batal install");
     }
     deferredPrompt = null;
-    installWrapper.style.display = "none"; // sembunyikan lagi
+    installBtn.style.display = "none"; // Sembunyikan setelah klik
   });
 
-  // Sembunyikan tombol jika sudah terinstall
   window.addEventListener('appinstalled', () => {
-    console.log('✅ App telah terinstall');
+    console.log("✅ App berhasil diinstall");
     deferredPrompt = null;
-    installWrapper.style.display = "none";
+    installBtn.style.display = "none";
   });
 </script>
 
