@@ -3,7 +3,7 @@
   "short_name": "Quran Poster",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#fefcf9",
+  "background_color": "#fefcf8",
   "theme_color": "#fefcf8",
   "description": "Aplikasi Poster Ayat Quran interaktif & cantik",
   "icons": [
