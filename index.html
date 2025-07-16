@@ -28,34 +28,6 @@ h2 {
   margin-bottom: 1rem;
 }
 
-#authPassword {
-  direction: ltr;
-}
-
-body.blurred *:not(#authModal):not(#authModal *) {
-  filter: blur(4px);
-  pointer-events: none;
-  user-select: none;
-}
-#authModal {
-  position: fixed;
-  z-index: 9999;
-  top: 0; left: 0; right: 0; bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0,0,0,0.5);
-}
-.modal-content {
-  background: white;
-  padding: 2em;
-  border-radius: 12px;
-  width: 300px;
-}
-
-
-
-    
 
 #pages::before {
   content: "";
@@ -389,7 +361,7 @@ button:hover {
 
   
 
-<h2>Poster Quran - Terjemah dan Watermark Bisa Diedit</h2>
+<h2>Poster Quran (Klik Teks Terjemah Untuk Mengedit)</h2>
   
 <div class="controls">
   <!-- Baris 1: Surah & Ayat -->
@@ -1021,7 +993,7 @@ async function loadAyat() {
     // 🏷 Tambahkan watermark
     const brandDiv = document.createElement("div");
     brandDiv.className = "brand-watermark";
-    brandDiv.textContent = "by Dicky Miswardi, B.A.";
+    brandDiv.textContent = "videomurottal.com";
     brandDiv.contentEditable = true; // ✅ bisa diedit
     brandDiv.style.userSelect = "text";
     brandDiv.setAttribute("draggable", "false");
@@ -1533,17 +1505,6 @@ backgroundOpacitySlider.addEventListener("input", () => {
     });
   }
 </script>
-
-
-  <div id="authModal" class="modal-overlay">
-  <form id="authForm" class="modal-content">
-    <h2>Masukkan Password 🔒</h2>
-    <input type="password" id="authPassword" required>
-    <button type="submit">Masuk</button>
-    <div id="authError" style="color: red; margin-top: 10px;"></div>
-  </form>
-</div>
-<script src="auth.js"></script>
 
   
 </body>
