@@ -866,7 +866,8 @@ async function loadAyat({ wordStart: forceStart, wordEnd: forceEnd } = {}) {
     words = data.verse.words.map(w => ({ arabic: w[apiField] || w.text, id: w.id }));
 
     // 🔄 Update word dropdown
-    const prevStart = forceStart ? +forceStart : (+wordStart.value || 1);const prevEnd = forceEnd ? +forceEnd : (+wordEnd.value || 1);
+    const prevStart = forceStart ? +forceStart : (+wordStart.value || 1);
+    const prevEnd = forceEnd ? +forceEnd : (+wordEnd.value || 1);
     wordStart.innerHTML = "";
     for (let i = 1; i <= words.length; i++) wordStart.appendChild(new Option(`Word ${i}`, i));
     wordStart.value = initialLoad ? 1 : Math.min(prevStart, words.length);
@@ -1440,6 +1441,54 @@ backgroundOpacitySlider.addEventListener("input", () => {
   });
 </script>
 
+  <!-- 🌟 Tombol Install PWA -->
+<div id="installPwaWrapper" style="position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 10000;">
+  <button id="installPwaButton" style="
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    cursor: pointer;
+    display: none;
+    transition: background-color 0.3s;">
+    ➕ Install Aplikasi
+  </button>
+</div>
+
+  <script>
+  let deferredPrompt;
+  const installBtn = document.getElementById('installPwaButton');
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault(); // Blok prompt otomatis
+    deferredPrompt = e;
+    installBtn.style.display = 'inline-block';
+  });
+
+  installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      if (choice.outcome === 'accepted') {
+        console.log('✅ User accepted install');
+      } else {
+        console.log('❌ User dismissed install');
+      }
+      deferredPrompt = null;
+      installBtn.style.display = 'none';
+    }
+  });
+
+  // Jika sudah terinstal, sembunyikan tombol
+  window.addEventListener('appinstalled', () => {
+    installBtn.style.display = 'none';
+    console.log("✅ Aplikasi terinstal");
+  });
+</script>
   
 </body>
 </html>
