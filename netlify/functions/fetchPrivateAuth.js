@@ -1,5 +1,4 @@
 // netlify/functions/fetchAuth.js
-
 exports.handler = async function () {
   const GITHUB_TOKEN = process.env.TOKEN_AUTH;
   const repo = 'tafsirnetlifyapp/posterauth'; // ← Ganti dengan repo privat kamu
