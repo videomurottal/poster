@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // SHA-256 function
   async function sha256(text) {
-    const encoder = new TextEncoder();
+    const encoder = new TextEncoder('quran2025');
     const data = encoder.encode(text);
     const hashBuffer = await crypto.subtle.digest('SHA-256', data);
     return Array.from(new Uint8Array(hashBuffer)).map(b =>
