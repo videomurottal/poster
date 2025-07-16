@@ -4,7 +4,7 @@
   "start_url": ".",
   "display": "standalone",
   "background_color": "#fefcf8",
-  "theme_color": "#23eb55",
+  "theme_color": "#fefcf8",
   "description": "Aplikasi Poster Ayat Quran interaktif & cantik",
   "icons": [
     {
