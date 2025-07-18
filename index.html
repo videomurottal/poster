@@ -845,7 +845,10 @@ const pagesContainer = document.getElementById("pages");
 backgroundSelect.addEventListener("change", () => {
   const bg = backgroundSelect.value;
   if (bg) {
-    pagesContainer.style.setProperty('--bg-image', `url('${bg}')`);
+    pagesContainer.style.backgroundImage = `url('${bg}')`;
+    pagesContainer.style.backgroundSize = 'cover';
+    pagesContainer.style.backgroundPosition = 'center';
+
     backgroundUrl.value = "";
   } else {
     pagesContainer.style.setProperty('--bg-image', 'none');
