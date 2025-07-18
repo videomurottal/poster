@@ -1713,9 +1713,12 @@ searchPexelsBtn.addEventListener('click', () => {
 // ✅ Terapkan gambar ke background
 applyPexelsBtn.addEventListener('click', () => {
   if (selectedPexelsImage) {
-    document.body.style.backgroundImage = `url(${selectedPexelsImage})`;
-    document.body.style.backgroundSize = 'cover';
-    document.body.style.backgroundPosition = 'center';
+    const posterDiv = document.querySelector(".page-container");
+    if (posterDiv) {
+      posterDiv.style.backgroundImage = `url(${selectedPexelsImage})`;
+      posterDiv.style.backgroundSize = 'cover';
+      posterDiv.style.backgroundPosition = 'center';
+    }
     pexelsModal.style.display = 'none';
   }
 });
