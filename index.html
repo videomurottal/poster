@@ -1134,24 +1134,33 @@ updateAyahDropdown(false).then(() => {
   const surahName = surahList[s][0].replace(/[^a-zA-Z0-9]/g, "-");
   const filename = `${surahName}-${a}.png`;
 
-  // Set scale lebih tinggi untuk hasil tajam
-  const scale = 4; // 💥 4x resolusi layar
+  // Tampilkan loader overlay
+  const loader = document.getElementById("loaderOverlay");
+  loader.style.display = "flex";
 
-  html2canvas(node, {
-    scale: scale,
-    useCORS: true,
-    allowTaint: true,
-    backgroundColor: null
-  }).then(canvas => {
+  try {
+    const scale = 4; // 💥 4x resolusi untuk hasil tajam
+    const canvas = await html2canvas(node, {
+      scale: scale,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: null
+    });
+
     // Konversi ke blob dengan kualitas maksimum
     canvas.toBlob(blob => {
       saveAs(blob, filename);
-    }, 'image/png', 1.0); // 1.0 = kualitas PNG penuh
-  }).catch(err => {
+    }, 'image/png', 1.0);
+
+  } catch (err) {
     alert("❌ Gagal menyimpan gambar: " + err.message);
     console.error(err);
-  });
+  } finally {
+    // Sembunyikan loader overlay
+    loader.style.display = "none";
+  }
 });
+
 
 
 
