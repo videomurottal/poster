@@ -658,21 +658,36 @@ button:hover {
   Jarak Kata Terjemah:
   <input type="range" id="translationWordSpacing" min="0" max="1" step="0.05" value="0.2">
 </label>
+
+
+  <!-- 🎨 Pilihan Warna Background -->
+<div style="display: flex; flex-direction: column; gap: 0.5em; margin-top: 0.5em;">
+  <label for="backgroundColorPicker">Warna Background:</label>
+  <input type="color" id="backgroundColorPicker" value="#23eb55">
+  <button id="applyBackgroundColorBtn" class="button" type="button">Terapkan</button>
+</div>
+  
   
 <!-- Warna Ayat, Terjemah dan Info Surah -->
-  <label>
+  <!-- 🎨 Pilihan Warna -->
+<div style="display: flex; flex-direction: column; gap: 0.5em; margin-top: 0.5em;">
+  <label for="colorTarget">Warna Elemen:</label>
   <select id="colorTarget">
     <option value="quran-text">Warna Ayat</option>
     <option value="translation">Warna Terjemah</option>
     <option value="surah-info">Warna Info Surah</option>
   </select>
-</label>
-   <label>
+  <label for="colorPicker">Pilih Warna:</label>
   <input type="color" id="colorPicker" value="#e83fb0">
-</label>
+  <button id="applyColorBtn" class="button" type="button">Terapkan</button>
+</div>
 
+  <!-- Pilihan Font Terjemah -->
+<div class="button-wrapper">
+  <button id="showFontSelectBtn" class="button" type="button">Font Terjemah</button>
+</div>
 
-   <!-- Dropdown Background -->
+   <!-- Pilih Wallpaper -->
   <label><select id="backgroundSelect">
       <option value="https://images.pexels.com/photos/6068385/pexels-photo-6068385.jpeg">Wallpaper 1</option>
       <option value="https://images.pexels.com/photos/673020/pexels-photo-673020.jpeg">Wallpaper 2</option>
@@ -681,18 +696,6 @@ button:hover {
     </select>
   </label>
 
-  
-    <!-- Warna Background -->
-<label>
-  <input type="color" id="backgroundColorPicker" value="#23eb55">
-</label>
-
-  
-
-  <!-- Pilihan Font Terjemah -->
-<div class="button-wrapper">
-  <button id="showFontSelectBtn" class="button" type="button">Font Terjemah</button>
-</div>
 
 <div id="fontSelectWrapper" style="display: none; flex-direction: column; gap: 0.5em; margin-top: 0.5em;">
   <label for="translationFontSelect">Pilih Font:</label>
