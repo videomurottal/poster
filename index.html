@@ -685,31 +685,6 @@ button:hover {
     </select>
   </label>
 
-  
-
-  <!-- 🎨 Warna Background -->
-<div class="button-wrapper">
-  <button id="toggleBackgroundPicker" class="button" type="button">Warna Background</button>
-</div>
-
-<div id="backgroundPickerPanel" style="display: none; margin-top: 0.5em;">
-  <input type="color" id="backgroundColorPicker" value="#23eb55">
-</div>
-
-<script>
-  const toggleBackgroundPickerBtn = document.getElementById('toggleBackgroundPicker');
-  const backgroundPickerPanel = document.getElementById('backgroundPickerPanel');
-  const backgroundColorPicker = document.getElementById('backgroundColorPicker');
-
-  toggleBackgroundPickerBtn.addEventListener('click', () => {
-    backgroundPickerPanel.style.display = (backgroundPickerPanel.style.display === 'none') ? 'block' : 'none';
-  });
-
-  backgroundColorPicker.addEventListener('input', (e) => {
-    document.body.style.backgroundColor = e.target.value;
-  });
-</script>
-
 
   
   
@@ -749,7 +724,31 @@ button:hover {
 </script>
 
 
+ <!-- 🎨 Warna Background -->
+<div class="button-wrapper">
+  <button id="toggleBackgroundPicker" class="button" type="button">Warna Background</button>
+</div>
 
+<div id="backgroundPickerPanel" style="display: none; margin-top: 0.5em;">
+  <input type="color" id="backgroundColorPicker" value="#23eb55">
+</div>
+
+<script>
+  const toggleBackgroundPickerBtn = document.getElementById('toggleBackgroundPicker');
+  const backgroundPickerPanel = document.getElementById('backgroundPickerPanel');
+  const backgroundColorPicker = document.getElementById('backgroundColorPicker');
+
+  toggleBackgroundPickerBtn.addEventListener('click', () => {
+    backgroundPickerPanel.style.display = (backgroundPickerPanel.style.display === 'none') ? 'block' : 'none';
+  });
+
+  backgroundColorPicker.addEventListener('input', (e) => {
+    document.body.style.backgroundColor = e.target.value;
+  });
+</script>
+
+
+  
   
     <div class="button-wrapper">
   <button id="saveImageTrigger">Download Poster</button>
