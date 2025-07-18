@@ -1127,53 +1127,31 @@ updateAyahDropdown(false).then(() => {
 <script>
   const saveImageTrigger = document.getElementById("saveImageTrigger");
 
-  saveImageTrigger.addEventListener("click", () => {
+  saveImageTrigger.addEventListener("click", async () => {
   const node = document.getElementById("pages");
   const s = surahSelect.value;
   const a = ayahSelect.value;
   const surahName = surahList[s][0].replace(/[^a-zA-Z0-9]/g, "-");
   const filename = `${surahName}-${a}.png`;
 
-  // Ambil URL gambar background
-  const bgUrl = getComputedStyle(node).getPropertyValue('--bg-image').replace(/url\(["']?|["']?\)/g, "");
-  const img = new Image();
-  img.crossOrigin = "Anonymous"; // penting untuk gambar dari Pexels / URL
+  // Set scale lebih tinggi untuk hasil tajam
+  const scale = 4; // 💥 4x resolusi layar
 
-  img.onload = () => {
-    const bgWidth = img.naturalWidth;
-    const bgHeight = img.naturalHeight;
-
-    const divWidth = node.offsetWidth;
-    const divHeight = node.offsetHeight;
-
-    // Hitung skala supaya sesuai resolusi gambar asli
-    const scaleW = bgWidth / divWidth;
-    const scaleH = bgHeight / divHeight;
-    const scale = Math.min(scaleW, scaleH); // Pakai skala terkecil supaya pas
-
-    console.log(`📐 Export scale: ${scale} (BG: ${bgWidth}x${bgHeight}, DIV: ${divWidth}x${divHeight})`);
-
-    html2canvas(node, {
-      scale: scale,
-      useCORS: true,
-      backgroundColor: null
-    }).then(canvas => {
-      canvas.toBlob(blob => {
-        saveAs(blob, filename);
-      }, 'image/png');
-    }).catch(err => {
-      alert("❌ Gagal menyimpan gambar: " + err.message);
-      console.error(err);
-    });
-  };
-
-  img.onerror = () => {
-    alert("❌ Gagal memuat gambar background asli.");
-  };
-
-  img.src = bgUrl;
+  html2canvas(node, {
+    scale: scale,
+    useCORS: true,
+    allowTaint: true,
+    backgroundColor: null
+  }).then(canvas => {
+    // Konversi ke blob dengan kualitas maksimum
+    canvas.toBlob(blob => {
+      saveAs(blob, filename);
+    }, 'image/png', 1.0); // 1.0 = kualitas PNG penuh
+  }).catch(err => {
+    alert("❌ Gagal menyimpan gambar: " + err.message);
+    console.error(err);
+  });
 });
-
 
 
 
