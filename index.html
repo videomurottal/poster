@@ -664,80 +664,7 @@ button:hover {
 <div class="button-wrapper">
   <button id="showFontSelectBtn" class="button" type="button">Font Terjemah</button>
 </div>
-
-  
-
-  <!-- 🎨 Warna Background -->
-<div class="button-wrapper">
-  <button id="toggleBackgroundPicker" class="button" type="button">Warna Background</button>
-</div>
-
-<div id="backgroundPickerPanel" style="display: none; margin-top: 0.5em;">
-  <input type="color" id="backgroundColorPicker" value="#23eb55">
-</div>
-
-<script>
-  const toggleBackgroundPickerBtn = document.getElementById('toggleBackgroundPicker');
-  const backgroundPickerPanel = document.getElementById('backgroundPickerPanel');
-  const backgroundColorPicker = document.getElementById('backgroundColorPicker');
-
-  toggleBackgroundPickerBtn.addEventListener('click', () => {
-    backgroundPickerPanel.style.display = (backgroundPickerPanel.style.display === 'none') ? 'block' : 'none';
-  });
-
-  backgroundColorPicker.addEventListener('input', (e) => {
-    document.body.style.backgroundColor = e.target.value;
-  });
-</script>
-
-  
-  
-<!-- 🎨 Warna Elemen -->
-<div class="button-wrapper">
-  <button id="toggleColorPanel" class="button" type="button">Warna Elemen</button>
-</div>
-
-<div id="colorPanel" style="display: none; flex-direction: column; gap: 0.5em; margin-top: 0.5em;">
-  <label for="colorTargetSelect">Pilih Target:</label>
-  <select id="colorTargetSelect">
-    <option value="quran-text">Warna Ayat</option>
-    <option value="translation">Warna Terjemah</option>
-    <option value="surah-info">Warna Info Surah</option>
-  </select>
-  
-  <label for="colorPicker">Pilih Warna:</label>
-  <input type="color" id="colorPicker" value="#e83fb0">
-</div>
-
-<script>
-  const toggleColorPanelBtn = document.getElementById('toggleColorPanel');
-  const colorPanel = document.getElementById('colorPanel');
-  const colorTargetSelect = document.getElementById('colorTargetSelect');
-  const colorPicker = document.getElementById('colorPicker');
-
-  toggleColorPanelBtn.addEventListener('click', () => {
-    colorPanel.style.display = (colorPanel.style.display === 'none') ? 'flex' : 'none';
-  });
-
-  colorPicker.addEventListener('input', (e) => {
-    const targetClass = colorTargetSelect.value;
-    document.querySelectorAll(`.${targetClass}`).forEach(el => {
-      el.style.color = e.target.value;
-    });
-  });
-</script>
-
-   <!-- Pilih Wallpaper -->
-  <label><select id="backgroundSelect">
-      <option value="https://images.pexels.com/photos/6068385/pexels-photo-6068385.jpeg">Wallpaper 1</option>
-      <option value="https://images.pexels.com/photos/673020/pexels-photo-673020.jpeg">Wallpaper 2</option>
-    <option value="https://images.pexels.com/photos/10257141/pexels-photo-10257141.jpeg">Wallpaper 3</option>
-    <option value="https://images.pexels.com/photos/13922651/pexels-photo-13922651.jpeg">Wallpaper 4</option>
-    </select>
-  </label>
-
-
-<div id="fontSelectWrapper" style="display: none; flex-direction: column; gap: 0.5em; margin-top: 0.5em;">
+  <div id="fontSelectWrapper" style="display: none; flex-direction: column; gap: 0.5em; margin-top: 0.5em;">
   <label for="translationFontSelect">Pilih Font:</label>
   <select id="translationFontSelect">
     <option value="https://raw.githubusercontent.com/githubnext/monaspace/main/fonts/webfonts/MonaspaceNeon-BoldItalic.woff2">Monaspace Neon</option>
@@ -748,6 +675,45 @@ button:hover {
   <button id="applyFontBtn" class="button" type="button">Terapkan</button>
 </div>
 
+
+     <!-- Pilih Wallpaper -->
+  <label><select id="backgroundSelect">
+      <option value="https://images.pexels.com/photos/6068385/pexels-photo-6068385.jpeg">Wallpaper 1</option>
+      <option value="https://images.pexels.com/photos/673020/pexels-photo-673020.jpeg">Wallpaper 2</option>
+    <option value="https://images.pexels.com/photos/10257141/pexels-photo-10257141.jpeg">Wallpaper 3</option>
+    <option value="https://images.pexels.com/photos/13922651/pexels-photo-13922651.jpeg">Wallpaper 4</option>
+    </select>
+  </label>
+
+  
+
+  <!-- 🎨 Warna Background -->
+<div class="button-wrapper">
+  <button id="toggleBackgroundPicker" class="button" type="button">Warna Background</button>
+</div>
+<div id="backgroundPickerPanel" style="display: none; margin-top: 0.5em;">
+  <input type="color" id="backgroundColorPicker" value="#23eb55">
+</div>
+
+  
+  
+<!-- 🎨 Warna Elemen -->
+<div class="button-wrapper">
+  <button id="toggleColorPanel" class="button" type="button">Warna Elemen</button>
+</div>
+<div id="colorPanel" style="display: none; flex-direction: column; gap: 0.5em; margin-top: 0.5em;">
+  <label for="colorTargetSelect">Pilih Target:</label>
+  <select id="colorTargetSelect">
+    <option value="quran-text">Warna Ayat</option>
+    <option value="translation">Warna Terjemah</option>
+    <option value="surah-info">Warna Info Surah</option>
+  </select>
+  <label for="colorPicker">Pilih Warna:</label>
+  <input type="color" id="colorPicker" value="#e83fb0">
+</div>
+
+
+  
     <div class="button-wrapper">
   <button id="saveImageTrigger">Download Poster</button>
 </div>
@@ -1755,6 +1721,38 @@ pexelsInput.addEventListener("keydown", function (e) {
     loader.style.display = "none"; // ✅ Sembunyikan loader
   }
 });
+</script>
+
+
+<script>
+  const toggleBackgroundPickerBtn = document.getElementById('toggleBackgroundPicker');
+  const backgroundPickerPanel = document.getElementById('backgroundPickerPanel');
+  const backgroundColorPicker = document.getElementById('backgroundColorPicker');
+
+  toggleBackgroundPickerBtn.addEventListener('click', () => {
+    backgroundPickerPanel.style.display = (backgroundPickerPanel.style.display === 'none') ? 'block' : 'none';
+  });
+
+  backgroundColorPicker.addEventListener('input', (e) => {
+    document.body.style.backgroundColor = e.target.value;
+  });
+</script>
+<script>
+  const toggleColorPanelBtn = document.getElementById('toggleColorPanel');
+  const colorPanel = document.getElementById('colorPanel');
+  const colorTargetSelect = document.getElementById('colorTargetSelect');
+  const colorPicker = document.getElementById('colorPicker');
+
+  toggleColorPanelBtn.addEventListener('click', () => {
+    colorPanel.style.display = (colorPanel.style.display === 'none') ? 'flex' : 'none';
+  });
+
+  colorPicker.addEventListener('input', (e) => {
+    const targetClass = colorTargetSelect.value;
+    document.querySelectorAll(`.${targetClass}`).forEach(el => {
+      el.style.color = e.target.value;
+    });
+  });
 </script>
   
 </body>
