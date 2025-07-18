@@ -665,7 +665,6 @@ button:hover {
   <button id="showFontSelectBtn" class="button" type="button">Font Terjemah</button>
 </div>
   <div id="fontSelectWrapper" style="display: none; flex-direction: column; gap: 0.5em; margin-top: 0.5em;">
-  <label for="translationFontSelect">Pilih Font:</label>
   <select id="translationFontSelect">
     <option value="https://raw.githubusercontent.com/githubnext/monaspace/main/fonts/webfonts/MonaspaceNeon-BoldItalic.woff2">Monaspace Neon</option>
     <option value="https://raw.githubusercontent.com/tafsirnetlifyapp/poster/main/fonts/Anton-Regular.ttf">Anton</option>
@@ -716,24 +715,23 @@ button:hover {
 </div>
 
   <div class="button-wrapper">
-  <button id="pexelsButton">Background Pexels</button>
+  <button id="pexelsButton">Cari Background</button>
 </div>
 
   <!-- Upload File -->
   <div class="button-wrapper">
-  <button id="uploadTrigger">Background Upload</button>
+  <button id="uploadTrigger">Upload Background</button>
   <input type="file" id="backgroundUpload" accept="image/*" style="display: none;">
 </div>
 
   <!-- Input URL di awal -->
   <div class="button-wrapper">
-  <button id="showUrlInput" class="button">Background Link</button>
+  <button id="showUrlInput" class="button">Link Background</button>
 </div>
 
 <div id="urlInputWrapper" style="display:none; flex-direction: column; gap: 0.5em;">
   <label>
-    <span style="font-size: 0.9em;">Masukkan URL Gambar:</span>
-    <input type="url" id="backgroundUrl" placeholder="Pastekan https://" style="width: 100%;">
+    <input type="url" id="backgroundUrl" placeholder="Masukkan https://" style="width: 100%;">
   </label>
   <button id="applyUrlButton" class="button">OK</button>
 </div>
