@@ -1686,6 +1686,36 @@ pexelsInput.addEventListener("keydown", function (e) {
 
 </script>
 
+<script>
+  document.getElementById("applyFontBtn").addEventListener("click", async () => {
+  const loader = document.getElementById("loaderOverlay");
+  loader.style.display = "flex"; // 🔥 Tampilkan loader
+
+  const fontUrl = document.getElementById("translationFontSelect").value;
+
+  try {
+    // Ambil nama font dari URL untuk digunakan di CSS
+    const fontName = fontUrl.split('/').pop().split('.')[0];
+
+    // Load font secara dinamis
+    const font = new FontFace(fontName, `url(${fontUrl})`);
+    await font.load();
+    document.fonts.add(font);
+
+    // Terapkan font ke elemen terjemahan
+    document.querySelectorAll(".translation-text").forEach(el => {
+      el.style.fontFamily = fontName;
+    });
+
+  } catch (err) {
+    alert("❌ Gagal memuat font: " + err.message);
+    console.error(err);
+  } finally {
+    loader.style.display = "none"; // ✅ Sembunyikan loader
+  }
+});
+</script>
+
   
 </body>
 </html>
