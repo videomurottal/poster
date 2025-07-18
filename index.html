@@ -32,13 +32,14 @@ h2 {
 
 #applyPexelsBtn {
   width: 100%;
-  padding: 12px 0;
+  padding: 12px 12px; /* ⬅️ dari 12px 0 ke 12px 12px biar proporsional */
   background-color: #38bdf8;
   color: white;
   border: none;
   border-radius: 8px;
   font-size: 16px;
   cursor: pointer;
+  box-sizing: border-box; /* ⬅️ supaya padding tidak merusak lebar */
 }
 
 #applyPexelsBtn:hover {
@@ -48,26 +49,27 @@ h2 {
 
 #pexelsKeyword {
   width: 100%;
-  padding: 10px 12px;
+  padding: 12px 12px; /* ⬅️ diperbesar supaya lebih nyaman diketik */
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 12px; /* ⬅️ sedikit lebih lega jarak bawah */
+  box-sizing: border-box;
 }
 
 
 .pexels-close {
   position: absolute;
-  top: 2px;         
-  right: 22px;
-  border-radius: 0; /* hapus bulat */
-  background: none; /* ✅ hapus background biru */
-  color: #fff;   /* merah untuk ❌ */
+  top: 10px;          /* ⬅️ sedikit turun biar nggak nempel ke tepi */
+  right: 10px;        /* ⬅️ lebih ke pojok kanan */
+  border-radius: 50%; /* ⬅️ kecilkan ke bulat */
+  background: #f87171; /* ⬅️ merah lembut untuk close button */
+  color: white;       /* ⬅️ putih untuk icon ❌ */
   font-size: 1.2rem;
   border: none;     
-  width: auto;      /* biarkan auto */
-  height: auto;     
-  line-height: normal;
+  width: 32px;        /* ⬅️ ukuran tombol close lebih kecil */
+  height: 32px;
+  line-height: 32px;
   text-align: center;
   cursor: pointer;
 }
@@ -90,12 +92,14 @@ h2 {
   max-width: 500px;
   box-shadow: 0 8px 16px rgba(0,0,0,0.25);
   animation: fadeIn 0.3s ease-out;
+  position: relative; /* ⬅️ supaya .pexels-close tetap di dalam modal */
 }
 
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.9); }
   to { opacity: 1; transform: scale(1); }
 }
+
 
 
 
