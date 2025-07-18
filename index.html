@@ -1127,29 +1127,32 @@ updateAyahDropdown(false).then(() => {
 <script>
   const saveImageTrigger = document.getElementById("saveImageTrigger");
 
-  saveImageTrigger.addEventListener("click", () => {
-    const node = document.getElementById("pages");
-    const s = surahSelect.value;
-    const a = ayahSelect.value;
-    const surahName = surahList[s][0].replace(/[^a-zA-Z0-9]/g, "-");
-    const filename = `${surahName}-${a}.png`;
+  saveImageTrigger.addEventListener("click", async () => {
+  const node = document.getElementById("pages");
+  const s = surahSelect.value;
+  const a = ayahSelect.value;
+  const surahName = surahList[s][0].replace(/[^a-zA-Z0-9]/g, "-");
+  const filename = `${surahName}-${a}.png`;
 
-    // Gunakan DPI perangkat
-    const scale = window.devicePixelRatio || 2;
+  // Set scale lebih tinggi untuk hasil tajam
+  const scale = 4; // 💥 4x resolusi layar
 
-    html2canvas(node, {
-      scale: scale,
-      useCORS: true, // jika ada gambar dari URL lain
-      backgroundColor: null // agar background transparan jika ingin
-    }).then(canvas => {
-      canvas.toBlob(blob => {
-        saveAs(blob, filename);
-      }, 'image/png');
-    }).catch(err => {
-      alert("Gagal menyimpan gambar: " + err.message);
-      console.error(err);
-    });
+  html2canvas(node, {
+    scale: scale,
+    useCORS: true,
+    allowTaint: true,
+    backgroundColor: null
+  }).then(canvas => {
+    // Konversi ke blob dengan kualitas maksimum
+    canvas.toBlob(blob => {
+      saveAs(blob, filename);
+    }, 'image/png', 1.0); // 1.0 = kualitas PNG penuh
+  }).catch(err => {
+    alert("❌ Gagal menyimpan gambar: " + err.message);
+    console.error(err);
   });
+});
+
 
 
 
