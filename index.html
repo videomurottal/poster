@@ -624,6 +624,48 @@ button:hover {
 <div id="pages"></div>
 
 <div class="controls">
+
+
+  <label>
+  Opacity Gambar:
+  <input type="range" id="backgroundOpacity" min="0" max="100" value="100">
+</label>
+
+  <!-- Ukuran Font Ayat -->
+<label>
+  Ukuran Ayat:
+  <input type="range" id="quranFontSize" min="18" max="72" value="36">
+</label>
+  
+<label>
+  Ukuran Terjemah:
+  <input type="range" id="translationFontSize" min="10" max="48" value="20">
+</label>
+
+<!-- Ukuran Font Info Surah -->
+<label>
+  Ukuran Info Surah:
+  <input type="range" id="infoFontSize" min="10" max="32" value="16">
+</label>
+
+  <!-- Jarak Kata Quran -->
+<label>
+  Jarak Kata Quran:
+  <input type="range" id="quranWordSpacing" min="0" max="1" step="0.05" value="0.1">
+</label>
+
+<!-- Jarak Kata Terjemah -->
+<label>
+  Jarak Kata Terjemah:
+  <input type="range" id="translationWordSpacing" min="0" max="1" step="0.05" value="0.2">
+</label>
+
+    <div class="button-wrapper">
+  <button id="saveImageTrigger">Download Poster</button>
+</div>
+
+
+  
   <!-- Dropdown Background -->
   <label><select id="backgroundSelect">
       <option value="https://images.pexels.com/photos/6068385/pexels-photo-6068385.jpeg">Wallpaper 1</option>
@@ -637,11 +679,6 @@ button:hover {
   <div class="button-wrapper">
   <button id="pexelsButton">Background Pexels</button>
 </div>
-
-  <label>
-  Opacity Gambar:
-  <input type="range" id="backgroundOpacity" min="0" max="100" value="100">
-</label>
 
 
 <!-- Warna Background -->
@@ -669,10 +706,6 @@ button:hover {
     <input type="url" id="backgroundUrl" placeholder="Pastekan https://" style="width: 100%;">
   </label>
   <button id="applyUrlButton" class="button">OK</button>
-</div>
-
-  <div class="button-wrapper">
-  <button id="saveImageTrigger">Download Poster</button>
 </div>
 
 <label>
@@ -704,39 +737,6 @@ button:hover {
   </select>
   <button id="applyFontBtn" class="button" type="button">Terapkan</button>
 </div>
-
-
-  
-
-
-<!-- Ukuran Font Ayat -->
-<label>
-  Ukuran Ayat:
-  <input type="range" id="quranFontSize" min="18" max="72" value="36">
-</label>
-  
-<label>
-  Ukuran Terjemah:
-  <input type="range" id="translationFontSize" min="10" max="48" value="20">
-</label>
-
-<!-- Ukuran Font Info Surah -->
-<label>
-  Ukuran Info Surah:
-  <input type="range" id="infoFontSize" min="10" max="32" value="16">
-</label>
-
-  <!-- Jarak Kata Quran -->
-<label>
-  Jarak Kata Quran:
-  <input type="range" id="quranWordSpacing" min="0" max="1" step="0.05" value="0.1">
-</label>
-
-<!-- Jarak Kata Terjemah -->
-<label>
-  Jarak Kata Terjemah:
-  <input type="range" id="translationWordSpacing" min="0" max="1" step="0.05" value="0.2">
-</label>
 
 
   <!-- 📲 Tombol Install PWA -->
