@@ -1,4 +1,4 @@
-const CACHE_NAME = 'poster-quran-v2'; // 🔥 Ganti versi biar refresh
+const CACHE_NAME = 'poster-quran-v3'; // 🔥 Ganti versi biar refresh
 const urlsToCache = [
   '/',
   '/index.html',
