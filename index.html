@@ -692,19 +692,14 @@ button:hover {
 <div class="button-wrapper">
   <button id="toggleColorPanel" class="button" type="button">Warna Elemen</button>
 </div>
-
 <div id="colorPanel" style="display: none; flex-direction: column; gap: 0.5em; margin-top: 0.5em;">
-  <label for="colorTargetSelect">Pilih Target:</label>
   <select id="colorTargetSelect">
     <option value="quran-text">Warna Ayat</option>
     <option value="translation">Warna Terjemah</option>
     <option value="surah-info">Warna Info Surah</option>
   </select>
-  
-  <label for="colorPicker">Pilih Warna:</label>
   <input type="color" id="colorPicker" value="#e83fb0">
 </div>
-
 <script>
   const toggleColorPanelBtn = document.getElementById('toggleColorPanel');
   const colorPanel = document.getElementById('colorPanel');
@@ -728,11 +723,9 @@ button:hover {
 <div class="button-wrapper">
   <button id="toggleBackgroundPicker" class="button" type="button">Warna Background</button>
 </div>
-
 <div id="backgroundPickerPanel" style="display: none; margin-top: 0.5em;">
   <input type="color" id="backgroundColorPicker" value="#23eb55">
 </div>
-
 <script>
   const toggleBackgroundPickerBtn = document.getElementById('toggleBackgroundPicker');
   const backgroundPickerPanel = document.getElementById('backgroundPickerPanel');
