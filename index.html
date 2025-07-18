@@ -667,7 +667,7 @@ button:hover {
 </div>
 
   <div class="button-wrapper">
-  <button id="saveImageTrigger">Download Gambar</button>
+  <button id="saveImageTrigger">Download Poster</button>
 </div>
 
 <label>
@@ -1129,29 +1129,50 @@ updateAyahDropdown(false).then(() => {
 
   saveImageTrigger.addEventListener("click", async () => {
   const node = document.getElementById("pages");
+  const bgUrl = getComputedStyle(node).getPropertyValue('--bg-image').replace(/url\(["']?|["']?\)/g, "");
   const s = surahSelect.value;
   const a = ayahSelect.value;
   const surahName = surahList[s][0].replace(/[^a-zA-Z0-9]/g, "-");
-  const filename = `${surahName}-${a}.png`;
+  const filename = `${surahName}-${a}-HD.png`;
 
-  // Set scale lebih tinggi untuk hasil tajam
-  const scale = 4; // 💥 4x resolusi layar
+  try {
+    // Fetch background image asli
+    const bgResponse = await fetch(bgUrl, { mode: 'cors' });
+    const blob = await bgResponse.blob();
+    const img = await createImageBitmap(blob);
 
-  html2canvas(node, {
-    scale: scale,
-    useCORS: true,
-    allowTaint: true,
-    backgroundColor: null
-  }).then(canvas => {
-    // Konversi ke blob dengan kualitas maksimum
+    // Buat canvas sesuai ukuran gambar asli
+    const canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext("2d");
+
+    // Gambar background asli
+    ctx.drawImage(img, 0, 0);
+
+    // Hitung skala text & overlay (supaya pas di ukuran besar)
+    const scaleFactor = img.width / node.offsetWidth;
+
+    // Render text Quran & terjemah dengan html2canvas (tapi tanpa background)
+    await html2canvas(node, {
+      scale: scaleFactor,
+      backgroundColor: null,
+      useCORS: true,
+      allowTaint: true
+    }).then(overlayCanvas => {
+      ctx.drawImage(overlayCanvas, 0, 0);
+    });
+
+    // Export dengan kualitas penuh
     canvas.toBlob(blob => {
       saveAs(blob, filename);
-    }, 'image/png', 1.0); // 1.0 = kualitas PNG penuh
-  }).catch(err => {
-    alert("❌ Gagal menyimpan gambar: " + err.message);
+    }, 'image/png', 1.0);
+  } catch (err) {
+    alert("❌ Gagal menyimpan gambar kualitas penuh: " + err.message);
     console.error(err);
-  });
+  }
 });
+
 
 
 
