@@ -763,7 +763,7 @@ button:hover {
     <input type="text" id="pexelsKeyword" placeholder="Masukkan kata kunci gambar..." style="width: 100%; margin-bottom: 10px;">
 
     <!-- 🚀 Tombol Terapkan -->
-    <button id="applyPexelsBtn" style="width: 100%;">Terapkan Background</button>
+    <button id="applyPexelsBtn" style="width: 100%;">Cari Background</button>
 
     <!-- 📋 Preview Gambar -->
     <div id="pexelsPreview" style="margin-top: 15px; max-height: 300px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px;"></div>
@@ -1660,24 +1660,15 @@ applyPexelsBtn.addEventListener("click", async () => {
 });
 
 // Fungsi yang sudah ada untuk apply background
-function applyPexelsBackground() {
-  const keyword = document.getElementById("pexelsKeyword").value.trim();
-  if (keyword !== "") {
-    // Panggil fungsi pencarian atau apapun yang kamu pakai
-    searchPexelsImage(keyword);
-  }
-}
+const pexelsInput = document.getElementById("pexelsKeyword");
 
-// Tombol apply background
-document.getElementById("applyPexelsBtn").addEventListener("click", applyPexelsBackground);
-
-// 🔥 Tambahkan event listener untuk Enter di input
-document.getElementById("pexelsKeyword").addEventListener("keypress", function (e) {
+pexelsInput.addEventListener("keydown", function (e) {
   if (e.key === "Enter") {
-    e.preventDefault(); // ⬅️ supaya tidak reload form
-    applyPexelsBackground();
+    e.preventDefault(); // ⬅️ Hentikan submit form default
+    document.getElementById("applyPexelsBtn").click(); // Simulasikan klik
   }
 });
+
 </script>
 
   
