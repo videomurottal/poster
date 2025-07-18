@@ -660,26 +660,24 @@ button:hover {
 </label>
 
 
+
   <!-- 🎨 Pilihan Warna Background -->
-<div style="display: flex; flex-direction: column; gap: 0.5em; margin-top: 0.5em;">
-  <label for="backgroundColorPicker">Warna Background:</label>
+  <div class="button-wrapper">
+  <button id="backgroundColorPicker" class="button">Warna Background</button>
   <input type="color" id="backgroundColorPicker" value="#23eb55">
-  <button id="applyBackgroundColorBtn" class="button" type="button">Terapkan</button>
 </div>
   
   
 <!-- Warna Ayat, Terjemah dan Info Surah -->
   <!-- 🎨 Pilihan Warna -->
-<div style="display: flex; flex-direction: column; gap: 0.5em; margin-top: 0.5em;">
-  <label for="colorTarget">Warna Elemen:</label>
-  <select id="colorTarget">
+  <div class="button-wrapper">
+  <button id="colorTarget" class="button">Warna Elemen</button>
+    <select id="colorTarget">
     <option value="quran-text">Warna Ayat</option>
     <option value="translation">Warna Terjemah</option>
     <option value="surah-info">Warna Info Surah</option>
   </select>
-  <label for="colorPicker">Pilih Warna:</label>
   <input type="color" id="colorPicker" value="#e83fb0">
-  <button id="applyColorBtn" class="button" type="button">Terapkan</button>
 </div>
 
   <!-- Pilihan Font Terjemah -->
