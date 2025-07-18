@@ -662,23 +662,32 @@ button:hover {
 
 
   <!-- 🎨 Pilihan Warna Background -->
-  <div class="button-wrapper">
-  <button id="backgroundColorPicker" class="button">Warna Background</button>
-  <input type="color" id="backgroundColorPicker" value="#23eb55">
+<div class="button-wrapper">
+  <button id="toggleBackgroundColorBtn" class="button">Warna Background</button>
+  <div id="backgroundColorWrapper" style="display: none; margin-top: 0.5em;">
+    <input type="color" id="backgroundColorPicker" value="#23eb55">
+    <button id="applyBackgroundColorBtn" class="button" type="button">Terapkan</button>
+  </div>
 </div>
   
   
-<!-- Warna Ayat, Terjemah dan Info Surah -->
-  <!-- 🎨 Pilihan Warna -->
-  <div class="button-wrapper">
-  <button id="colorTarget" class="button">Warna Elemen</button>
-    <select id="colorTarget">
+<!-- 🎨 Pilihan Warna Elemen -->
+<div class="button-wrapper">
+  <button id="toggleColorPanel" class="button" type="button">Warna Elemen</button>
+</div>
+
+<div id="colorPanel" style="display: none; flex-direction: column; gap: 0.5em; margin-top: 0.5em;">
+  <label for="colorTargetSelect">Pilih Target Warna:</label>
+  <select id="colorTargetSelect">
     <option value="quran-text">Warna Ayat</option>
     <option value="translation">Warna Terjemah</option>
     <option value="surah-info">Warna Info Surah</option>
   </select>
+  
+  <label for="colorPicker">Pilih Warna:</label>
   <input type="color" id="colorPicker" value="#e83fb0">
 </div>
+
 
   <!-- Pilihan Font Terjemah -->
 <div class="button-wrapper">
@@ -1715,6 +1724,41 @@ pexelsInput.addEventListener("keydown", function (e) {
 });
 </script>
 
+<script>
+  const toggleBgBtn = document.getElementById('toggleBackgroundColorBtn');
+  const bgWrapper = document.getElementById('backgroundColorWrapper');
+  const applyBgBtn = document.getElementById('applyBackgroundColorBtn');
+  const bgPicker = document.getElementById('backgroundColorPicker');
+
+  toggleBgBtn.addEventListener('click', () => {
+    // Toggle tampil/sembunyi
+    bgWrapper.style.display = (bgWrapper.style.display === 'none') ? 'block' : 'none';
+  });
+
+  applyBgBtn.addEventListener('click', () => {
+    // Terapkan warna ke body
+    document.body.style.backgroundColor = bgPicker.value;
+  });
+</script>
+
+  <script>
+  const toggleColorPanelBtn = document.getElementById('toggleColorPanel');
+  const colorPanel = document.getElementById('colorPanel');
+  const applyColorBtn = document.getElementById('applyColorBtn');
+  const colorPicker = document.getElementById('colorPicker');
+  const colorTargetSelect = document.getElementById('colorTargetSelect');
+
+  toggleColorPanelBtn.addEventListener('click', () => {
+    colorPanel.style.display = (colorPanel.style.display === 'none') ? 'flex' : 'none';
+  });
+
+  applyColorBtn.addEventListener('click', () => {
+    const targetClass = colorTargetSelect.value;
+    const color = colorPicker.value;
+    document.querySelectorAll(`.${targetClass}`).forEach(el => {
+      el.style.color = color;
+    });
+</script>
   
 </body>
 </html>
