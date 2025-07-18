@@ -60,16 +60,16 @@ h2 {
 
 .pexels-close {
   position: absolute;
-  top: 10px;          /* ⬅️ sedikit turun biar nggak nempel ke tepi */
-  right: 10px;        /* ⬅️ lebih ke pojok kanan */
-  border-radius: 50%; /* ⬅️ kecilkan ke bulat */
-  background: #f87171; /* ⬅️ merah lembut untuk close button */
-  color: white;       /* ⬅️ putih untuk icon ❌ */
+  top: 2px;         
+  right: 22px;
+  border-radius: 0; /* hapus bulat */
+  background: none; /* ✅ hapus background biru */
+  color: #fff;   /* merah untuk ❌ */
   font-size: 1.2rem;
   border: none;     
-  width: 32px;        /* ⬅️ ukuran tombol close lebih kecil */
-  height: 32px;
-  line-height: 32px;
+  width: auto;      /* biarkan auto */
+  height: auto;     
+  line-height: normal;
   text-align: center;
   cursor: pointer;
 }
@@ -1656,6 +1656,26 @@ applyPexelsBtn.addEventListener("click", async () => {
   } catch (e) {
     console.error(e);
     pexelsPreview.innerHTML = "<p style='color:red;'>Gagal memuat gambar dari Pexels.</p>";
+  }
+});
+
+// Fungsi yang sudah ada untuk apply background
+function applyPexelsBackground() {
+  const keyword = document.getElementById("pexelsKeyword").value.trim();
+  if (keyword !== "") {
+    // Panggil fungsi pencarian atau apapun yang kamu pakai
+    searchPexelsImage(keyword);
+  }
+}
+
+// Tombol apply background
+document.getElementById("applyPexelsBtn").addEventListener("click", applyPexelsBackground);
+
+// 🔥 Tambahkan event listener untuk Enter di input
+document.getElementById("pexelsKeyword").addEventListener("keypress", function (e) {
+  if (e.key === "Enter") {
+    e.preventDefault(); // ⬅️ supaya tidak reload form
+    applyPexelsBackground();
   }
 });
 </script>
