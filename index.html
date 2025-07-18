@@ -660,55 +660,7 @@ button:hover {
   <input type="range" id="translationWordSpacing" min="0" max="1" step="0.05" value="0.2">
 </label>
 
-    <div class="button-wrapper">
-  <button id="saveImageTrigger">Download Poster</button>
-</div>
-
-
-  
-  <!-- Dropdown Background -->
-  <label><select id="backgroundSelect">
-      <option value="https://images.pexels.com/photos/6068385/pexels-photo-6068385.jpeg">Wallpaper 1</option>
-      <option value="https://images.pexels.com/photos/673020/pexels-photo-673020.jpeg">Wallpaper 2</option>
-    <option value="https://images.pexels.com/photos/10257141/pexels-photo-10257141.jpeg">Wallpaper 3</option>
-    <option value="https://images.pexels.com/photos/13922651/pexels-photo-13922651.jpeg">Wallpaper 4</option>
-    </select>
-  </label>
-
-
-  <div class="button-wrapper">
-  <button id="pexelsButton">Background Pexels</button>
-</div>
-
-
-<!-- Warna Background -->
-<label>
-  <input type="color" id="backgroundColorPicker" value="#23eb55">
-</label>
-
-  <!-- Upload File -->
-  <div class="button-wrapper">
-  <button id="uploadTrigger">Background Upload</button>
-  <input type="file" id="backgroundUpload" accept="image/*" style="display: none;">
-</div>
-
-  <!-- Input URL di awal -->
-  <div class="button-wrapper">
-  <button id="showUrlInput" class="button">Background Link</button>
-</div>
-
-  
-
-
-<div id="urlInputWrapper" style="display:none; flex-direction: column; gap: 0.5em;">
   <label>
-    <span style="font-size: 0.9em;">Masukkan URL Gambar:</span>
-    <input type="url" id="backgroundUrl" placeholder="Pastekan https://" style="width: 100%;">
-  </label>
-  <button id="applyUrlButton" class="button">OK</button>
-</div>
-
-<label>
   <select id="colorTarget">
     <option value="quran-text">Warna Ayat</option>
     <option value="translation">Warna Terjemah</option>
@@ -716,13 +668,7 @@ button:hover {
   </select>
 </label>
 
-<label>
-  <input type="color" id="colorPicker" value="#e83fb0">
-</label>
-
-
-
-<!-- Pilihan Font Terjemah -->
+  <!-- Pilihan Font Terjemah -->
 <div class="button-wrapper">
   <button id="showFontSelectBtn" class="button" type="button">Font Terjemah</button>
 </div>
@@ -737,6 +683,51 @@ button:hover {
   </select>
   <button id="applyFontBtn" class="button" type="button">Terapkan</button>
 </div>
+
+    <div class="button-wrapper">
+  <button id="saveImageTrigger">Download Poster</button>
+</div>
+
+  <div class="button-wrapper">
+  <button id="pexelsButton">Background Pexels</button>
+</div>
+
+  <!-- Warna Background -->
+<label>
+  <input type="color" id="backgroundColorPicker" value="#23eb55">
+</label>
+  
+  <!-- Dropdown Background -->
+  <label><select id="backgroundSelect">
+      <option value="https://images.pexels.com/photos/6068385/pexels-photo-6068385.jpeg">Wallpaper 1</option>
+      <option value="https://images.pexels.com/photos/673020/pexels-photo-673020.jpeg">Wallpaper 2</option>
+    <option value="https://images.pexels.com/photos/10257141/pexels-photo-10257141.jpeg">Wallpaper 3</option>
+    <option value="https://images.pexels.com/photos/13922651/pexels-photo-13922651.jpeg">Wallpaper 4</option>
+    </select>
+  </label>
+
+  <!-- Upload File -->
+  <div class="button-wrapper">
+  <button id="uploadTrigger">Background Upload</button>
+  <input type="file" id="backgroundUpload" accept="image/*" style="display: none;">
+</div>
+
+  <!-- Input URL di awal -->
+  <div class="button-wrapper">
+  <button id="showUrlInput" class="button">Background Link</button>
+</div>
+
+<div id="urlInputWrapper" style="display:none; flex-direction: column; gap: 0.5em;">
+  <label>
+    <span style="font-size: 0.9em;">Masukkan URL Gambar:</span>
+    <input type="url" id="backgroundUrl" placeholder="Pastekan https://" style="width: 100%;">
+  </label>
+  <button id="applyUrlButton" class="button">OK</button>
+</div>
+
+<label>
+  <input type="color" id="colorPicker" value="#e83fb0">
+</label>
 
 
   <!-- 📲 Tombol Install PWA -->
