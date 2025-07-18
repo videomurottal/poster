@@ -29,6 +29,59 @@ h2 {
 }
 
 
+
+/* Modal styling */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.6);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 700px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.results-grid img {
+  width: 100%;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.results-grid img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+    
+
 #pages::before {
   content: "";
   position: absolute;
@@ -543,14 +596,21 @@ button:hover {
 <div id="pages"></div>
 
 <div class="controls">
-  <!-- Dropdown Background -->
-  <label><select id="backgroundSelect">
-      <option value="https://images.pexels.com/photos/6068385/pexels-photo-6068385.jpeg">Wallpaper 1</option>
-      <option value="https://images.pexels.com/photos/673020/pexels-photo-673020.jpeg">Wallpaper 2</option>
-    <option value="https://images.pexels.com/photos/10257141/pexels-photo-10257141.jpeg">Wallpaper 3</option>
-    <option value="https://images.pexels.com/photos/13922651/pexels-photo-13922651.jpeg">Wallpaper 4</option>
-    </select>
-  </label>
+  <!-- Tombol Pexels -->
+  <button id="openPexelsModal">Cari Gambar Pexels</button>
+</div>
+
+<!-- 🔥 Modal Pexels -->
+<div id="pexelsModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Cari Wallpaper di Pexels</h2>
+    <input type="text" id="pexelsSearch" placeholder="Contoh: Quran, Nature, Masjid">
+    <button id="searchPexelsBtn">Cari</button>
+    <div id="pexelsResults" class="results-grid"></div>
+    <button id="applyPexelsBtn" style="display:none;">Terapkan</button>
+  </div>
+</div>
 
 
   <label>
@@ -1504,6 +1564,64 @@ backgroundOpacitySlider.addEventListener("input", () => {
         .catch(err => console.warn('❌ Service Worker gagal:', err));
     });
   }
+</script>
+
+
+<script>
+const PEXELS_API_KEY = 'JWCdnIm4kz6dUqxfFCfJ0SxgpbFZ87W1j09e0bXShM1MvlFd7sZjpfxx';
+let selectedPexelsImage = "";
+
+const modal = document.getElementById("pexelsModal");
+const openModalBtn = document.getElementById("openPexelsModal");
+const closeModal = document.querySelector(".close");
+const searchBtn = document.getElementById("searchPexelsBtn");
+const applyBtn = document.getElementById("applyPexelsBtn");
+const resultsGrid = document.getElementById("pexelsResults");
+
+openModalBtn.onclick = () => modal.style.display = "block";
+closeModal.onclick = () => modal.style.display = "none";
+window.onclick = e => { if (e.target === modal) modal.style.display = "none"; };
+
+searchBtn.addEventListener("click", async () => {
+  const query = document.getElementById("pexelsSearch").value.trim();
+  if (!query) return alert("Masukkan kata kunci!");
+
+  resultsGrid.innerHTML = "⏳ Memuat...";
+  applyBtn.style.display = "none";
+  selectedPexelsImage = "";
+
+  try {
+    const res = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=15`, {
+      headers: { Authorization: PEXELS_API_KEY }
+    });
+    const data = await res.json();
+
+    resultsGrid.innerHTML = "";
+    data.photos.forEach(photo => {
+      const img = document.createElement("img");
+      img.src = photo.src.medium;
+      img.title = "Klik untuk pilih";
+      img.onclick = () => {
+        document.querySelectorAll(".results-grid img").forEach(i => i.style.border = "none");
+        img.style.border = "3px solid #007BFF";
+        selectedPexelsImage = photo.src.large2x;
+        applyBtn.style.display = "inline-block";
+      };
+      resultsGrid.appendChild(img);
+    });
+  } catch (err) {
+    console.error(err);
+    resultsGrid.innerHTML = "❌ Gagal memuat gambar.";
+  }
+});
+
+applyBtn.addEventListener("click", () => {
+  if (selectedPexelsImage) {
+    pagesContainer.style.setProperty('--bg-image', `url('${selectedPexelsImage}')`);
+    saveHistory();
+    modal.style.display = "none";
+  }
+});  
 </script>
 
   
