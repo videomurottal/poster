@@ -1721,37 +1721,26 @@ pexelsInput.addEventListener("keydown", function (e) {
 </script>
 
 
-  <script>
-  // === Toggle Panel Warna Elemen ===
-  const toggleColorPanelBtn = document.getElementById('toggleColorPanel');
-  const colorPanel = document.getElementById('colorPanel');
-  const colorTargetSelect = document.getElementById('colorTargetSelect');
-  const colorPicker = document.getElementById('colorPicker');
+<script>
+// Toggle Warna Background
+const toggleBackgroundBtn = document.getElementById("toggleBackgroundPicker");
+const backgroundPickerPanel = document.getElementById("backgroundPickerPanel");
 
-  toggleColorPanelBtn.addEventListener('click', () => {
-    colorPanel.style.display = (colorPanel.style.display === 'none' || colorPanel.style.display === '') ? 'flex' : 'none';
-  });
+toggleBackgroundBtn.addEventListener("click", () => {
+  const isVisible = backgroundPickerPanel.style.display === "flex";
+  backgroundPickerPanel.style.display = isVisible ? "none" : "flex";
+});
 
-  colorPicker.addEventListener('input', (e) => {
-    const targetClass = colorTargetSelect.value;
-    document.querySelectorAll(`.${targetClass}`).forEach(el => {
-      el.style.color = e.target.value;
-    });
-  });
+// Toggle Warna Elemen
+const toggleColorBtn = document.getElementById("toggleColorPanel");
+const colorPanel = document.getElementById("colorPanel");
 
-  // === Toggle Panel Warna Background ===
-  const toggleBackgroundPickerBtn = document.getElementById('toggleBackgroundPicker');
-  const backgroundPickerPanel = document.getElementById('backgroundPickerPanel');
-  const backgroundColorPicker = document.getElementById('backgroundColorPicker');
-
-  toggleBackgroundPickerBtn.addEventListener('click', () => {
-    backgroundPickerPanel.style.display = (backgroundPickerPanel.style.display === 'none' || backgroundPickerPanel.style.display === '') ? 'block' : 'none';
-  });
-
-  backgroundColorPicker.addEventListener('input', (e) => {
-    document.body.style.backgroundColor = e.target.value;
-  });
+toggleColorBtn.addEventListener("click", () => {
+  const isVisible = colorPanel.style.display === "flex";
+  colorPanel.style.display = isVisible ? "none" : "flex";
+});
 </script>
+
 
   
 
