@@ -691,9 +691,25 @@ button:hover {
 <div class="button-wrapper">
   <button id="toggleBackgroundPicker" class="button" type="button">Warna Background</button>
 </div>
+
 <div id="backgroundPickerPanel" style="display: none; margin-top: 0.5em;">
   <input type="color" id="backgroundColorPicker" value="#23eb55">
 </div>
+
+<script>
+  const toggleBackgroundPickerBtn = document.getElementById('toggleBackgroundPicker');
+  const backgroundPickerPanel = document.getElementById('backgroundPickerPanel');
+  const backgroundColorPicker = document.getElementById('backgroundColorPicker');
+
+  toggleBackgroundPickerBtn.addEventListener('click', () => {
+    backgroundPickerPanel.style.display = (backgroundPickerPanel.style.display === 'none') ? 'block' : 'none';
+  });
+
+  backgroundColorPicker.addEventListener('input', (e) => {
+    document.body.style.backgroundColor = e.target.value;
+  });
+</script>
+
 
   
   
@@ -701,6 +717,7 @@ button:hover {
 <div class="button-wrapper">
   <button id="toggleColorPanel" class="button" type="button">Warna Elemen</button>
 </div>
+
 <div id="colorPanel" style="display: none; flex-direction: column; gap: 0.5em; margin-top: 0.5em;">
   <label for="colorTargetSelect">Pilih Target:</label>
   <select id="colorTargetSelect">
@@ -708,9 +725,29 @@ button:hover {
     <option value="translation">Warna Terjemah</option>
     <option value="surah-info">Warna Info Surah</option>
   </select>
+  
   <label for="colorPicker">Pilih Warna:</label>
   <input type="color" id="colorPicker" value="#e83fb0">
 </div>
+
+<script>
+  const toggleColorPanelBtn = document.getElementById('toggleColorPanel');
+  const colorPanel = document.getElementById('colorPanel');
+  const colorTargetSelect = document.getElementById('colorTargetSelect');
+  const colorPicker = document.getElementById('colorPicker');
+
+  toggleColorPanelBtn.addEventListener('click', () => {
+    colorPanel.style.display = (colorPanel.style.display === 'none') ? 'flex' : 'none';
+  });
+
+  colorPicker.addEventListener('input', (e) => {
+    const targetClass = colorTargetSelect.value;
+    document.querySelectorAll(`.${targetClass}`).forEach(el => {
+      el.style.color = e.target.value;
+    });
+  });
+</script>
+
 
 
   
@@ -1724,36 +1761,6 @@ pexelsInput.addEventListener("keydown", function (e) {
 </script>
 
 
-<script>
-  const toggleBackgroundPickerBtn = document.getElementById('toggleBackgroundPicker');
-  const backgroundPickerPanel = document.getElementById('backgroundPickerPanel');
-  const backgroundColorPicker = document.getElementById('backgroundColorPicker');
-
-  toggleBackgroundPickerBtn.addEventListener('click', () => {
-    backgroundPickerPanel.style.display = (backgroundPickerPanel.style.display === 'none') ? 'block' : 'none';
-  });
-
-  backgroundColorPicker.addEventListener('input', (e) => {
-    document.body.style.backgroundColor = e.target.value;
-  });
-</script>
-<script>
-  const toggleColorPanelBtn = document.getElementById('toggleColorPanel');
-  const colorPanel = document.getElementById('colorPanel');
-  const colorTargetSelect = document.getElementById('colorTargetSelect');
-  const colorPicker = document.getElementById('colorPicker');
-
-  toggleColorPanelBtn.addEventListener('click', () => {
-    colorPanel.style.display = (colorPanel.style.display === 'none') ? 'flex' : 'none';
-  });
-
-  colorPicker.addEventListener('input', (e) => {
-    const targetClass = colorTargetSelect.value;
-    document.querySelectorAll(`.${targetClass}`).forEach(el => {
-      el.style.color = e.target.value;
-    });
-  });
-</script>
   
 </body>
 </html>
