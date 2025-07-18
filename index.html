@@ -1722,13 +1722,14 @@ pexelsInput.addEventListener("keydown", function (e) {
 
 
   <script>
+  // === Toggle Panel Warna Elemen ===
   const toggleColorPanelBtn = document.getElementById('toggleColorPanel');
   const colorPanel = document.getElementById('colorPanel');
   const colorTargetSelect = document.getElementById('colorTargetSelect');
   const colorPicker = document.getElementById('colorPicker');
 
   toggleColorPanelBtn.addEventListener('click', () => {
-    colorPanel.style.display = (colorPanel.style.display === 'none') ? 'flex' : 'none';
+    colorPanel.style.display = (colorPanel.style.display === 'none' || colorPanel.style.display === '') ? 'flex' : 'none';
   });
 
   colorPicker.addEventListener('input', (e) => {
@@ -1737,21 +1738,21 @@ pexelsInput.addEventListener("keydown", function (e) {
       el.style.color = e.target.value;
     });
   });
-</script>
 
-<script>
+  // === Toggle Panel Warna Background ===
   const toggleBackgroundPickerBtn = document.getElementById('toggleBackgroundPicker');
   const backgroundPickerPanel = document.getElementById('backgroundPickerPanel');
   const backgroundColorPicker = document.getElementById('backgroundColorPicker');
 
   toggleBackgroundPickerBtn.addEventListener('click', () => {
-    backgroundPickerPanel.style.display = (backgroundPickerPanel.style.display === 'none') ? 'block' : 'none';
+    backgroundPickerPanel.style.display = (backgroundPickerPanel.style.display === 'none' || backgroundPickerPanel.style.display === '') ? 'block' : 'none';
   });
 
   backgroundColorPicker.addEventListener('input', (e) => {
     document.body.style.backgroundColor = e.target.value;
   });
 </script>
+
   
 
 </body>
