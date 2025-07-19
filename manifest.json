@@ -8,12 +8,12 @@
   "description": "Aplikasi Poster Ayat Quran interaktif & cantik",
   "icons": [
     {
-      "src": "https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/iconposter.png",
+      "src": "https://raw.githubusercontent.com/videomurottal/poster/refs/heads/main/iconposter.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/iconposter.png",
+      "src": "https://raw.githubusercontent.com/videomurottal/poster/refs/heads/main/iconposter.png",
       "sizes": "512x512",
       "type": "image/png"
     }
