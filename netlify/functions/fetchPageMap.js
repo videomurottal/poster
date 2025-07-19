@@ -4,7 +4,7 @@ export async function handler(event, context) {
   const token = process.env.TOKEN_POSTER;
 
   const githubApiUrl =
-    'https://api.github.com/repos/tafsirnetlifyapp/qurantext/contents/pages.json?ref=refs/heads/main';
+    'https://api.github.com/repos/videomurottal/srt/contents/pages.json?ref=refs/heads/main';
 
   try {
     const response = await fetch(githubApiUrl, {
