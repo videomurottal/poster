@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#fefcf8">
   
 <link rel="icon" href="./icon-192.png" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/tafsirnetlifyapp/poster/refs/heads/main/iconposter.png">
+<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/videomurottal/poster/refs/heads/main/iconposter.png">
 
   
   <meta charset="UTF-8">
@@ -676,9 +676,9 @@ button:hover {
   <div id="fontSelectWrapper" style="display: none; flex-direction: column; gap: 0.5em; margin-top: 0.5em;">
   <select id="translationFontSelect">
     <option value="https://raw.githubusercontent.com/githubnext/monaspace/main/fonts/webfonts/MonaspaceNeon-BoldItalic.woff2">Monaspace Neon</option>
-    <option value="https://raw.githubusercontent.com/tafsirnetlifyapp/poster/main/fonts/Anton-Regular.ttf">Anton</option>
-    <option value="https://raw.githubusercontent.com/tafsirnetlifyapp/poster/main/fonts/BebasNeue-Regular.ttf">Bebas Neue</option>
-    <option value="https://raw.githubusercontent.com/tafsirnetlifyapp/poster/main/fonts/Castoro-Regular.ttf">Castoro</option>
+    <option value="https://raw.githubusercontent.com/videomurottal/poster/main/fonts/Anton-Regular.ttf">Anton</option>
+    <option value="https://raw.githubusercontent.com/videomurottal/poster/main/fonts/BebasNeue-Regular.ttf">Bebas Neue</option>
+    <option value="https://raw.githubusercontent.com/videomurottal/poster/main/fonts/Castoro-Regular.ttf">Castoro</option>
   </select>
   <button id="applyFontBtn" class="button" type="button">Terapkan</button>
 </div>
@@ -982,8 +982,8 @@ async function loadAyat() {
       : `QCF2${String(page).padStart(3, '0')}`;
 
     const fontUrl = currentVersion === 'v1'
-      ? `https://cdn.jsdelivr.net/gh/dickymiswardi/quran/fonts/${fontName}.TTF`
-      : `https://cdn.jsdelivr.net/gh/tafsirnetlifyapp/quran@refs/heads/main/fontsglyphvs/${fontName}.ttf`;
+      ? `https://cdn.jsdelivr.net/gh/videomurottal/tadabbur/fonts/${fontName}.TTF`
+      : `https://cdn.jsdelivr.net/gh/videomurottal/tadabbur@refs/heads/main/fontsglyphvs/${fontName}.ttf`;
 
     const apiField = currentVersion === "v1" ? "code_v1" : "code_v2";
     const data = await fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?words=true&word_fields=${apiField}`).then(r => r.json());
