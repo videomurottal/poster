@@ -42,6 +42,7 @@
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(255,255,255,0.8);
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   z-index: 9999;
@@ -54,12 +55,13 @@
     height: 60px;
     animation: spin 1s linear infinite;">
   </div>
+  <p style="margin-top: 1em;">⏳ Memuat FFmpeg... Harap tunggu</p>
 </div>
 
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.5/dist/ffmpeg.min.js"></script>
-<script async src="https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.5/dist/ffmpeg-core.js"></script>
+<script async src="https://unpkg.com/@ffmpeg/core@0.12.5/dist/ffmpeg-core.js"></script>
 
 <script>
 let ffmpeg;
@@ -74,7 +76,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   fetchFile = FFmpegLib.fetchFile;
   ffmpeg = FFmpegLib.createFFmpeg({
     log: true,
-    corePath: "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.5/dist/ffmpeg-core.js"
+    corePath: "https://unpkg.com/@ffmpeg/core@0.12.5/dist/ffmpeg-core.js"
   });
 
   try {
