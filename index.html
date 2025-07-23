@@ -713,18 +713,6 @@ button:hover {
 </div>
 
 
-  <!-- ✅ Download MP4 (Tombol Baru Paling Bawah) -->
-<div class="button-wrapper">
-  <button class="button" type="button" onclick="toggleMp4Panel()">Download MP4</button>
-</div>
-<div id="mp4Panel" style="display: none; flex-direction: column; gap: 0.5em; margin-top: 0.5em;">
-  <select id="mp4Qari">
-    <option value="Abdul_Basit_Murattal_64kbps">Abdul Bashit Murattal</option>
-    <option value="Abdurrahmaan_As-Sudais_64kbps">Abdurrahmaan As-Sudais</option>
-    <option value="Misyari_Rasyid_Al-Afasy_64kbps">Misyari Rasyid Al-Afasy</option>
-  </select>
-  <button class="button" type="button" onclick="applyMp4()">Terapkan</button>
-</div>
 
 
  <!-- 🎨 Warna Background -->
@@ -1751,8 +1739,18 @@ toggleColorBtn.addEventListener("click", () => {
 });
 </script>
 
-
-
+<!-- ✅ Download MP4 (Tombol Baru Paling Bawah) -->
+<div class="button-wrapper">
+  <button class="button" type="button" onclick="toggleMp4Panel()">Download MP4</button>
+</div>
+<div id="mp4Panel" style="display: none; flex-direction: column; gap: 0.5em; margin-top: 0.5em;">
+  <select id="mp4Qari">
+    <option value="Abdul_Basit_Murattal_64kbps">Abdul Bashit Murattal</option>
+    <option value="Abdurrahmaan_As-Sudais_64kbps">Abdurrahmaan As-Sudais</option>
+    <option value="Misyari_Rasyid_Al-Afasy_64kbps">Misyari Rasyid Al-Afasy</option>
+  </select>
+  <button class="button" type="button" onclick="applyMp4()">Terapkan</button>
+</div>
 
 <!-- 🔥 Loader Overlay Fix -->
 <style>
@@ -1777,6 +1775,12 @@ toggleColorBtn.addEventListener("click", () => {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+#mp4Panel {
+  display: none !important;
+  flex-direction: column;
+  gap: 0.5em;
+  margin-top: 0.5em;
+}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -1787,7 +1791,8 @@ const ffmpeg = createFFmpeg({ log: true });
 
 function toggleMp4Panel() {
   const panel = document.getElementById(\"mp4Panel\");
-  panel.style.display = panel.style.display === \"none\" ? \"flex\" : \"none\";
+  if (!panel) return alert(\"❌ Panel MP4 tidak ditemukan!\");
+  panel.style.display = (panel.style.display === \"flex\") ? \"none\" : \"flex\";
 }
 
 async function applyMp4() {
@@ -1803,7 +1808,6 @@ async function applyMp4() {
     return;
   }
   loader.style.display = \"flex\"; // ✅ Tampilkan loader
-
   document.getElementById(\"mp4Panel\").style.display = \"none\";
 
   try {
