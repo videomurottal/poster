@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Poster Quran Video Maker</title>
-  <!-- html2canvas untuk tangkap HTML jadi gambar -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <!-- script utama -->
   <script type="module" src="script.js"></script>
   <style>
     body {
@@ -46,7 +44,9 @@
     <input id="surah" value="001" placeholder="Surah (e.g. 001)" style="width:80px;">
     <input id="ayah" value="001" placeholder="Ayat (e.g. 001)" style="width:80px;">
     <br>
-    <button onclick="generateVideo()">Download Video WebM</button>
+    <button onclick="generateVideo()">🎞️ Download Video WebM</button>
+    <br>
+    <button onclick="downloadWasm()">⬇️ Download ffmpeg-core.wasm</button>
   </div>
 </body>
 </html>
