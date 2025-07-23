@@ -633,7 +633,7 @@ button:hover {
 
 <div class="controls">
 
-<!-- Download MP4 -->
+  <!-- Download MP4 -->
 <div class="button-wrapper">
   <button class="button" type="button" onclick="toggleMp4Panel()">Download MP4</button>
 </div>
@@ -647,8 +647,6 @@ button:hover {
 </div>
 
 
-
-  
   <label>
   Opacity Gambar:
   <input type="range" id="backgroundOpacity" min="0" max="100" value="100">
@@ -1754,60 +1752,16 @@ toggleColorBtn.addEventListener("click", () => {
 });
 </script>
 
-<!-- ✅ Download MP4 (Tombol Baru Paling Bawah) -->
-<div class="button-wrapper">
-  <button class="button" type="button" onclick="toggleMp4Panel()">Download MP4</button>
-</div>
-<div id="mp4Panel" style="display: none; flex-direction: column; gap: 0.5em; margin-top: 0.5em;">
-  <select id="mp4Qari">
-    <option value="Abdul_Basit_Murattal_64kbps">Abdul Bashit Murattal</option>
-    <option value="Abdurrahmaan_As-Sudais_64kbps">Abdurrahmaan As-Sudais</option>
-    <option value="Misyari_Rasyid_Al-Afasy_64kbps">Misyari Rasyid Al-Afasy</option>
-  </select>
-  <button class="button" type="button" onclick="applyMp4()">Terapkan</button>
-</div>
-
-<!-- 🔥 Loader Overlay Fix -->
-<style>
-#loaderOverlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(255,255,255,0.8);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 999999 !important;
-}
-#loaderOverlay div {
-  border: 8px solid #f3f3f3;
-  border-top: 8px solid #4cafef;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  animation: spin 1s linear infinite;
-}
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-#mp4Panel {
-  display: none !important;
-  flex-direction: column;
-  gap: 0.5em;
-  margin-top: 0.5em;
-}
-</style>
-
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.5/dist/ffmpeg.min.js"></script>
 <script>
 const { createFFmpeg, fetchFile } = FFmpeg;
 const ffmpeg = createFFmpeg({ log: true });
+const loader = document.getElementById("loaderOverlay");
 
 function toggleMp4Panel() {
-  const panel = document.getElementById(\"mp4Panel\");
-  if (!panel) return alert(\"❌ Panel MP4 tidak ditemukan!\");
-  panel.style.display = (panel.style.display === \"flex\") ? \"none\" : \"flex\";
+  const panel = document.getElementById("mp4Panel");
+  panel.style.display = panel.style.display === "none" ? "flex" : "none";
 }
 
 async function applyMp4() {
