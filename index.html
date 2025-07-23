@@ -756,46 +756,45 @@ button:hover {
 
 <!-- 🎥 Tombol Download MP4 -->
 <div class="button-wrapper">
-  <button id="downloadMp4Btn">Download MP4</button>
+  <button id="downloadMp4Button" class="button">Download MP4</button>
 </div>
 
-<!-- 📋 Panel Pilih Qari -->
-<div id="mp4OptionsPanel" style="display: none; margin-top: 10px; margin-bottom: 10px; flex-direction: column; gap: 0.5em;">
+<div id="qariPanel" style="display:none; margin-top: 1em; flex-direction: column; gap: 0.5em;">
   <label for="qariSelect">Pilih Qari:</label>
   <select id="qariSelect" style="width: 100%;">
-  <option value="Abdul_Basit_Murattal_64kbps">Abdul Bashit Murattal</option>
-  <option value="Abdul_Basit_Mujawwad_128kbps">Abdul Bashit Mujawwad</option>
-  <option value="Abdullaah_3awwaad_Al-Juhaynee_128kbps">Abdullaah Awad Al-Juhany</option>
-  <option value="Abdullah_Basfar_64kbps">Abdullah Bashfar</option>
-  <option value="Abdullah_Matroud_128kbps">Abdullah Mathrud</option>
-  <option value="Abdurrahmaan_As-Sudais_64kbps">Abdurrahmaan As-Sudais</option>
-  <option value="Abu_Bakr_Ash-Shaatree_64kbps">Abu Bakar As-Syathiry</option>
-  <option value="Ahmed_Neana_128kbps">Ahmad Nuaina</option>
-  <option value="ahmed_ibn_ali_al_ajamy_128kbps">Ahmad Ali Al-Ajmy</option>
-  <option value="Akram_AlAlaqimy_128kbps">Akram Al-Alaqimy</option>
-  <option value="Husary_64kbps">Al-Husary</option>
-  <option value="Husary_Mujawwad_64kbps">Al-Husary Mujawwad</option>
-  <option value="Minshawy_Mujawwad_64kbps">Al-Minshawy Mujawwad</option>
-  <option value="Hudhaify_64kbps">Ali Al-Hudzaiify</option>
-  <option value="Ali_Jaber_64kbps">Ali Jaber</option>
-  <option value="aziz_alili_128kbps">Aziz Alili</option>
-  <option value="Fares_Abbad_64kbps">Faris Abbad</option>
-  <option value="Hani_Rifai_64kbps">Hani Ar-Rifai</option>
-  <option value="Ibrahim_Akhdar_32kbps">Ibrahim Al-Akhdhar</option>
-  <option value="khalefa_al_tunaiji_64kbps">Khalifah At-Tunaiji</option>
-  <option value="Maher_AlMuaiqly_64kbps">Maher Al-Muaiqily</option>
-  <option value="mahmoud_ali_al_banna_32kbps">Mahmud Ali Al-Banna</option>
-  <option value="Alafasy_64kbps">Misyari Rasyid Al-Afasy</option>
-  <option value="Muhammad_Ayyoub_64kbps">Muhammad Ayyub</option>
-  <option value="Ghamadi_40kbps">Saad Al-Ghamidi</option>
-  <option value="Sahih_Intnl_Ibrahim_Walk_192kbps">Sahih Intnl Ibrahim Walk</option>
-  <option value="Saood_ash-Shuraym_64kbps">Suud As-Syuraim</option>
-  <option value="warsh_Abdul_Basit_128kbps">Warsh Abdul Bashit</option>
-  <option value="warsh_ibrahim_aldosary_128kbps">Warsh Ibrahim Aldosary</option>
-  <option value="warsh_yassin_al_jazaery_64kbps">Warsh Yasin Al-Jazairy</option>
-  <option value="Yasser_Ad-Dussary_128kbps">Yasir Ad-Dausary</option>
+    <option value="Abdul_Basit_Murattal_64kbps">Abdul Bashit Murattal</option>
+    <option value="Abdul_Basit_Mujawwad_128kbps">Abdul Bashit Mujawwad</option>
+    <option value="Abdullaah_3awwaad_Al-Juhaynee_128kbps">Abdullaah Awad Al-Juhany</option>
+    <option value="Abdullah_Basfar_64kbps">Abdullah Bashfar</option>
+    <option value="Abdullah_Matroud_128kbps">Abdullah Mathrud</option>
+    <option value="Abdurrahmaan_As-Sudais_64kbps">Abdurrahmaan As-Sudais</option>
+    <option value="Abu_Bakr_Ash-Shaatree_64kbps">Abu Bakar As-Syathiry</option>
+    <option value="Ahmed_Neana_128kbps">Ahmad Nuaina</option>
+    <option value="ahmed_ibn_ali_al_ajamy_128kbps">Ahmad Ali Al-Ajmy</option>
+    <option value="Akram_AlAlaqimy_128kbps">Akram Al-Alaqimy</option>
+    <option value="Husary_64kbps">Al-Husary</option>
+    <option value="Husary_Mujawwad_64kbps">Al-Husary Mujawwad</option>
+    <option value="Minshawy_Mujawwad_64kbps">Al-Minshawy Mujawwad</option>
+    <option value="Hudhaify_64kbps">Ali Al-Hudzaiify</option>
+    <option value="Ali_Jaber_64kbps">Ali Jaber</option>
+    <option value="aziz_alili_128kbps">Aziz Alili</option>
+    <option value="Fares_Abbad_64kbps">Faris Abbad</option>
+    <option value="Hani_Rifai_64kbps">Hani Ar-Rifai</option>
+    <option value="Ibrahim_Akhdar_32kbps">Ibrahim Al-Akhdhar</option>
+    <option value="khalefa_al_tunaiji_64kbps">Khalifah At-Tunaiji</option>
+    <option value="Maher_AlMuaiqly_64kbps">Maher Al-Muaiqily</option>
+    <option value="mahmoud_ali_al_banna_32kbps">Mahmud Ali Al-Banna</option>
+    <option value="Alafasy_64kbps">Misyari Rasyid Al-Afasy</option>
+    <option value="Muhammad_Ayyoub_64kbps">Muhammad Ayyub</option>
+    <option value="Ghamadi_40kbps">Saad Al-Ghamidi</option>
+    <option value="Sahih_Intnl_Ibrahim_Walk_192kbps">Sahih Intnl Ibrahim Walk</option>
+    <option value="Saood_ash-Shuraym_64kbps">Suud As-Syuraim</option>
+    <option value="warsh_Abdul_Basit_128kbps">Warsh Abdul Bashit</option>
+    <option value="warsh_ibrahim_aldosary_128kbps">Warsh Ibrahim Aldosary</option>
+    <option value="warsh_yassin_al_jazaery_64kbps">Warsh Yasin Al-Jazairy</option>
+    <option value="Yasser_Ad-Dussary_128kbps">Yasir Ad-Dausary</option>
   </select>
-  <button id="applyMp4Btn" class="button">Terapkan</button>
+  <button id="applyQariBtn" class="button" type="button">Terapkan</button>
 </div>
   
 </div>
@@ -1856,6 +1855,55 @@ applyMp4Btn.addEventListener("click", async () => {
   }
   hideLoader(); // Hide overlay
 });
+
+
+  const downloadMp4Button = document.getElementById("downloadMp4Button");
+const qariPanel = document.getElementById("qariPanel");
+const applyQariBtn = document.getElementById("applyQariBtn");
+let qariPanelVisible = false;
+
+// Toggle panel saat klik Download MP4
+downloadMp4Button.addEventListener("click", () => {
+  qariPanelVisible = !qariPanelVisible;
+  qariPanel.style.display = qariPanelVisible ? "flex" : "none";
+});
+
+// Klik Terapkan
+applyQariBtn.addEventListener("click", async () => {
+  const selectedQari = document.getElementById("qariSelect").value;
+
+  // Tutup panel dropdown
+  qariPanel.style.display = "none";
+  qariPanelVisible = false;
+
+  // Tampilkan loader overlay
+  showLoader();
+
+  try {
+    // Simulasi proses render MP4
+    await renderPosterToMp4WithAudio(selectedQari);
+    alert("🎉 Video MP4 dengan audio berhasil dibuat!");
+  } catch (err) {
+    console.error(err);
+    alert("❌ Gagal membuat video MP4");
+  } finally {
+    hideLoader();
+  }
+});
+
+// Loader functions
+function showLoader() {
+  document.getElementById("loaderOverlay").style.display = "flex";
+}
+function hideLoader() {
+  document.getElementById("loaderOverlay").style.display = "none";
+}
+
+// Dummy render function
+async function renderPosterToMp4WithAudio(qariId) {
+  console.log("Membuat MP4 untuk qari:", qariId);
+  await new Promise(resolve => setTimeout(resolve, 3000)); // simulasi proses 3 detik
+}
 </script>
 
   
