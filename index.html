@@ -754,8 +754,48 @@ button:hover {
   Instal Poster
 </button>
 
-  <div class="button-wrapper">
+<!-- 🎥 Tombol Download MP4 -->
+<div class="button-wrapper">
   <button id="downloadMp4Btn">Download MP4</button>
+</div>
+
+<!-- 📋 Panel Pilih Qari -->
+<div id="mp4OptionsPanel" style="display: none; margin-top: 10px; margin-bottom: 10px; flex-direction: column; gap: 0.5em;">
+  <label for="qariSelect">Pilih Qari:</label>
+  <select id="qariSelect" style="width: 100%;">
+  <option value="Abdul_Basit_Murattal_64kbps">Abdul Bashit Murattal</option>
+  <option value="Abdul_Basit_Mujawwad_128kbps">Abdul Bashit Mujawwad</option>
+  <option value="Abdullaah_3awwaad_Al-Juhaynee_128kbps">Abdullaah Awad Al-Juhany</option>
+  <option value="Abdullah_Basfar_64kbps">Abdullah Bashfar</option>
+  <option value="Abdullah_Matroud_128kbps">Abdullah Mathrud</option>
+  <option value="Abdurrahmaan_As-Sudais_64kbps">Abdurrahmaan As-Sudais</option>
+  <option value="Abu_Bakr_Ash-Shaatree_64kbps">Abu Bakar As-Syathiry</option>
+  <option value="Ahmed_Neana_128kbps">Ahmad Nuaina</option>
+  <option value="ahmed_ibn_ali_al_ajamy_128kbps">Ahmad Ali Al-Ajmy</option>
+  <option value="Akram_AlAlaqimy_128kbps">Akram Al-Alaqimy</option>
+  <option value="Husary_64kbps">Al-Husary</option>
+  <option value="Husary_Mujawwad_64kbps">Al-Husary Mujawwad</option>
+  <option value="Minshawy_Mujawwad_64kbps">Al-Minshawy Mujawwad</option>
+  <option value="Hudhaify_64kbps">Ali Al-Hudzaiify</option>
+  <option value="Ali_Jaber_64kbps">Ali Jaber</option>
+  <option value="aziz_alili_128kbps">Aziz Alili</option>
+  <option value="Fares_Abbad_64kbps">Faris Abbad</option>
+  <option value="Hani_Rifai_64kbps">Hani Ar-Rifai</option>
+  <option value="Ibrahim_Akhdar_32kbps">Ibrahim Al-Akhdhar</option>
+  <option value="khalefa_al_tunaiji_64kbps">Khalifah At-Tunaiji</option>
+  <option value="Maher_AlMuaiqly_64kbps">Maher Al-Muaiqily</option>
+  <option value="mahmoud_ali_al_banna_32kbps">Mahmud Ali Al-Banna</option>
+  <option value="Alafasy_64kbps">Misyari Rasyid Al-Afasy</option>
+  <option value="Muhammad_Ayyoub_64kbps">Muhammad Ayyub</option>
+  <option value="Ghamadi_40kbps">Saad Al-Ghamidi</option>
+  <option value="Sahih_Intnl_Ibrahim_Walk_192kbps">Sahih Intnl Ibrahim Walk</option>
+  <option value="Saood_ash-Shuraym_64kbps">Suud As-Syuraim</option>
+  <option value="warsh_Abdul_Basit_128kbps">Warsh Abdul Bashit</option>
+  <option value="warsh_ibrahim_aldosary_128kbps">Warsh Ibrahim Aldosary</option>
+  <option value="warsh_yassin_al_jazaery_64kbps">Warsh Yasin Al-Jazairy</option>
+  <option value="Yasser_Ad-Dussary_128kbps">Yasir Ad-Dausary</option>
+  </select>
+  <button id="applyMp4Btn" class="button">Terapkan</button>
 </div>
   
 </div>
@@ -1742,70 +1782,81 @@ toggleColorBtn.addEventListener("click", () => {
 });
 </script>
 
-<!-- 🔥 Loader Overlay -->
-<div id="loaderOverlay" style="
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(255,255,255,0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  display: none;">
-  <div style="
-    border: 8px solid #f3f3f3;
-    border-top: 8px solid #4cafef;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    animation: spin 1s linear infinite;">
-  </div>
-</div>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.5/dist/ffmpeg.min.js"></script>
+<script>
+const { createFFmpeg, fetchFile } = FFmpeg;
+const ffmpeg = createFFmpeg({ log: true });
 
-<style>
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-</style>
-
-
-  <script>
 const downloadMp4Btn = document.getElementById("downloadMp4Btn");
-const loader = document.getElementById("loaderOverlay");
+const mp4OptionsPanel = document.getElementById("mp4OptionsPanel");
+const applyMp4Btn = document.getElementById("applyMp4Btn");
+const qariSelect = document.getElementById("qariSelect");
 
-// Fungsi bantu delay (simulasi proses)
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+downloadMp4Btn.addEventListener("click", () => {
+  // Toggle panel on button click
+  mp4OptionsPanel.style.display = 
+    mp4OptionsPanel.style.display === "none" ? "flex" : "none";
+});
 
-downloadMp4Btn.addEventListener("click", async () => {
-  loader.style.display = "flex"; // Tampilkan loader
+applyMp4Btn.addEventListener("click", async () => {
+  mp4OptionsPanel.style.display = "none"; // Hide panel
+  showLoader(); // Show overlay
 
   try {
-    // Simulasi proses generate video + suara
-    await delay(4000);  // ganti dengan proses nyata nanti
+    const currentQari = qariSelect.value;
+    const poster = document.getElementById("pages");
+    const canvas = await html2canvas(poster, { scale: 2 });
+    const posterBlob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
 
-    // Buat file video dummy (kosong)
-    const blob = new Blob(["Dummy video content"], { type: "video/mp4" });
-    const url = URL.createObjectURL(blob);
+    // Ambil audio MP3
+    const s = surahSelect.value, a = ayahSelect.value;
+    const surahStr = String(s).padStart(3, '0');
+    const ayahStr = String(a).padStart(3, '0');
+    const audioUrl = `https://github.com/dickymiswardi/tadabbur/raw/refs/heads/main/audio/${currentQari}/${surahStr}/${surahStr}${ayahStr}.mp3`;
+    const audioRes = await fetch(audioUrl);
+    const audioBlob = await audioRes.blob();
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "poster-ayat.mp4";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
+    // Load ffmpeg.wasm
+    if (!ffmpeg.isLoaded()) await ffmpeg.load();
 
-  } catch (e) {
-    alert("Gagal download MP4: " + e.message);
-  } finally {
-    loader.style.display = "none"; // Sembunyikan loader
+    // Tulis file ke FS
+    ffmpeg.FS('writeFile', 'poster.png', await fetchFile(posterBlob));
+    ffmpeg.FS('writeFile', 'audio.mp3', await fetchFile(audioBlob));
+
+    // Gabungkan image + audio jadi MP4
+    await ffmpeg.run(
+      '-loop', '1',            // Loop image
+      '-i', 'poster.png',      // Input image
+      '-i', 'audio.mp3',       // Input audio
+      '-c:v', 'libx264',
+      '-tune', 'stillimage',   // Optimize for still images
+      '-c:a', 'aac',           // Audio codec
+      '-b:a', '192k',          // Audio bitrate
+      '-shortest',             // Stop when audio ends
+      '-pix_fmt', 'yuv420p',   // Compatibility
+      'output.mp4'
+    );
+
+    // Ambil hasil video
+    const data = ffmpeg.FS('readFile', 'output.mp4');
+    const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
+    const videoUrl = URL.createObjectURL(videoBlob);
+
+    // Download file
+    const aTag = document.createElement("a");
+    aTag.href = videoUrl;
+    aTag.download = `poster-${surahStr}-${ayahStr}.mp4`;
+    aTag.click();
+
+    alert("✅ Video MP4 berhasil dibuat!");
+  } catch (err) {
+    console.error(err);
+    alert("❌ Gagal membuat video MP4");
   }
+  hideLoader(); // Hide overlay
 });
 </script>
-
 
   
 </body>
