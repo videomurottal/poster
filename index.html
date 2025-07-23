@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Poster Murottal Generator</title>
+  <title>Poster Murottal Generator (Fix)</title>
   <style>
     body { font-family: sans-serif; text-align: center; padding: 2em; }
     canvas { border: 1px solid #ccc; display: block; margin: 1em auto; }
@@ -11,7 +10,7 @@
   </style>
 </head>
 <body>
-  <h1>Poster Murottal Video Generator</h1>
+  <h1>Poster Murottal Video Generator (Fix)</h1>
 
   <div>
     <select id="qari">
@@ -51,6 +50,7 @@
     document.getElementById("posterText").addEventListener("input", drawPoster);
 
     async function generateVideo() {
+      drawPoster();
       const surah = document.getElementById("surah").value;
       const ayah = document.getElementById("ayah").value;
       const qari = document.getElementById("qari").value;
@@ -58,27 +58,37 @@
 
       const stream = canvas.captureStream(30);
       const audio = new Audio(mp3Url);
+      audio.crossOrigin = "anonymous";
+
       const audioCtx = new AudioContext();
       const source = audioCtx.createMediaElementSource(audio);
       const dest = audioCtx.createMediaStreamDestination();
       source.connect(dest);
       source.connect(audioCtx.destination);
-      const combined = new MediaStream([...stream.getTracks(), ...dest.stream.getTracks()]);
 
+      await audioCtx.resume();
+      const combined = new MediaStream([...stream.getTracks(), ...dest.stream.getAudioTracks()]);
       const recorder = new MediaRecorder(combined);
       const chunks = [];
 
       recorder.ondataavailable = e => chunks.push(e.data);
       recorder.onstop = () => {
         const blob = new Blob(chunks, { type: "video/webm" });
+        if (blob.size < 100) {
+          alert("❌ Gagal merekam. Coba ulangi.");
+          return;
+        }
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
         a.download = `murottal_${surah}_${ayah}.webm`;
         a.click();
       };
 
-      audio.play();
-      recorder.start();
+      audio.oncanplaythrough = () => {
+        audio.play();
+        recorder.start();
+      };
+
       audio.onended = () => recorder.stop();
     }
 
