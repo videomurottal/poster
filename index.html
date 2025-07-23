@@ -754,14 +754,14 @@ button:hover {
   Instal Poster
 </button>
 
-<!-- 🎥 Tombol Download MP4 -->
-<div class="button-wrapper">
-  <button id="downloadMp4Button" class="button">Download MP4</button>
-</div>
 
-<div id="qariPanel" style="display:none; margin-top: 1em; flex-direction: column; gap: 0.5em;">
-  <label for="qariSelect">Pilih Qari:</label>
-  <select id="qariSelect" style="width: 100%;">
+
+<!-- Download MP4 -->
+<div class="button-wrapper">
+  <button id="showMp4OptionsBtn" class="button" type="button">Download MP4</button>
+</div>
+<div id="mp4OptionsWrapper" style="display: none; flex-direction: column; gap: 0.5em; margin-top: 0.5em;">
+  <select id="qariSelect">
     <option value="Abdul_Basit_Murattal_64kbps">Abdul Bashit Murattal</option>
     <option value="Abdul_Basit_Mujawwad_128kbps">Abdul Bashit Mujawwad</option>
     <option value="Abdullaah_3awwaad_Al-Juhaynee_128kbps">Abdullaah Awad Al-Juhany</option>
@@ -794,8 +794,10 @@ button:hover {
     <option value="warsh_yassin_al_jazaery_64kbps">Warsh Yasin Al-Jazairy</option>
     <option value="Yasser_Ad-Dussary_128kbps">Yasir Ad-Dausary</option>
   </select>
-  <button id="applyQariBtn" class="button" type="button">Terapkan</button>
+  <button id="applyMp4Btn" class="button" type="button">Terapkan</button>
 </div>
+
+  
   
 </div>
 
@@ -1855,55 +1857,56 @@ applyMp4Btn.addEventListener("click", async () => {
   }
   hideLoader(); // Hide overlay
 });
+</script>
 
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const toggleMp4Btn = document.getElementById("showMp4OptionsBtn");
+    const mp4OptionsWrapper = document.getElementById("mp4OptionsWrapper");
+    const qariSelect = document.getElementById("qariSelect");
+    const applyMp4Btn = document.getElementById("applyMp4Btn");
+    const loader = document.getElementById("loaderOverlay");
 
-  const downloadMp4Button = document.getElementById("downloadMp4Button");
-const qariPanel = document.getElementById("qariPanel");
-const applyQariBtn = document.getElementById("applyQariBtn");
-let qariPanelVisible = false;
+    // Toggle panel Download MP4
+    toggleMp4Btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      mp4OptionsWrapper.style.display = mp4OptionsWrapper.style.display === "none" ? "flex" : "none";
+    });
 
-// Toggle panel saat klik Download MP4
-downloadMp4Button.addEventListener("click", () => {
-  qariPanelVisible = !qariPanelVisible;
-  qariPanel.style.display = qariPanelVisible ? "flex" : "none";
-});
+    // Klik Terapkan
+    applyMp4Btn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      const qariId = qariSelect.value;
 
-// Klik Terapkan
-applyQariBtn.addEventListener("click", async () => {
-  const selectedQari = document.getElementById("qariSelect").value;
+      // Sembunyikan panel
+      mp4OptionsWrapper.style.display = "none";
 
-  // Tutup panel dropdown
-  qariPanel.style.display = "none";
-  qariPanelVisible = false;
+      // Tampilkan loader
+      loader.style.display = "flex";
 
-  // Tampilkan loader overlay
-  showLoader();
+      try {
+        // 👉 Panggil fungsi generate MP4
+        await generatePosterMp4(qariId);
 
-  try {
-    // Simulasi proses render MP4
-    await renderPosterToMp4WithAudio(selectedQari);
-    alert("🎉 Video MP4 dengan audio berhasil dibuat!");
-  } catch (err) {
-    console.error(err);
-    alert("❌ Gagal membuat video MP4");
-  } finally {
-    hideLoader();
-  }
-});
+        alert("🎉 Video MP4 berhasil dibuat untuk qari: " + qariId);
+      } catch (err) {
+        alert("❌ Gagal membuat video MP4: " + err.message);
+        console.error(err);
+      } finally {
+        loader.style.display = "none";
+      }
+    });
 
-// Loader functions
-function showLoader() {
-  document.getElementById("loaderOverlay").style.display = "flex";
-}
-function hideLoader() {
-  document.getElementById("loaderOverlay").style.display = "none";
-}
+    async function generatePosterMp4(qariId) {
+      // 💡 Di sini kamu bisa pakai ffmpeg.wasm untuk render video
+      console.log("Membuat video MP4 dengan qari:", qariId);
 
-// Dummy render function
-async function renderPosterToMp4WithAudio(qariId) {
-  console.log("Membuat MP4 untuk qari:", qariId);
-  await new Promise(resolve => setTimeout(resolve, 3000)); // simulasi proses 3 detik
-}
+      // 🔥 Simulasi proses lama
+      await new Promise(resolve => setTimeout(resolve, 3000));
+
+      // TODO: Tambahkan integrasi ffmpeg.wasm + canvas capture + audio
+    }
+  });
 </script>
 
   
