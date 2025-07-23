@@ -1,52 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Poster Quran Video Maker</title>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script type="module" src="script.js"></script>
+  <meta charset="UTF-8" />
+  <title>Poster Murottal Video</title>
   <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      padding: 2em;
-    }
-    #pages {
-      width: 500px;
-      height: 500px;
-      margin: auto;
-      background: #222;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      border-radius: 12px;
-    }
-    button {
-      margin-top: 1em;
-      padding: 0.5em 1em;
-      font-size: 1em;
-    }
+    body { font-family: sans-serif; text-align: center; padding: 2em; }
+    canvas { border: 1px solid #ccc; display: block; margin: 1em auto; }
   </style>
 </head>
 <body>
-  <h1>Poster Quran Video Maker</h1>
+  <h1>Poster Murottal Video Generator</h1>
 
-  <div id="pages">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</div>
+  <canvas id="posterCanvas" width="720" height="720"></canvas>
+  <br>
+  <button onclick="startRecording()">🎞️ Download Video WebM</button>
 
-  <div style="margin-top: 1.5em;">
-    <select id="mp4Qari">
-      <option value="AbdulSamad_64kbps_QuranExplorer.Com">Abdul Samad</option>
-      <option value="Abdul_Basit_Murattal_64kbps">Abdul Basit</option>
-      <option value="Mishari_Rashid_64kbps">Misyari Rasyid</option>
-    </select>
-    <input id="surah" value="001" placeholder="Surah (e.g. 001)" style="width:80px;">
-    <input id="ayah" value="001" placeholder="Ayat (e.g. 001)" style="width:80px;">
-    <br>
-    <button onclick="generateVideo()">🎞️ Download Video WebM</button>
-    <br>
-    <button onclick="downloadWasm()">⬇️ Download ffmpeg-core.wasm</button>
-  </div>
+  <script>
+    const canvas = document.getElementById("posterCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // Gambar poster statis (misalnya)
+    ctx.fillStyle = "#222";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "white";
+    ctx.font = "40px serif";
+    ctx.textAlign = "center";
+    ctx.fillText("بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ", canvas.width / 2, canvas.height / 2);
+
+    async function startRecording() {
+      const stream = canvas.captureStream(30); // 30 FPS video dari canvas
+      const audio = new Audio("https://everyayah.com/data/AbdulSamad_64kbps_QuranExplorer.Com/001001.mp3");
+      const audioCtx = new AudioContext();
+      const source = audioCtx.createMediaElementSource(audio);
+      const dest = audioCtx.createMediaStreamDestination();
+      source.connect(dest);
+      source.connect(audioCtx.destination);
+      const combined = new MediaStream([...stream.getTracks(), ...dest.stream.getTracks()]);
+
+      const recorder = new MediaRecorder(combined);
+      const chunks = [];
+
+      recorder.ondataavailable = e => chunks.push(e.data);
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: "video/webm" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "murottal.webm";
+        a.click();
+      };
+
+      audio.play();
+      recorder.start();
+      audio.onended = () => recorder.stop();
+    }
+  </script>
 </body>
 </html>
