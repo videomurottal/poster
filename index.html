@@ -756,12 +756,13 @@ button:hover {
 
 
 
+
 <!-- Download MP4 -->
 <div class="button-wrapper">
-  <button id="showMp4OptionsBtn" class="button" type="button">Download MP4</button>
+  <button id="showMp4SelectBtn" class="button" type="button">Download MP4</button>
 </div>
-<div id="mp4OptionsWrapper" style="display: none; flex-direction: column; gap: 0.5em; margin-top: 0.5em;">
-  <select id="qariSelect">
+<div id="mp4SelectWrapper" style="display: none; flex-direction: column; gap: 0.5em; margin-top: 0.5em;">
+  <select id="mp4QariSelect">
     <option value="Abdul_Basit_Murattal_64kbps">Abdul Bashit Murattal</option>
     <option value="Abdul_Basit_Mujawwad_128kbps">Abdul Bashit Mujawwad</option>
     <option value="Abdullaah_3awwaad_Al-Juhaynee_128kbps">Abdullaah Awad Al-Juhany</option>
@@ -796,7 +797,6 @@ button:hover {
   </select>
   <button id="applyMp4Btn" class="button" type="button">Terapkan</button>
 </div>
-
   
   
 </div>
@@ -1786,126 +1786,77 @@ toggleColorBtn.addEventListener("click", () => {
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.5/dist/ffmpeg.min.js"></script>
 <script>
-const { createFFmpeg, fetchFile } = FFmpeg;
-const ffmpeg = createFFmpeg({ log: true });
-
-const downloadMp4Btn = document.getElementById("downloadMp4Btn");
-const mp4OptionsPanel = document.getElementById("mp4OptionsPanel");
-const applyMp4Btn = document.getElementById("applyMp4Btn");
-const qariSelect = document.getElementById("qariSelect");
-
-downloadMp4Btn.addEventListener("click", () => {
-  // Toggle panel on button click
-  mp4OptionsPanel.style.display = 
-    mp4OptionsPanel.style.display === "none" ? "flex" : "none";
-});
-
-applyMp4Btn.addEventListener("click", async () => {
-  mp4OptionsPanel.style.display = "none"; // Hide panel
-  showLoader(); // Show overlay
-
-  try {
-    const currentQari = qariSelect.value;
-    const poster = document.getElementById("pages");
-    const canvas = await html2canvas(poster, { scale: 2 });
-    const posterBlob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
-
-    // Ambil audio MP3
-    const s = surahSelect.value, a = ayahSelect.value;
-    const surahStr = String(s).padStart(3, '0');
-    const ayahStr = String(a).padStart(3, '0');
-    const audioUrl = `https://github.com/dickymiswardi/tadabbur/raw/refs/heads/main/audio/${currentQari}/${surahStr}/${surahStr}${ayahStr}.mp3`;
-    const audioRes = await fetch(audioUrl);
-    const audioBlob = await audioRes.blob();
-
-    // Load ffmpeg.wasm
-    if (!ffmpeg.isLoaded()) await ffmpeg.load();
-
-    // Tulis file ke FS
-    ffmpeg.FS('writeFile', 'poster.png', await fetchFile(posterBlob));
-    ffmpeg.FS('writeFile', 'audio.mp3', await fetchFile(audioBlob));
-
-    // Gabungkan image + audio jadi MP4
-    await ffmpeg.run(
-      '-loop', '1',            // Loop image
-      '-i', 'poster.png',      // Input image
-      '-i', 'audio.mp3',       // Input audio
-      '-c:v', 'libx264',
-      '-tune', 'stillimage',   // Optimize for still images
-      '-c:a', 'aac',           // Audio codec
-      '-b:a', '192k',          // Audio bitrate
-      '-shortest',             // Stop when audio ends
-      '-pix_fmt', 'yuv420p',   // Compatibility
-      'output.mp4'
-    );
-
-    // Ambil hasil video
-    const data = ffmpeg.FS('readFile', 'output.mp4');
-    const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
-    const videoUrl = URL.createObjectURL(videoBlob);
-
-    // Download file
-    const aTag = document.createElement("a");
-    aTag.href = videoUrl;
-    aTag.download = `poster-${surahStr}-${ayahStr}.mp4`;
-    aTag.click();
-
-    alert("✅ Video MP4 berhasil dibuat!");
-  } catch (err) {
-    console.error(err);
-    alert("❌ Gagal membuat video MP4");
-  }
-  hideLoader(); // Hide overlay
-});
-</script>
-
-  <script>
   document.addEventListener("DOMContentLoaded", () => {
-    const toggleMp4Btn = document.getElementById("showMp4OptionsBtn");
-    const mp4OptionsWrapper = document.getElementById("mp4OptionsWrapper");
-    const qariSelect = document.getElementById("qariSelect");
-    const applyMp4Btn = document.getElementById("applyMp4Btn");
+    const toggleBtn = document.getElementById("showMp4SelectBtn");
+    const mp4Wrapper = document.getElementById("mp4SelectWrapper");
+    const qariSelect = document.getElementById("mp4QariSelect");
+    const applyBtn = document.getElementById("applyMp4Btn");
     const loader = document.getElementById("loaderOverlay");
+    const { createFFmpeg, fetchFile } = FFmpeg;
+    const ffmpeg = createFFmpeg({ log: true });
 
-    // Toggle panel Download MP4
-    toggleMp4Btn.addEventListener("click", (e) => {
+    // Toggle tampil/sembunyi panel MP4
+    toggleBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      mp4OptionsWrapper.style.display = mp4OptionsWrapper.style.display === "none" ? "flex" : "none";
+      mp4Wrapper.style.display = mp4Wrapper.style.display === "none" ? "flex" : "none";
     });
 
-    // Klik Terapkan
-    applyMp4Btn.addEventListener("click", async (e) => {
+    applyBtn.addEventListener("click", async (e) => {
       e.preventDefault();
       const qariId = qariSelect.value;
 
       // Sembunyikan panel
-      mp4OptionsWrapper.style.display = "none";
-
-      // Tampilkan loader
+      mp4Wrapper.style.display = "none";
       loader.style.display = "flex";
 
       try {
-        // 👉 Panggil fungsi generate MP4
-        await generatePosterMp4(qariId);
+        const poster = document.getElementById("pages");
+        const canvas = await html2canvas(poster, { scale: 2 });
+        const posterBlob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
 
-        alert("🎉 Video MP4 berhasil dibuat untuk qari: " + qariId);
+        // Ambil audio MP3
+        const s = surahSelect.value, a = ayahSelect.value;
+        const surahStr = String(s).padStart(3, '0');
+        const ayahStr = String(a).padStart(3, '0');
+        const audioUrl = `https://github.com/dickymiswardi/tadabbur/raw/refs/heads/main/audio/${qariId}/${surahStr}/${surahStr}${ayahStr}.mp3`;
+        const audioRes = await fetch(audioUrl);
+        const audioBlob = await audioRes.blob();
+
+        if (!ffmpeg.isLoaded()) await ffmpeg.load();
+
+        ffmpeg.FS('writeFile', 'poster.png', await fetchFile(posterBlob));
+        ffmpeg.FS('writeFile', 'audio.mp3', await fetchFile(audioBlob));
+
+        await ffmpeg.run(
+          '-loop', '1',
+          '-i', 'poster.png',
+          '-i', 'audio.mp3',
+          '-c:v', 'libx264',
+          '-tune', 'stillimage',
+          '-c:a', 'aac',
+          '-b:a', '192k',
+          '-shortest',
+          '-pix_fmt', 'yuv420p',
+          'output.mp4'
+        );
+
+        const data = ffmpeg.FS('readFile', 'output.mp4');
+        const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
+        const videoUrl = URL.createObjectURL(videoBlob);
+
+        const aTag = document.createElement("a");
+        aTag.href = videoUrl;
+        aTag.download = `poster-${surahStr}-${ayahStr}.mp4`;
+        aTag.click();
+
+        alert("✅ Video MP4 berhasil dibuat!");
       } catch (err) {
-        alert("❌ Gagal membuat video MP4: " + err.message);
         console.error(err);
+        alert("❌ Gagal membuat video MP4: " + err.message);
       } finally {
         loader.style.display = "none";
       }
     });
-
-    async function generatePosterMp4(qariId) {
-      // 💡 Di sini kamu bisa pakai ffmpeg.wasm untuk render video
-      console.log("Membuat video MP4 dengan qari:", qariId);
-
-      // 🔥 Simulasi proses lama
-      await new Promise(resolve => setTimeout(resolve, 3000));
-
-      // TODO: Tambahkan integrasi ffmpeg.wasm + canvas capture + audio
-    }
   });
 </script>
 
