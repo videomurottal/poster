@@ -40,7 +40,7 @@
       const qari = document.getElementById('mp4Qari').value;
       const s = document.getElementById('surah').value;
       const a = document.getElementById('ayah').value;
-      const audioUrl = `https://verses.quran.com/${qari}/${s}${a}.mp3`;
+      const audioUrl = `https://everyayah.com/data/${qari}/${s}${a}.mp3`;
       const audioResp = await fetch(audioUrl);
       const audioData = new Uint8Array(await audioResp.arrayBuffer());
       ffmpeg.FS('writeFile', 'audio.mp3', audioData);
