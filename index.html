@@ -1,21 +1,21 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <title>Poster Quran ke MP4</title>
+  <title>Contoh Video Quran</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    .button-wrapper {
+    body { font-family: sans-serif; padding: 1em; }
+    .button { padding: 0.7em 1.5em; background: #4caf50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; }
+    #poster {
+      width: 600px; height: 340px;
+      background: #fefce8;
+      border: 2px solid #ccc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       margin-top: 1em;
-    }
-    .button {
-      padding: 0.5em 1em;
-      font-size: 1em;
-      cursor: pointer;
-      background-color: #4caf50;
-      color: white;
-      border: none;
-      border-radius: 4px;
     }
     @keyframes spin {
       0% { transform: rotate(0deg); }
@@ -25,35 +25,18 @@
 </head>
 <body>
 
-<!-- Pilihan Surah dan Ayat -->
-<select id="surahSelect">
-  <option value="1">Al-Fatihah</option>
-  <option value="2">Al-Baqarah</option>
-  <option value="3">Ali Imran</option>
-</select>
+<h2>Contoh Poster Quran ke MP4</h2>
+<p>Contoh ini akan menggabungkan poster sederhana dengan 1 file MP3 ayat.</p>
 
-<select id="ayahSelect">
-  <option value="1">1</option>
-  <option value="2">2</option>
-  <option value="3">3</option>
-</select>
-
-<!-- Poster HTML -->
-<div id="pages" style="width: 600px; height: 300px; background: #fefce8; margin-top: 1em; display: flex; justify-content: center; align-items: center; border: 2px solid #ccc;">
-  <h2 style="text-align: center;">Contoh Poster Quran</h2>
+<!-- Poster -->
+<div id="poster">
+  <h1 style="font-size: 2em;">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</h1>
 </div>
 
-<!-- Tombol Download MP4 -->
-<div class="button-wrapper">
-  <select id="qariId">
-    <option value="AbdulSamad_64kbps_QuranExplorer.Com">Abdul Samad</option>
-    <option value="Abdurrahmaan_As-Sudais_64kbps">Sudais</option>
-    <option value="MisharyRashid_64kbps">Misyari Rasyid</option>
-  </select>
-  <button class="button" id="downloadMp4Btn">Download MP4</button>
-</div>
+<!-- Tombol -->
+<button class="button" id="downloadBtn">Download MP4</button>
 
-<!-- Loader Overlay -->
+<!-- Loader -->
 <div id="loaderOverlay" style="
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -80,77 +63,64 @@ let ffmpeg;
 let fetchFile;
 let ffmpegReady = false;
 
-// Inisialisasi FFmpeg saat halaman siap
 window.addEventListener("DOMContentLoaded", async () => {
   const FFmpegLib = FFmpeg;
   fetchFile = FFmpegLib.fetchFile;
   ffmpeg = FFmpegLib.createFFmpeg({ log: true });
 
   try {
-    console.log("⏳ Loading FFmpeg...");
     await ffmpeg.load();
     ffmpegReady = true;
-    console.log("✅ FFmpeg siap!");
   } catch (e) {
-    console.error("❌ Gagal memuat FFmpeg:", e);
+    console.error("Gagal load FFmpeg:", e);
   }
 });
 
-document.getElementById("downloadMp4Btn").addEventListener("click", async () => {
+document.getElementById("downloadBtn").addEventListener("click", async () => {
   const loader = document.getElementById("loaderOverlay");
   loader.style.display = "flex";
 
   try {
     if (!ffmpegReady) {
-      alert("❗ FFmpeg belum siap, mohon tunggu...");
+      alert("❗ FFmpeg belum siap, tunggu beberapa detik...");
       return;
     }
 
-    const qari = document.getElementById("qariId").value;
-    const surah = String(document.getElementById("surahSelect").value).padStart(3, '0');
-    const ayat = String(document.getElementById("ayahSelect").value).padStart(3, '0');
-    const audioUrl = `https://everyayah.com/data/${qari}/${surah}${ayat}.mp3`;
-
-    // Gambar poster
-    const poster = document.getElementById("pages");
+    const poster = document.getElementById("poster");
     const canvas = await html2canvas(poster, { scale: 2 });
     const posterBlob = await new Promise(res => canvas.toBlob(res, "image/png"));
 
-    // Ambil MP3
+    const audioUrl = "https://everyayah.com/data/AbdulSamad_64kbps_QuranExplorer.Com/001001.mp3";
     const audioRes = await fetch(audioUrl);
-    if (!audioRes.ok) throw new Error("Audio tidak ditemukan.");
+    if (!audioRes.ok) throw new Error("Gagal ambil audio MP3.");
     const audioBlob = await audioRes.blob();
 
-    // Masukkan ke FFmpeg FS
     ffmpeg.FS("writeFile", "poster.png", await fetchFile(posterBlob));
     ffmpeg.FS("writeFile", "audio.mp3", await fetchFile(audioBlob));
 
-    // Jalankan FFmpeg
     await ffmpeg.run(
-      '-loop', '1', '-i', 'poster.png', '-i', 'audio.mp3',
-      '-c:v', 'libx264', '-tune', 'stillimage',
-      '-c:a', 'aac', '-b:a', '192k', '-shortest',
-      '-pix_fmt', 'yuv420p', 'output.mp4'
+      "-loop", "1", "-i", "poster.png", "-i", "audio.mp3",
+      "-c:v", "libx264", "-tune", "stillimage",
+      "-c:a", "aac", "-b:a", "192k", "-shortest",
+      "-pix_fmt", "yuv420p", "output.mp4"
     );
 
-    // Ambil hasil
-    const data = ffmpeg.FS('readFile', 'output.mp4');
-    const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
+    const data = ffmpeg.FS("readFile", "output.mp4");
+    const videoBlob = new Blob([data.buffer], { type: "video/mp4" });
     const url = URL.createObjectURL(videoBlob);
 
-    // Download
     const a = document.createElement("a");
     a.href = url;
-    a.download = `Poster-${surah}-${ayat}.mp4`;
+    a.download = "ContohPoster.mp4";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    alert("✅ Video MP4 berhasil dibuat!");
-  } catch (e) {
-    console.error(e);
-    alert("❌ Gagal membuat video: " + e.message);
+    alert("✅ Video berhasil dibuat!");
+  } catch (err) {
+    alert("❌ Gagal: " + err.message);
+    console.error(err);
   } finally {
     loader.style.display = "none";
   }
