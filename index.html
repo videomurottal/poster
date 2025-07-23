@@ -1,143 +1,60 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Poster Quran ke MP4</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <title>Poster Quran Video Maker</title>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.9/dist/ffmpeg.min.js"></script>
   <style>
-    body { font-family: sans-serif; padding: 1em; background: #fefcf8; }
-    .button { padding: 0.7em 1.5em; background: #4caf50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; }
-    .button[disabled] { background: #aaa; cursor: not-allowed; }
-    #poster {
-      width: 600px; height: 340px;
-      background: #fefce8;
-      border: 2px solid #ccc;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-top: 1em;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+    body { font-family: sans-serif; text-align: center; padding: 2em; }
+    #pages { width: 500px; height: 500px; margin: auto; background: #222; color: white; display: flex; align-items: center; justify-content: center; }
   </style>
 </head>
 <body>
+  <h1>Poster Quran Video Maker</h1>
+  <div id="pages">Contoh Poster Quran</div>
 
-<h2>Poster Quran ke MP4</h2>
-<p>Gabungkan gambar poster & audio ayat jadi video MP4 (dengan FFmpeg di browser)</p>
-
-<!-- Poster -->
-<div id="poster">
-  <h1 style="font-size: 2em;">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</h1>
-</div>
-
-<!-- Tombol -->
-<button class="button" id="downloadBtn" disabled>Download MP4</button>
-
-<!-- Loader Overlay -->
-<div id="loaderOverlay" style="
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(255,255,255,0.8);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  display: none;">
-  <div style="
-    border: 8px solid #f3f3f3;
-    border-top: 8px solid #4cafef;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    animation: spin 1s linear infinite;">
+  <div style="margin: 1em 0;">
+    <select id="mp4Qari">
+      <option value="AbdulSamad_64kbps_QuranExplorer.Com">Abdul Bashit Murattal</option>
+      <option value="Abdurrahmaan_As-Sudais_64kbps">Abdurrahmaan As-Sudais</option>
+      <option value="Misyari_Rasyid_Al-Afasy_64kbps">Misyari Rasyid Al-Afasy</option>
+    </select>
+    <input id="surah" value="001" placeholder="Surah (e.g. 001)" style="width:80px;">
+    <input id="ayah" value="001" placeholder="Ayat (e.g. 001)" style="width:80px;">
+    <button onclick="generateVideo()">Download MP4</button>
   </div>
-  <p style="margin-top: 1em;">⏳ Memuat FFmpeg... Harap tunggu</p>
-</div>
 
-<!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.5/dist/ffmpeg.min.js"></script>
-<script async src="https://unpkg.com/@ffmpeg/core@0.12.5/dist/ffmpeg-core.js"></script>
+  <script>
+    async function generateVideo() {
+      const { createFFmpeg, fetchFile } = FFmpeg;
+      const ffmpeg = createFFmpeg({ log: true, corePath: 'https://unpkg.com/@ffmpeg/core@0.12.2/dist/ffmpeg-core.js' });
+      if (!ffmpeg.isLoaded()) await ffmpeg.load();
 
-<script>
-let ffmpeg;
-let fetchFile;
-let ffmpegReady = false;
+      const canvas = await html2canvas(document.getElementById("pages"), { scale: 2 });
+      const dataUrl = canvas.toDataURL("image/png");
+      const imageBlob = await (await fetch(dataUrl)).blob();
+      const imageData = new Uint8Array(await imageBlob.arrayBuffer());
+      ffmpeg.FS('writeFile', 'poster.png', imageData);
 
-window.addEventListener("DOMContentLoaded", async () => {
-  const loader = document.getElementById("loaderOverlay");
-  loader.style.display = "flex";
+      const qari = document.getElementById('mp4Qari').value;
+      const s = document.getElementById('surah').value;
+      const a = document.getElementById('ayah').value;
+      const audioUrl = `https://verses.quran.com/${qari}/${s}${a}.mp3`;
+      const audioResp = await fetch(audioUrl);
+      const audioData = new Uint8Array(await audioResp.arrayBuffer());
+      ffmpeg.FS('writeFile', 'audio.mp3', audioData);
 
-  const FFmpegLib = FFmpeg;
-  fetchFile = FFmpegLib.fetchFile;
-  ffmpeg = FFmpegLib.createFFmpeg({
-    log: true,
-    corePath: "https://unpkg.com/@ffmpeg/core@0.12.5/dist/ffmpeg-core.js"
-  });
+      await ffmpeg.run('-loop', '1', '-i', 'poster.png', '-i', 'audio.mp3', '-c:v', 'libvpx', '-c:a', 'libvorbis', '-shortest', 'output.webm');
+      const output = ffmpeg.FS('readFile', 'output.webm');
+      const videoBlob = new Blob([output.buffer], { type: 'video/webm' });
+      const videoUrl = URL.createObjectURL(videoBlob);
 
-  try {
-    console.log("⏳ Memuat FFmpeg...");
-    await ffmpeg.load();
-    ffmpegReady = true;
-    console.log("✅ FFmpeg siap!");
-    document.getElementById("downloadBtn").disabled = false;
-  } catch (err) {
-    alert("❌ Gagal memuat FFmpeg: " + err.message);
-    console.error(err);
-  } finally {
-    loader.style.display = "none";
-  }
-});
-
-document.getElementById("downloadBtn").addEventListener("click", async () => {
-  const loader = document.getElementById("loaderOverlay");
-  loader.style.display = "flex";
-
-  try {
-    const poster = document.getElementById("poster");
-    const canvas = await html2canvas(poster, { scale: 2 });
-    const posterBlob = await new Promise(res => canvas.toBlob(res, "image/png"));
-
-    const audioUrl = "https://everyayah.com/data/AbdulSamad_64kbps_QuranExplorer.Com/001001.mp3";
-    const audioRes = await fetch(audioUrl);
-    if (!audioRes.ok) throw new Error("Gagal ambil audio MP3.");
-    const audioBlob = await audioRes.blob();
-
-    ffmpeg.FS("writeFile", "poster.png", await fetchFile(posterBlob));
-    ffmpeg.FS("writeFile", "audio.mp3", await fetchFile(audioBlob));
-
-    await ffmpeg.run(
-      "-loop", "1", "-i", "poster.png", "-i", "audio.mp3",
-      "-c:v", "libx264", "-tune", "stillimage",
-      "-c:a", "aac", "-b:a", "192k", "-shortest",
-      "-pix_fmt", "yuv420p", "output.mp4"
-    );
-
-    const data = ffmpeg.FS("readFile", "output.mp4");
-    const videoBlob = new Blob([data.buffer], { type: "video/mp4" });
-    const url = URL.createObjectURL(videoBlob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "PosterQuran.mp4";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    alert("✅ Video berhasil dibuat!");
-  } catch (err) {
-    alert("❌ Gagal: " + err.message);
-    console.error(err);
-  } finally {
-    loader.style.display = "none";
-  }
-});
-</script>
-
+      const aEl = document.createElement('a');
+      aEl.href = videoUrl;
+      aEl.download = `murottal-${s}-${a}.webm`;
+      aEl.click();
+    }
+  </script>
 </body>
 </html>
