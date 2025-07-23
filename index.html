@@ -1769,9 +1769,9 @@ async function applyMp4() {
   const qari = document.getElementById("mp4Qari").value;
   const surah = String(document.getElementById("surahSelect").value).padStart(3, '0');
   const ayat = String(document.getElementById("ayahSelect").value).padStart(3, '0');
-  const audioUrl = `https://github.com/dickymiswardi/tadabbur/raw/refs/heads/main/audio/${qari}/${surah}/${surah}${ayat}.mp3`;
+  const proxy = "https://corsproxy.io/?";
+  const audioUrl = proxy + `https://github.com/dickymiswardi/tadabbur/raw/refs/heads/main/audio/${qari}/${surah}/${surah}${ayat}.mp3`;
 
-  const loader = document.getElementById("loaderOverlay");
   document.getElementById("mp4Panel").style.display = "none";
   loader.style.display = "flex"; // ✅ Tampilkan loader
 
@@ -1780,13 +1780,14 @@ async function applyMp4() {
     const canvas = await html2canvas(poster, { scale: 2 });
     const posterBlob = await new Promise(res => canvas.toBlob(res, "image/png"));
     const audioRes = await fetch(audioUrl);
-    if (!audioRes.ok) throw new Error("Audio tidak ditemukan.");
+    if (!audioRes.ok) throw new Error(`Audio tidak ditemukan (${audioRes.status})`);
     const audioBlob = await audioRes.blob();
 
     if (!ffmpeg.isLoaded()) await ffmpeg.load();
     ffmpeg.FS('writeFile', 'poster.png', await fetchFile(posterBlob));
     ffmpeg.FS('writeFile', 'audio.mp3', await fetchFile(audioBlob));
 
+    console.log("🎥 Memulai render MP4...");
     await ffmpeg.run(
       '-loop', '1', '-i', 'poster.png', '-i', 'audio.mp3',
       '-c:v', 'libx264', '-tune', 'stillimage',
@@ -1798,6 +1799,7 @@ async function applyMp4() {
     const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
     const url = URL.createObjectURL(videoBlob);
 
+    console.log("✅ Render selesai, mulai download...");
     const a = document.createElement("a");
     a.href = url;
     a.download = `Poster-${surah}-${ayat}.mp4`;
@@ -1815,7 +1817,6 @@ async function applyMp4() {
   }
 }
 </script>
-
   
 </body>
 </html>
