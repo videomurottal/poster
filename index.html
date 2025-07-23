@@ -633,7 +633,8 @@ button:hover {
 
 <div class="controls">
 
-  <!-- Download MP4 -->
+
+<!-- Download MP4 -->
 <div class="button-wrapper">
   <button class="button" type="button" onclick="toggleMp4Panel()">Download MP4</button>
 </div>
@@ -646,21 +647,8 @@ button:hover {
   <button class="button" type="button" onclick="applyMp4()">Terapkan</button>
 </div>
 
-<!-- Loader Overlay -->
-<div id="loaderOverlay" style="
-  display: none;
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  color: #fff;
-  font-size: 1.2em;
-  text-align: center;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-">⏳ Memproses video...</div>
 
-
+  
   <label>
   Opacity Gambar:
   <input type="range" id="backgroundOpacity" min="0" max="100" value="100">
@@ -1766,59 +1754,42 @@ toggleColorBtn.addEventListener("click", () => {
 });
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.5/dist/ffmpeg.min.js"></script>
-<script>
+
+
+  <script>
 const { createFFmpeg, fetchFile } = FFmpeg;
 const ffmpeg = createFFmpeg({ log: true });
-const loader = document.getElementById("loaderOverlay");
 
 function toggleMp4Panel() {
   const panel = document.getElementById("mp4Panel");
-  panel.style.display = panel.style.display === "none" ? "flex" : "none";
+  panel.style.display = (panel.style.display === "none") ? "flex" : "none";
 }
 
 async function applyMp4() {
   const qari = document.getElementById("mp4Qari").value;
   const surah = String(document.getElementById("surahSelect").value).padStart(3, '0');
   const ayat = String(document.getElementById("ayahSelect").value).padStart(3, '0');
+  const audioUrl = `https://github.com/dickymiswardi/tadabbur/raw/refs/heads/main/audio/${qari}/${surah}/${surah}${ayat}.mp3`;
 
-  // 🛡️ Bypass CORS proxy
-  const rawUrl = `https://github.com/dickymiswardi/tadabbur/raw/refs/heads/main/audio/${qari}/${surah}/${surah}${ayat}.mp3`;
-  const audioUrl = `https://corsproxy.io/?${encodeURIComponent(rawUrl)}`;
-
-  loader.innerText = "⏳ Memproses video...";
-  loader.style.display = "flex"; // ✅ Tampilkan loader
+  const loader = document.getElementById("loaderOverlay");
+  document.getElementById("mp4Panel").style.display = "none";
+  loader.style.display = "flex";
 
   try {
-    const poster = document.getElementById("pages");
-    if (!poster) throw new Error("#pages tidak ditemukan di halaman.");
-
-    // 🔥 Render canvas dari poster
+    const poster = document.getElementById("pages"); // Elemen poster
     const canvas = await html2canvas(poster, { scale: 2 });
     const posterBlob = await new Promise(res => canvas.toBlob(res, "image/png"));
 
-    // 🎧 Fetch audio dengan CORS proxy
-    console.log("🎧 Fetching audio:", rawUrl);
     const audioRes = await fetch(audioUrl);
-    if (!audioRes.ok) throw new Error("Audio tidak ditemukan di server.");
+    if (!audioRes.ok) throw new Error("Audio tidak ditemukan.");
     const audioBlob = await audioRes.blob();
 
-    // 🔥 Load FFmpeg jika belum
-    if (!ffmpeg.isLoaded()) {
-      console.log("🚀 Loading FFmpeg...");
-      loader.innerText = "⏳ Memuat FFmpeg...";
-      await ffmpeg.load();
-      console.log("✅ FFmpeg loaded.");
-    }
-
-    // 📝 Tulis file ke FS FFmpeg
+    if (!ffmpeg.isLoaded()) await ffmpeg.load();
     ffmpeg.FS('writeFile', 'poster.png', await fetchFile(posterBlob));
     ffmpeg.FS('writeFile', 'audio.mp3', await fetchFile(audioBlob));
 
-    // 🎬 Jalankan encoding
-    loader.innerText = "⏳ Membuat video...";
-    console.log("🎬 Encoding video...");
     await ffmpeg.run(
       '-loop', '1', '-i', 'poster.png', '-i', 'audio.mp3',
       '-c:v', 'libx264', '-tune', 'stillimage',
@@ -1826,12 +1797,10 @@ async function applyMp4() {
       '-pix_fmt', 'yuv420p', 'output.mp4'
     );
 
-    // 📦 Baca hasil video
     const data = ffmpeg.FS('readFile', 'output.mp4');
     const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
     const url = URL.createObjectURL(videoBlob);
 
-    // ⬇️ Download otomatis
     const a = document.createElement("a");
     a.href = url;
     a.download = `Poster-${surah}-${ayat}.mp4`;
@@ -1840,16 +1809,17 @@ async function applyMp4() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    alert("✅ Video MP4 berhasil dibuat & diunduh!");
+    alert("✅ Video MP4 berhasil dibuat!");
   } catch (e) {
     console.error(e);
     alert("❌ Gagal membuat video: " + e.message);
   } finally {
-    loader.style.display = "none"; // ✅ Sembunyikan loader
+    loader.style.display = "none";
   }
 }
-
 </script>
+
+
 
   
 </body>
