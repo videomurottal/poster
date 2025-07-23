@@ -1771,8 +1771,9 @@ async function applyMp4() {
   const ayat = String(document.getElementById("ayahSelect").value).padStart(3, '0');
   const audioUrl = `https://github.com/dickymiswardi/tadabbur/raw/refs/heads/main/audio/${qari}/${surah}/${surah}${ayat}.mp3`;
 
+  const loader = document.getElementById("loaderOverlay");
   document.getElementById("mp4Panel").style.display = "none";
-  loader.style.display = "flex";
+  loader.style.display = "flex"; // ✅ Tampilkan loader
 
   try {
     const poster = document.getElementById("pages");
@@ -1796,17 +1797,21 @@ async function applyMp4() {
     const data = ffmpeg.FS('readFile', 'output.mp4');
     const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
     const url = URL.createObjectURL(videoBlob);
+
     const a = document.createElement("a");
     a.href = url;
     a.download = `Poster-${surah}-${ayat}.mp4`;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
+
     alert("✅ Video MP4 berhasil dibuat!");
   } catch (e) {
     console.error(e);
     alert("❌ Gagal membuat video: " + e.message);
   } finally {
-    loader.style.display = "none";
+    loader.style.display = "none"; // ✅ Sembunyikan loader
   }
 }
 </script>
