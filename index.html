@@ -818,6 +818,14 @@ button:hover {
 
 <script>
 
+  if (!surahVal || !ayatVal) {
+  alert("❌ Surah dan ayat belum dipilih.");
+  loader.style.display = "none";
+  return;
+}
+
+  console.log("🎧 AUDIO URL:", audioUrl);
+
 const backgroundSelect = document.getElementById("backgroundSelect");
 const backgroundUpload = document.getElementById("backgroundUpload");
 const backgroundUrl = document.getElementById("backgroundUrl");
