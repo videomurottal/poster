@@ -755,22 +755,18 @@ button:hover {
 </button>
 
 
-<!-- 📦 Download MP4 -->
+<!-- Download MP4 (Tombol Baru di Paling Bawah) -->
 <div class="button-wrapper">
-  <button id="showMp4OptionsBtn" class="button" type="button">Download MP4</button>
+  <button class="button" type="button" onclick="toggleMp4Panel()">Download MP4</button>
 </div>
-<div id="mp4OptionsWrapper" style="display: none; flex-direction: column; gap: 0.5em; margin-top: 0.5em;">
-  <select id="qariSelect">
+<div id="mp4Panel" style="display: none; flex-direction: column; gap: 0.5em; margin-top: 0.5em;">
+  <select id="mp4Qari">
     <option value="Abdul_Basit_Murattal_64kbps">Abdul Bashit Murattal</option>
-    <option value="Abdul_Basit_Mujawwad_128kbps">Abdul Bashit Mujawwad</option>
     <option value="Abdurrahmaan_As-Sudais_64kbps">Abdurrahmaan As-Sudais</option>
-    <option value="Maher_AlMuaiqly_64kbps">Maher Al-Muaiqily</option>
     <option value="Misyari_Rasyid_Al-Afasy_64kbps">Misyari Rasyid Al-Afasy</option>
   </select>
-  <button id="applyMp4Btn" class="button" type="button">Terapkan</button>
+  <button class="button" type="button" onclick="applyMp4()">Terapkan</button>
 </div>
-
-
   
   
 </div>
@@ -1757,81 +1753,61 @@ toggleColorBtn.addEventListener("click", () => {
 });
 </script>
 
-
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.5/dist/ffmpeg.min.js"></script>
 <script>
 const { createFFmpeg, fetchFile } = FFmpeg;
 const ffmpeg = createFFmpeg({ log: true });
-
-const toggleMp4Btn = document.getElementById("showMp4OptionsBtn");
-const mp4OptionsWrapper = document.getElementById("mp4OptionsWrapper");
-const applyMp4Btn = document.getElementById("applyMp4Btn");
-const qariSelect = document.getElementById("qariSelect");
 const loader = document.getElementById("loaderOverlay");
 
-// Toggle tampil/sembunyi menu MP4
-if (toggleMp4Btn) {
-  toggleMp4Btn.addEventListener("click", (e) => {
-    e.preventDefault();
-    mp4OptionsWrapper.style.display = mp4OptionsWrapper.style.display === "none" ? "flex" : "none";
-  });
+function toggleMp4Panel() {
+  const panel = document.getElementById("mp4Panel");
+  panel.style.display = panel.style.display === "none" ? "flex" : "none";
 }
 
-// Klik Terapkan
-if (applyMp4Btn) {
-  applyMp4Btn.addEventListener("click", async (e) => {
-    e.preventDefault();
-    mp4OptionsWrapper.style.display = "none";
-    loader.style.display = "flex"; // Tampilkan loader
+async function applyMp4() {
+  const qari = document.getElementById("mp4Qari").value;
+  const surah = String(document.getElementById("surahSelect").value).padStart(3, '0');
+  const ayat = String(document.getElementById("ayahSelect").value).padStart(3, '0');
+  const audioUrl = `https://github.com/dickymiswardi/tadabbur/raw/refs/heads/main/audio/${qari}/${surah}/${surah}${ayat}.mp3`;
 
-    try {
-      const qariId = qariSelect.value;
-      const surahStr = String(document.getElementById("surahSelect").value).padStart(3, '0');
-      const ayahStr = String(document.getElementById("ayahSelect").value).padStart(3, '0');
-      const audioUrl = `https://github.com/dickymiswardi/tadabbur/raw/refs/heads/main/audio/${qariId}/${surahStr}/${surahStr}${ayahStr}.mp3`;
+  document.getElementById("mp4Panel").style.display = "none";
+  loader.style.display = "flex";
 
-      const poster = document.getElementById("pages");
-      const canvas = await html2canvas(poster, { scale: 2 });
-      const posterBlob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
-      const audioRes = await fetch(audioUrl);
-      if (!audioRes.ok) throw new Error("Audio tidak ditemukan untuk Qari ini.");
-      const audioBlob = await audioRes.blob();
+  try {
+    const poster = document.getElementById("pages");
+    const canvas = await html2canvas(poster, { scale: 2 });
+    const posterBlob = await new Promise(res => canvas.toBlob(res, "image/png"));
+    const audioRes = await fetch(audioUrl);
+    if (!audioRes.ok) throw new Error("Audio tidak ditemukan.");
+    const audioBlob = await audioRes.blob();
 
-      if (!ffmpeg.isLoaded()) await ffmpeg.load();
-      ffmpeg.FS('writeFile', 'poster.png', await fetchFile(posterBlob));
-      ffmpeg.FS('writeFile', 'audio.mp3', await fetchFile(audioBlob));
+    if (!ffmpeg.isLoaded()) await ffmpeg.load();
+    ffmpeg.FS('writeFile', 'poster.png', await fetchFile(posterBlob));
+    ffmpeg.FS('writeFile', 'audio.mp3', await fetchFile(audioBlob));
 
-      await ffmpeg.run(
-        '-loop', '1',
-        '-i', 'poster.png',
-        '-i', 'audio.mp3',
-        '-c:v', 'libx264',
-        '-tune', 'stillimage',
-        '-c:a', 'aac',
-        '-b:a', '192k',
-        '-shortest',
-        '-pix_fmt', 'yuv420p',
-        'output.mp4'
-      );
+    await ffmpeg.run(
+      '-loop', '1', '-i', 'poster.png', '-i', 'audio.mp3',
+      '-c:v', 'libx264', '-tune', 'stillimage',
+      '-c:a', 'aac', '-b:a', '192k', '-shortest',
+      '-pix_fmt', 'yuv420p', 'output.mp4'
+    );
 
-      const data = ffmpeg.FS('readFile', 'output.mp4');
-      const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
-      const url = URL.createObjectURL(videoBlob);
-
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `Poster-${surahStr}-${ayahStr}.mp4`;
-      a.click();
-      URL.revokeObjectURL(url);
-      alert("✅ MP4 berhasil dibuat!");
-    } catch (err) {
-      console.error(err);
-      alert("❌ Gagal membuat MP4: " + err.message);
-    } finally {
-      loader.style.display = "none";
-    }
-  });
+    const data = ffmpeg.FS('readFile', 'output.mp4');
+    const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
+    const url = URL.createObjectURL(videoBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Poster-${surah}-${ayat}.mp4`;
+    a.click();
+    URL.revokeObjectURL(url);
+    alert("✅ Video MP4 berhasil dibuat!");
+  } catch (e) {
+    console.error(e);
+    alert("❌ Gagal membuat video: " + e.message);
+  } finally {
+    loader.style.display = "none";
+  }
 }
 </script>
 
