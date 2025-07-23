@@ -640,13 +640,12 @@ button:hover {
 </div>
 <div id="mp4Panel" style="display: none; flex-direction: column; gap: 0.5em; margin-top: 0.5em;">
   <select id="mp4Qari">
-    <option value="Abdul_Basit_Murattal_64kbps">Abdul Bashit Murattal</option>
+    <option value="AbdulSamad_64kbps_QuranExplorer.Com">Abdul Bashit Murattal</option>
     <option value="Abdurrahmaan_As-Sudais_64kbps">Abdurrahmaan As-Sudais</option>
     <option value="Misyari_Rasyid_Al-Afasy_64kbps">Misyari Rasyid Al-Afasy</option>
   </select>
   <button class="button" type="button" onclick="applyMp4()">Terapkan</button>
 </div>
-
 
 
   
@@ -817,14 +816,6 @@ button:hover {
 </style>
 
 <script>
-
-  if (!surahVal || !ayatVal) {
-  alert("❌ Surah dan ayat belum dipilih.");
-  loader.style.display = "none";
-  return;
-}
-
-  console.log("🎧 AUDIO URL:", audioUrl);
 
 const backgroundSelect = document.getElementById("backgroundSelect");
 const backgroundUpload = document.getElementById("backgroundUpload");
@@ -1763,70 +1754,70 @@ toggleColorBtn.addEventListener("click", () => {
 });
 </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.5/dist/ffmpeg.min.js"></script>
-<script>
-  const { createFFmpeg, fetchFile } = FFmpeg;
-  const ffmpeg = createFFmpeg({ log: true });
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.5/dist/ffmpeg.min.js"></script>
 
-  function toggleMp4Panel() {
-    const panel = document.getElementById("mp4Panel");
-    panel.style.display = panel.style.display === "none" ? "flex" : "none";
+
+  <script>
+const { createFFmpeg, fetchFile } = FFmpeg;
+const ffmpeg = createFFmpeg({ log: true });
+
+function toggleMp4Panel() {
+  const panel = document.getElementById("mp4Panel");
+  panel.style.display = (panel.style.display === "none") ? "flex" : "none";
+}
+
+async function applyMp4() {
+  const qari = document.getElementById("mp4Qari").value;
+  const surah = String(document.getElementById("surahSelect").value).padStart(3, '0');
+  const ayat = String(document.getElementById("ayahSelect").value).padStart(3, '0');
+  const audioUrl = `https://everyayah.com/data/${qari}/${surah}${ayat}.mp3`;
+
+  const loader = document.getElementById("loaderOverlay");
+  document.getElementById("mp4Panel").style.display = "none";
+  loader.style.display = "flex";
+
+  try {
+    const poster = document.getElementById("pages"); // Elemen poster
+    const canvas = await html2canvas(poster, { scale: 2 });
+    const posterBlob = await new Promise(res => canvas.toBlob(res, "image/png"));
+
+    const audioRes = await fetch(audioUrl);
+    if (!audioRes.ok) throw new Error("Audio tidak ditemukan.");
+    const audioBlob = await audioRes.blob();
+
+    if (!ffmpeg.isLoaded()) await ffmpeg.load();
+    ffmpeg.FS('writeFile', 'poster.png', await fetchFile(posterBlob));
+    ffmpeg.FS('writeFile', 'audio.mp3', await fetchFile(audioBlob));
+
+    await ffmpeg.run(
+      '-loop', '1', '-i', 'poster.png', '-i', 'audio.mp3',
+      '-c:v', 'libx264', '-tune', 'stillimage',
+      '-c:a', 'aac', '-b:a', '192k', '-shortest',
+      '-pix_fmt', 'yuv420p', 'output.mp4'
+    );
+
+    const data = ffmpeg.FS('readFile', 'output.mp4');
+    const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
+    const url = URL.createObjectURL(videoBlob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Poster-${surah}-${ayat}.mp4`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    alert("✅ Video MP4 berhasil dibuat!");
+  } catch (e) {
+    console.error(e);
+    alert("❌ Gagal membuat video: " + e.message);
+  } finally {
+    loader.style.display = "none";
   }
-
-  async function applyMp4() {
-    const loader = document.getElementById("loaderOverlay");
-    loader.style.display = "flex";
-    document.getElementById("mp4Panel").style.display = "none";
-
-    const qari = document.getElementById("mp4Qari").value;
-    const surahVal = document.getElementById("surahSelect").value;
-    const ayatVal = document.getElementById("ayahSelect").value;
-    const surah = surahVal.padStart(3, '0');
-    const ayat = ayatVal.padStart(3, '0');
-    const audioUrl = `https://github.com/dickymiswardi/tadabbur/raw/refs/heads/main/audio/${qari}/${surah}/${surah}${ayat}.mp3`;
-
-    try {
-      const poster = document.getElementById("pages");
-      const canvas = await html2canvas(poster, { scale: 2 });
-      const posterBlob = await new Promise(res => canvas.toBlob(res, "image/png"));
-
-      const audioRes = await fetch(audioUrl);
-      if (!audioRes.ok) throw new Error("Audio tidak ditemukan.");
-      const audioBlob = await audioRes.blob();
-
-      if (!ffmpeg.isLoaded()) await ffmpeg.load();
-      ffmpeg.FS('writeFile', 'poster.png', await fetchFile(posterBlob));
-      ffmpeg.FS('writeFile', 'audio.mp3', await fetchFile(audioBlob));
-
-      await ffmpeg.run(
-        '-loop', '1', '-i', 'poster.png', '-i', 'audio.mp3',
-        '-c:v', 'libx264', '-tune', 'stillimage',
-        '-c:a', 'aac', '-b:a', '192k', '-shortest',
-        '-pix_fmt', 'yuv420p', 'output.mp4'
-      );
-
-      const data = ffmpeg.FS('readFile', 'output.mp4');
-      const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
-      const url = URL.createObjectURL(videoBlob);
-
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `Poster-${surah}-${ayat}.mp4`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      alert("✅ Video MP4 berhasil dibuat!");
-    } catch (e) {
-      console.error(e);
-      alert("❌ Gagal membuat video: " + e.message);
-    } finally {
-      loader.style.display = "none";
-    }
-  }
+}
 </script>
-
 
 
 
