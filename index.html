@@ -647,11 +647,6 @@ button:hover {
   <button class="button" type="button" onclick="applyMp4()">Terapkan</button>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.5/dist/ffmpeg.min.js"></script>
-
-
-  
   <label>
   Opacity Gambar:
   <input type="range" id="backgroundOpacity" min="0" max="100" value="100">
@@ -1757,15 +1752,15 @@ toggleColorBtn.addEventListener("click", () => {
 });
 </script>
 
-  
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
-
+// Panel Download MP4
 function toggleMp4Panel() {
   const panel = document.getElementById("mp4Panel");
   if (!panel) return;
   panel.style.display = (panel.style.display === "none") ? "flex" : "none";
 }
-  
+
 async function applyMp4() {
   const qari = document.getElementById("mp4Qari").value;
   const surah = String(document.getElementById("surahSelect").value).padStart(3, '0');
@@ -1777,23 +1772,28 @@ async function applyMp4() {
   loader.style.display = "flex";
 
   try {
-    // Ambil URL poster langsung dari halaman
-    const posterEl = document.querySelector("#posterImage") || document.querySelector("#pages img");
-    if (!posterEl) throw new Error("Poster tidak ditemukan.");
-    const posterUrl = posterEl.src;
+    // Render elemen #pages jadi PNG pakai html2canvas
+    const node = document.getElementById("pages");
+    const canvas = await html2canvas(node, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: null
+    });
+    const posterDataUrl = canvas.toDataURL("image/png");
 
-    // Kirim URL poster & audio ke backend Railway
+    // Kirim poster (base64) dan audio ke backend Railway
     const apiUrl = "https://mp4converter-production.up.railway.app/generate";
     const res = await fetch(apiUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ posterUrl, audioUrl })
+      body: JSON.stringify({ posterUrl: posterDataUrl, audioUrl })
     });
 
     if (!res.ok) throw new Error("Server gagal memproses MP4.");
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
 
+    // Auto-download MP4
     const a = document.createElement("a");
     a.href = url;
     a.download = `Poster-${surah}-${ayat}.mp4`;
@@ -1811,6 +1811,9 @@ async function applyMp4() {
   }
 }
 </script>
+
+  
+
 
 
 
