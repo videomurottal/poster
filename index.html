@@ -2,63 +2,120 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>WebM to MP4 Converter</title>
+  <title>Poster Murottal Generator + MP4 Converter</title>
   <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      padding: 2em;
-    }
-    input {
-      margin: 0.5em;
-      padding: 0.75em;
-      font-size: 1em;
-    }
-    #status {
-      margin-top: 1em;
-      font-weight: bold;
-    }
+    body { font-family: sans-serif; text-align: center; padding: 2em; }
+    canvas { border: 1px solid #ccc; display: block; margin: 1em auto; }
+    input, select, button { margin: 0.25em; padding: 0.5em; font-size: 1em; }
+    #status { font-weight: bold; margin-top: 1em; }
   </style>
 </head>
 <body>
-  <h1>🎥 WebM to MP4 Converter</h1>
-  <input type="file" id="webmInput" accept=".webm" onchange="upload(this.files[0])" />
-  <p id="status">Pilih file WebM untuk dikonversi otomatis</p>
+  <h1>Poster Murottal Video (WebM ➝ MP4 Otomatis)</h1>
+
+  <div>
+    <select id="qari">
+      <option value="AbdulSamad_64kbps_QuranExplorer.Com">Abdul Samad</option>
+      <option value="Abdul_Basit_Murattal_64kbps">Abdul Basit</option>
+      <option value="Mishari_Rashid_64kbps">Misyari Rasyid</option>
+    </select>
+    <input id="surah" value="001" placeholder="Surah (e.g. 001)" style="width:80px;">
+    <input id="ayah" value="001" placeholder="Ayat (e.g. 001)" style="width:80px;">
+    <br>
+    <input id="posterText" value="بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ" style="width:300px;">
+  </div>
+
+  <canvas id="posterCanvas" width="720" height="720"></canvas>
+  <button onclick="generateAndConvert()">🎞️ Buat Video & Convert ke MP4</button>
+
+  <p id="status">💡 Siap membuat video dari poster + audio...</p>
 
   <script>
-    async function upload(file) {
-      if (!file) return;
+    const canvas = document.getElementById("posterCanvas");
+    const ctx = canvas.getContext("2d");
 
-      const form = new FormData();
-      form.append("file", file);
+    function drawPoster() {
+      const text = document.getElementById("posterText").value;
+      ctx.fillStyle = "#222";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "white";
+      ctx.font = "40px serif";
+      ctx.textAlign = "center";
+      ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+    }
 
+    drawPoster();
+    document.getElementById("posterText").addEventListener("input", drawPoster);
+
+    async function generateAndConvert() {
+      drawPoster();
       const status = document.getElementById("status");
-      status.innerText = "⏳ Mengunggah dan memproses...";
+      const surah = document.getElementById("surah").value;
+      const ayah = document.getElementById("ayah").value;
+      const qari = document.getElementById("qari").value;
+      const mp3Url = `https://everyayah.com/data/${qari}/${surah}${ayah}.mp3`;
 
-      try {
-        const res = await fetch("https://mp4converter-production.up.railway.app/upload", {
-          method: "POST",
-          body: form
-        });
+      const stream = canvas.captureStream(30);
+      const audio = new Audio(mp3Url);
+      audio.crossOrigin = "anonymous";
 
-        if (!res.ok) {
-          status.innerText = "❌ Gagal mengunggah.";
+      const audioCtx = new AudioContext();
+      const source = audioCtx.createMediaElementSource(audio);
+      const dest = audioCtx.createMediaStreamDestination();
+      source.connect(dest);
+      source.connect(audioCtx.destination);
+
+      await audioCtx.resume();
+      const combined = new MediaStream([...stream.getTracks(), ...dest.stream.getAudioTracks()]);
+      const recorder = new MediaRecorder(combined);
+      const chunks = [];
+
+      recorder.ondataavailable = e => chunks.push(e.data);
+      recorder.onstop = async () => {
+        const blob = new Blob(chunks, { type: "video/webm" });
+        if (blob.size < 100) {
+          status.innerText = "❌ Gagal merekam. Coba ulangi.";
           return;
         }
 
-        const blob = await res.blob();
-        const url = URL.createObjectURL(blob);
+        status.innerText = "⏳ Mengunggah dan mengkonversi ke MP4...";
 
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = file.name.replace(/\.webm$/, ".mp4");
-        a.click();
+        const form = new FormData();
+        form.append("file", blob, `murottal_${surah}_${ayah}.webm`);
 
-        status.innerText = "✅ Konversi selesai. File terunduh.";
-      } catch (err) {
-        console.error(err);
-        status.innerText = "❌ Terjadi kesalahan saat mengunggah.";
-      }
+        try {
+          const res = await fetch("https://mp4converter-production.up.railway.app/upload", {
+            method: "POST",
+            body: form
+          });
+
+          if (!res.ok) {
+            status.innerText = "❌ Upload gagal.";
+            return;
+          }
+
+          const mp4Blob = await res.blob();
+          const url = URL.createObjectURL(mp4Blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `murottal_${surah}_${ayah}.mp4`;
+          a.click();
+
+          status.innerText = "✅ Konversi selesai. MP4 berhasil diunduh.";
+        } catch (err) {
+          console.error(err);
+          status.innerText = "❌ Error saat upload/konversi.";
+        }
+      };
+
+      audio.oncanplaythrough = () => {
+        audio.play();
+        recorder.start();
+      };
+
+      audio.onended = () => recorder.stop();
+
+      status.innerText = "🎥 Merekam video...";
     }
   </script>
 </body>
