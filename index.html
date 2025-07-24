@@ -1759,6 +1759,13 @@ toggleColorBtn.addEventListener("click", () => {
 
   
 <script>
+
+function toggleMp4Panel() {
+  const panel = document.getElementById("mp4Panel");
+  if (!panel) return;
+  panel.style.display = (panel.style.display === "none") ? "flex" : "none";
+}
+  
 async function applyMp4() {
   const qari = document.getElementById("mp4Qari").value;
   const surah = String(document.getElementById("surahSelect").value).padStart(3, '0');
