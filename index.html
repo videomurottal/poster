@@ -1,64 +1,135 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Gabungkan Video + Audio</title>
+  <meta charset="UTF-8" />
+  <title>Poster Murottal Generator (Fix + MP4)</title>
   <style>
-    body {
-      font-family: sans-serif;
-      background: #f7f7f7;
-      padding: 2rem;
-      max-width: 600px;
-      margin: auto;
-    }
-    input, button {
-      width: 100%;
-      padding: 0.75rem;
-      margin-top: 1rem;
-      font-size: 1rem;
-    }
-    #result {
-      margin-top: 2rem;
-      font-weight: bold;
-    }
+    body { font-family: sans-serif; text-align: center; padding: 2em; }
+    canvas { border: 1px solid #ccc; display: block; margin: 1em auto; }
+    input, select, button { margin: 0.25em; padding: 0.5em; font-size: 1em; }
+    #mp4Link { margin-top: 1em; display: none; }
   </style>
 </head>
 <body>
+  <h1>Poster Murottal Video Generator (Fix)</h1>
 
-  <h2>Gabungkan Video dan Audio (MP4 Converter)</h2>
+  <div>
+    <select id="qari">
+      <option value="AbdulSamad_64kbps_QuranExplorer.Com">Abdul Samad</option>
+      <option value="Abdul_Basit_Murattal_64kbps">Abdul Basit</option>
+      <option value="Mishari_Rashid_64kbps">Misyari Rasyid</option>
+    </select>
+    <input id="surah" value="001" placeholder="Surah (e.g. 001)" style="width:80px;">
+    <input id="ayah" value="001" placeholder="Ayat (e.g. 001)" style="width:80px;">
+    <br>
+    <input id="posterText" value="بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ" style="width:300px;">
+  </div>
 
-  <input type="url" id="videoUrl" placeholder="URL Video (tanpa audio)" required>
-  <input type="url" id="audioUrl" placeholder="URL Audio (mp3/m4a)" required>
+  <canvas id="posterCanvas" width="720" height="720"></canvas>
 
-  <button onclick="gabungkan()">🔁 Gabungkan Video + Audio</button>
+  <div>
+    <button onclick="generateVideo()">🎞️ Gabungkan & Download MP4</button>
+    <button onclick="downloadPoster()">🖼️ Download Poster PNG</button>
+    <button onclick="downloadMP3()">🎧 Download MP3</button>
+  </div>
 
-  <div id="result"></div>
+  <div id="mp4Link">
+    ✅ Berhasil! <a id="finalLink" href="#" download="murottal.mp4">⬇️ Download MP4</a>
+  </div>
 
   <script>
-    async function gabungkan() {
-      const video = document.getElementById("videoUrl").value.trim();
-      const audio = document.getElementById("audioUrl").value.trim();
-      const resultDiv = document.getElementById("result");
-      resultDiv.innerHTML = "⏳ Memproses...";
+    const canvas = document.getElementById("posterCanvas");
+    const ctx = canvas.getContext("2d");
 
-      try {
-        const baseUrl = "https://mp4converter.up.railway.app/convert";
-        const url = `${baseUrl}?video=${encodeURIComponent(video)}&audio=${encodeURIComponent(audio)}`;
-        
-        // Mulai fetch (trigger penggabungan)
-        const response = await fetch(url);
-        if (!response.ok) throw new Error("Gagal proses video");
+    function drawPoster() {
+      const text = document.getElementById("posterText").value;
+      ctx.fillStyle = "#222";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "white";
+      ctx.font = "40px serif";
+      ctx.textAlign = "center";
+      ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+    }
 
-        // Buat link download
-        resultDiv.innerHTML = `
-          ✅ Sukses! <br>
-          <a href="${url}" target="_blank" download>⬇️ Klik di sini untuk download MP4</a>
-        `;
-      } catch (err) {
-        resultDiv.innerHTML = "❌ Terjadi kesalahan: " + err.message;
-      }
+    drawPoster();
+    document.getElementById("posterText").addEventListener("input", drawPoster);
+
+    async function generateVideo() {
+      drawPoster();
+
+      const surah = document.getElementById("surah").value;
+      const ayah = document.getElementById("ayah").value;
+      const qari = document.getElementById("qari").value;
+      const mp3Url = `https://everyayah.com/data/${qari}/${surah}${ayah}.mp3`;
+
+      const stream = canvas.captureStream(30);
+      const audio = new Audio(mp3Url);
+      audio.crossOrigin = "anonymous";
+
+      const audioCtx = new AudioContext();
+      const source = audioCtx.createMediaElementSource(audio);
+      const dest = audioCtx.createMediaStreamDestination();
+      source.connect(dest);
+      source.connect(audioCtx.destination);
+
+      await audioCtx.resume();
+      const combined = new MediaStream([...stream.getTracks(), ...dest.stream.getAudioTracks()]);
+      const recorder = new MediaRecorder(combined);
+      const chunks = [];
+
+      recorder.ondataavailable = e => chunks.push(e.data);
+      recorder.onstop = async () => {
+        const blob = new Blob(chunks, { type: "video/webm" });
+
+        if (blob.size < 100) {
+          alert("❌ Gagal merekam. Coba ulangi.");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", blob, "video.webm");
+
+        // 🔗 GANTI INI DENGAN LINK Railway kamu
+        const backendURL = "https://YOUR_BACKEND_URL_HERE/upload";
+
+        const res = await fetch(backendURL, {
+          method: "POST",
+          body: formData
+        });
+
+        const json = await res.json();
+        const finalLink = document.getElementById("finalLink");
+        finalLink.href = backendURL.replace("/upload", "") + json.url;
+        finalLink.download = `murottal_${surah}_${ayah}.mp4`;
+        document.getElementById("mp4Link").style.display = "block";
+      };
+
+      audio.oncanplaythrough = () => {
+        audio.play();
+        recorder.start();
+      };
+
+      audio.onended = () => recorder.stop();
+    }
+
+    function downloadPoster() {
+      const link = document.createElement("a");
+      link.download = "poster.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    }
+
+    function downloadMP3() {
+      const surah = document.getElementById("surah").value;
+      const ayah = document.getElementById("ayah").value;
+      const qari = document.getElementById("qari").value;
+      const mp3Url = `https://everyayah.com/data/${qari}/${surah}${ayah}.mp3`;
+
+      const link = document.createElement("a");
+      link.href = mp3Url;
+      link.download = `${surah}${ayah}.mp3`;
+      link.click();
     }
   </script>
-
 </body>
 </html>
