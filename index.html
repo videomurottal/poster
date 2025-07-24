@@ -2,129 +2,63 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Poster Murottal Generator</title>
+  <title>WebM to MP4 Converter</title>
   <style>
-    body { font-family: sans-serif; text-align: center; padding: 2em; }
-    canvas { border: 1px solid #ccc; display: block; margin: 1em auto; }
-    input, select, button { margin: 0.25em; padding: 0.5em; font-size: 1em; }
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 2em;
+    }
+    input {
+      margin: 0.5em;
+      padding: 0.75em;
+      font-size: 1em;
+    }
+    #status {
+      margin-top: 1em;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
-  <h1>🎞️ Poster Murottal Generator</h1>
-
-  <div>
-    <select id="qari">
-      <option value="AbdulSamad_64kbps_QuranExplorer.Com">Abdul Samad</option>
-      <option value="Abdul_Basit_Murattal_64kbps">Abdul Basit</option>
-      <option value="Mishari_Rashid_64kbps">Misyari Rasyid</option>
-    </select>
-    <input id="surah" value="001" placeholder="Surah" style="width:80px;">
-    <input id="ayah" value="001" placeholder="Ayat" style="width:80px;">
-    <input id="posterText" value="بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ" style="width:300px;">
-  </div>
-
-  <canvas id="posterCanvas" width="720" height="720"></canvas>
-
-  <div>
-    <button onclick="downloadPoster()">🖼️ Poster PNG</button>
-    <button onclick="downloadMP3()">🎧 MP3</button>
-    <button onclick="generateAndUpload()">🎞️ Generate MP4</button>
-  </div>
-
-  <p id="status"></p>
+  <h1>🎥 WebM to MP4 Converter</h1>
+  <input type="file" id="webmInput" accept=".webm" onchange="upload(this.files[0])" />
+  <p id="status">Pilih file WebM untuk dikonversi otomatis</p>
 
   <script>
-    const canvas = document.getElementById("posterCanvas");
-    const ctx = canvas.getContext("2d");
+    async function upload(file) {
+      if (!file) return;
 
-    function drawPoster() {
-      const text = document.getElementById("posterText").value;
-      ctx.fillStyle = "#222";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "white";
-      ctx.font = "40px serif";
-      ctx.textAlign = "center";
-      ctx.fillText(text, canvas.width / 2, canvas.height / 2);
-    }
+      const form = new FormData();
+      form.append("file", file);
 
-    drawPoster();
-    document.getElementById("posterText").addEventListener("input", drawPoster);
-
-    function downloadPoster() {
-      const link = document.createElement("a");
-      link.download = "poster.png";
-      link.href = canvas.toDataURL("image/png");
-      link.click();
-    }
-
-    function downloadMP3() {
-      const surah = document.getElementById("surah").value;
-      const ayah = document.getElementById("ayah").value;
-      const qari = document.getElementById("qari").value;
-      const mp3Url = `https://everyayah.com/data/${qari}/${surah}${ayah}.mp3`;
-
-      const link = document.createElement("a");
-      link.href = mp3Url;
-      link.download = `${surah}${ayah}.mp3`;
-      link.click();
-    }
-
-    async function generateAndUpload() {
       const status = document.getElementById("status");
-      drawPoster();
+      status.innerText = "⏳ Mengunggah dan memproses...";
 
-      const surah = document.getElementById("surah").value;
-      const ayah = document.getElementById("ayah").value;
-      const qari = document.getElementById("qari").value;
-      const mp3Url = `https://everyayah.com/data/${qari}/${surah}${ayah}.mp3`;
+      try {
+        const res = await fetch("https://mp4converter-production.up.railway.app/upload", {
+          method: "POST",
+          body: form
+        });
 
-      const stream = canvas.captureStream(30);
-      const audio = new Audio(mp3Url);
-      audio.crossOrigin = "anonymous";
-
-      const audioCtx = new AudioContext();
-      const source = audioCtx.createMediaElementSource(audio);
-      const dest = audioCtx.createMediaStreamDestination();
-      source.connect(dest);
-      source.connect(audioCtx.destination);
-
-      await audioCtx.resume();
-      const combined = new MediaStream([...stream.getTracks(), ...dest.stream.getAudioTracks()]);
-      const recorder = new MediaRecorder(combined);
-      const chunks = [];
-
-      recorder.ondataavailable = e => chunks.push(e.data);
-      recorder.onstop = async () => {
-        const blob = new Blob(chunks, { type: "video/webm" });
-        if (blob.size < 100) {
-          alert("❌ Gagal merekam.");
-          return;
-        }
-
-        const form = new FormData();
-        form.append("file", blob, "murottal.webm");
-        status.innerText = "⏳ Upload ke server...";
-
-        const res = await fetch("/upload", { method: "POST", body: form });
         if (!res.ok) {
-          alert("❌ Upload gagal.");
+          status.innerText = "❌ Gagal mengunggah.";
           return;
         }
 
-        const mp4Blob = await res.blob();
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+
         const a = document.createElement("a");
-        a.href = URL.createObjectURL(mp4Blob);
-        a.download = `murottal_${surah}_${ayah}.mp4`;
+        a.href = url;
+        a.download = file.name.replace(/\.webm$/, ".mp4");
         a.click();
 
-        status.innerText = "✅ Selesai. MP4 diunduh.";
-      };
-
-      audio.oncanplaythrough = () => {
-        audio.play();
-        recorder.start();
-      };
-      audio.onended = () => recorder.stop();
+        status.innerText = "✅ Konversi selesai. File terunduh.";
+      } catch (err) {
+        console.error(err);
+        status.innerText = "❌ Terjadi kesalahan saat mengunggah.";
+      }
     }
   </script>
 </body>
