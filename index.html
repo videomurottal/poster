@@ -1759,9 +1759,6 @@ toggleColorBtn.addEventListener("click", () => {
 
   
 <script>
-const { createFFmpeg, fetchFile } = FFmpeg;
-const ffmpeg = createFFmpeg({ log: true });
-
 async function applyMp4() {
   const qari = document.getElementById("mp4Qari").value;
   const surah = String(document.getElementById("surahSelect").value).padStart(3, '0');
@@ -1773,21 +1770,20 @@ async function applyMp4() {
   loader.style.display = "flex";
 
   try {
-    // Ambil poster.png langsung dari halaman
-    const poster = document.querySelector("#posterImage") || document.querySelector("#pages img");
-    if (!poster) throw new Error("poster.png tidak ditemukan.");
-    const posterBlob = await fetch(poster.src).then(r => r.blob());
+    // Ambil URL poster langsung dari halaman
+    const posterEl = document.querySelector("#posterImage") || document.querySelector("#pages img");
+    if (!posterEl) throw new Error("Poster tidak ditemukan.");
+    const posterUrl = posterEl.src;
 
-    // Kirim ke backend Railway
-    const formData = new FormData();
-    formData.append("poster", posterBlob, "poster.png");
-    formData.append("audioUrl", audioUrl);
+    // Kirim URL poster & audio ke backend Railway
+    const apiUrl = "https://mp4converter-production.up.railway.app/generate";
+    const res = await fetch(apiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ posterUrl, audioUrl })
+    });
 
-    const apiUrl = "https://mp4converter.up.railway.app/generate"; // ganti dengan domain Railway
-    const res = await fetch(apiUrl, { method: "POST", body: formData });
-
-    if (!res.ok) throw new Error("Server API gagal, fallback ke browser.");
-
+    if (!res.ok) throw new Error("Server gagal memproses MP4.");
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
 
@@ -1799,47 +1795,10 @@ async function applyMp4() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    alert("✅ Video MP4 berhasil dibuat via server!");
-  } catch (err) {
-    console.warn("⚠️ Gagal via API, fallback ke browser FFmpeg:", err.message);
-    try {
-      // === Fallback ke metode lama (FFmpeg di browser) ===
-      const poster = document.getElementById("pages");
-      const canvas = await html2canvas(poster, { scale: 2 });
-      const posterBlob = await new Promise(res => canvas.toBlob(res, "image/png"));
-
-      const audioRes = await fetch(audioUrl);
-      if (!audioRes.ok) throw new Error("Audio tidak ditemukan.");
-      const audioBlob = await audioRes.blob();
-
-      if (!ffmpeg.isLoaded()) await ffmpeg.load();
-      ffmpeg.FS('writeFile', 'poster.png', await fetchFile(posterBlob));
-      ffmpeg.FS('writeFile', 'audio.mp3', await fetchFile(audioBlob));
-
-      await ffmpeg.run(
-        '-loop', '1', '-i', 'poster.png', '-i', 'audio.mp3',
-        '-c:v', 'libx264', '-tune', 'stillimage',
-        '-c:a', 'aac', '-b:a', '192k', '-shortest',
-        '-pix_fmt', 'yuv420p', 'output.mp4'
-      );
-
-      const data = ffmpeg.FS('readFile', 'output.mp4');
-      const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
-      const url = URL.createObjectURL(videoBlob);
-
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `Poster-${surah}-${ayat}.mp4`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      alert("✅ Video MP4 berhasil dibuat via browser fallback!");
-    } catch (fallbackErr) {
-      console.error("Gagal total membuat MP4:", fallbackErr);
-      alert("❌ Gagal membuat video MP4: " + fallbackErr.message);
-    }
+    alert("✅ Video MP4 berhasil dibuat!");
+  } catch (e) {
+    console.error(e);
+    alert("❌ Gagal membuat video: " + e.message);
   } finally {
     loader.style.display = "none";
   }
