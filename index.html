@@ -1126,40 +1126,69 @@ updateAyahDropdown(false).then(() => {
 <!-- Tambahkan ini di bagian <head> atau sebelum </body> -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.4/dist/ffmpeg.min.js"></script>
+
 
 <script>
-  const saveImageTrigger = document.getElementById("saveImageTrigger");
-
   saveImageTrigger.addEventListener("click", async () => {
   const node = document.getElementById("pages");
   const s = surahSelect.value;
   const a = ayahSelect.value;
   const surahName = surahList[s][0].replace(/[^a-zA-Z0-9]/g, "-");
-  const filename = `${surahName}-${a}.png`;
+  const filename = `${surahName}-${a}`;
 
-  // Tampilkan loader overlay
   const loader = document.getElementById("loaderOverlay");
   loader.style.display = "flex";
 
   try {
-    const scale = 4; // 💥 4x resolusi untuk hasil tajam
+    const scale = 4;
     const canvas = await html2canvas(node, {
       scale: scale,
       useCORS: true,
       allowTaint: true,
-      backgroundColor: null
+      backgroundColor: "#fff"
     });
 
-    // Konversi ke blob dengan kualitas maksimum
-    canvas.toBlob(blob => {
-      saveAs(blob, filename);
-    }, 'image/png', 1.0);
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png', 1.0));
+    const arrayBuffer = await blob.arrayBuffer();
+    const imageBytes = new Uint8Array(arrayBuffer);
 
+    // Ambil file MP3 dari input atau URL
+    const response = await fetch("audio.mp3"); // Ganti dengan path audio kamu
+    const audioBytes = new Uint8Array(await response.arrayBuffer());
+
+    // Inisialisasi FFmpeg
+    const { createFFmpeg, fetchFile } = FFmpeg;
+    const ffmpeg = createFFmpeg({ log: true });
+
+    if (!ffmpeg.isLoaded()) await ffmpeg.load();
+
+    ffmpeg.FS('writeFile', 'image.png', imageBytes);
+    ffmpeg.FS('writeFile', 'audio.mp3', audioBytes);
+
+    // Buat video dari gambar statis + audio
+    await ffmpeg.run(
+      '-loop', '1',
+      '-i', 'image.png',
+      '-i', 'audio.mp3',
+      '-c:v', 'libx264',
+      '-tune', 'stillimage',
+      '-c:a', 'aac',
+      '-b:a', '192k',
+      '-pix_fmt', 'yuv420p',
+      '-shortest',
+      `${filename}.mp4`
+    );
+
+    const data = ffmpeg.FS('readFile', `${filename}.mp4`);
+    const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
+
+    // Unduh file MP4
+    saveAs(videoBlob, `${filename}.mp4`);
   } catch (err) {
-    alert("❌ Gagal menyimpan gambar: " + err.message);
+    alert("❌ Gagal menyimpan video: " + err.message);
     console.error(err);
   } finally {
-    // Sembunyikan loader overlay
     loader.style.display = "none";
   }
 });
