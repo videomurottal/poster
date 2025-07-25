@@ -1154,7 +1154,7 @@ updateAyahDropdown(false).then(() => {
     const imageBytes = new Uint8Array(arrayBuffer);
 
     // Ambil file MP3 dari input atau URL
-    const response = await fetch("audio.mp3"); // Ganti dengan path audio kamu
+    const response = await fetch("https://everyayah.com/data/AbdulSamad_64kbps_QuranExplorer.Com/001001.mp3"); // Ganti dengan path audio kamu
     const audioBytes = new Uint8Array(await response.arrayBuffer());
 
     // Inisialisasi FFmpeg
