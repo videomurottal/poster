@@ -1124,82 +1124,76 @@ updateAyahDropdown(false).then(() => {
 </script>
 
 <!-- Tambahkan ini di bagian <head> atau sebelum </body> -->
+<!-- 1. Dependency -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.4/dist/ffmpeg.min.js"></script>
 
 
 <script>
-  // Global FFmpeg setup
-  const { createFFmpeg, fetchFile } = FFmpeg;
-  const ffmpeg = createFFmpeg({ log: true });
+  window.addEventListener("DOMContentLoaded", () => {
+    const { createFFmpeg, fetchFile } = FFmpeg;
+    const ffmpeg = createFFmpeg({ log: true });
 
-  const saveImageTrigger = document.getElementById("saveImageTrigger");
+    const saveImageTrigger = document.getElementById("saveImageTrigger");
 
-  saveImageTrigger.addEventListener("click", async () => {
-    const node = document.getElementById("pages");
-    const s = surahSelect.value;
-    const a = ayahSelect.value;
-    const surahName = surahList[s][0].replace(/[^a-zA-Z0-9]/g, "-");
-    const filename = `${surahName}-${a}`;
+    saveImageTrigger.addEventListener("click", async () => {
+      const node = document.getElementById("pages");
+      const s = surahSelect.value;
+      const a = ayahSelect.value;
+      const surahName = surahList[s][0].replace(/[^a-zA-Z0-9]/g, "-");
+      const filename = `${surahName}-${a}`;
 
-    const loader = document.getElementById("loaderOverlay");
-    loader.style.display = "flex";
+      const loader = document.getElementById("loaderOverlay");
+      loader.style.display = "flex";
 
-    try {
-      // Ambil tampilan sebagai PNG
-      const scale = 4;
-      const canvas = await html2canvas(node, {
-        scale: scale,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: "#fff"
-      });
+      try {
+        const scale = 4;
+        const canvas = await html2canvas(node, {
+          scale: scale,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: "#fff"
+        });
 
-      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png', 1.0));
-      const imageBytes = new Uint8Array(await blob.arrayBuffer());
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png', 1.0));
+        const imageBytes = new Uint8Array(await blob.arrayBuffer());
 
-      // Ambil audio MP3 (pastikan URL valid dan bisa diakses CORS)
-      const audioURL = "https://everyayah.com/data/AbdulSamad_64kbps_QuranExplorer.Com/001001.mp3";
-      const audioResponse = await fetch(audioURL);
-      const audioBytes = new Uint8Array(await audioResponse.arrayBuffer());
+        // Fetch audio file (pastikan ini bisa diakses & tidak kena CORS)
+        const audioURL = "https://everyayah.com/data/AbdulSamad_64kbps_QuranExplorer.Com/001001.mp3";
+        const audioResponse = await fetch(audioURL);
+        const audioBytes = new Uint8Array(await audioResponse.arrayBuffer());
 
-      // Muat ffmpeg jika belum
-      if (!ffmpeg.isLoaded()) {
-        await ffmpeg.load();
+        // Load FFmpeg
+        if (!ffmpeg.isLoaded()) await ffmpeg.load();
+
+        ffmpeg.FS('writeFile', 'image.png', imageBytes);
+        ffmpeg.FS('writeFile', 'audio.mp3', audioBytes);
+
+        await ffmpeg.run(
+          '-loop', '1',
+          '-i', 'image.png',
+          '-i', 'audio.mp3',
+          '-c:v', 'libx264',
+          '-tune', 'stillimage',
+          '-c:a', 'aac',
+          '-b:a', '192k',
+          '-pix_fmt', 'yuv420p',
+          '-shortest',
+          `${filename}.mp4`
+        );
+
+        const data = ffmpeg.FS('readFile', `${filename}.mp4`);
+        const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
+
+        saveAs(videoBlob, `${filename}.mp4`);
+      } catch (err) {
+        alert("❌ Gagal menyimpan video: " + err.message);
+        console.error(err);
+      } finally {
+        loader.style.display = "none";
       }
-
-      // Simpan file ke virtual FS
-      ffmpeg.FS('writeFile', 'image.png', imageBytes);
-      ffmpeg.FS('writeFile', 'audio.mp3', audioBytes);
-
-      // Proses gabungkan jadi video
-      await ffmpeg.run(
-        '-loop', '1',
-        '-i', 'image.png',
-        '-i', 'audio.mp3',
-        '-c:v', 'libx264',
-        '-tune', 'stillimage',
-        '-c:a', 'aac',
-        '-b:a', '192k',
-        '-pix_fmt', 'yuv420p',
-        '-shortest',
-        `${filename}.mp4`
-      );
-
-      // Ambil hasil video
-      const data = ffmpeg.FS('readFile', `${filename}.mp4`);
-      const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
-
-      // Simpan video ke perangkat
-      saveAs(videoBlob, `${filename}.mp4`);
-
-    } catch (err) {
-      alert("❌ Gagal menyimpan video: " + err.message);
-      console.error(err);
-    } finally {
-      loader.style.display = "none";
-    }
+    });
   });
 
 
