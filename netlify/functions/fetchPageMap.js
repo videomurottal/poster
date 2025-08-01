@@ -1,5 +1,3 @@
-// netlify/functions/fetchPageMap.js
-
 export async function handler(event, context) {
   const token = process.env.TOKEN_POSTER;
 
